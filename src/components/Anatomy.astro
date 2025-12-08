@@ -134,22 +134,28 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         .anatomy-grid {
             grid-template-columns: 1fr;
             text-align: center;
+            gap: 3rem; /* More space between items */
+        }
+
+        .visual-col {
+            order: -1; /* Image first */
+            margin-bottom: 2rem;
         }
 
         .left .label-item, .right .label-item {
             text-align: center;
             margin-bottom: 2rem;
+            padding: 0 1rem;
         }
 
+        /* Hide connecting lines on mobile */
         .left .label-item::after, .right .label-item::after {
-            display: none; /* Hide lines on mobile */
+            display: none;
         }
         
-        .visual-col {
-            order: -1; /* Image first on mobile */
-            margin-bottom: 2rem;
+        .exploded-img {
+            transform: scale(1);
+            max-width: 85%;
         }
-        
-        .exploded-img { max-width: 80%; margin: 0 auto; }
     }
 </style>

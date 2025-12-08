@@ -94,6 +94,23 @@ import Footer from '../components/Footer.astro';
         display: none; /* Hide standard separator, using flex gap instead */
     }
 
+    @media (max-width: 900px) {
+        .marquee-container {
+            transform: none; /* No tilt on mobile for clean stacking */
+            margin: 0 0 3rem 0; /* Reset margins to standard flow */
+            border-width: 2px;
+            padding: 0.8rem 0;
+            width: 100%;
+            left: 0;
+            margin-left: 0;
+        }
+
+        .marquee span {
+            font-size: 1.4rem; /* Smaller text */
+            margin: 0 1rem;
+        }
+    }
+
     @keyframes marquee {
         0% { transform: translateX(0); }
         100% { transform: translateX(-50%); }
