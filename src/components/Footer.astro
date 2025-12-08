@@ -1,3 +1,7 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
 <footer id="locations">
     <!-- Top Bar Call to Action -->
     <div class="footer-cta">
@@ -13,7 +17,7 @@
             <div class="footer-grid">
                 <!-- Brand Col -->
                 <div class="f-col brand-col">
-                    <img src="/logo.png" alt="Burgerium" class="f-logo">
+                    <img src={`${base}/logo.png`} alt="Burgerium" class="f-logo">
                     <p>Born in Calicut (1998).<br>Elevated in Chennai (2025).</p>
                     <div class="socials">
                         <a href="#"><i class="fab fa-instagram"></i></a>

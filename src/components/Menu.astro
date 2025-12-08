@@ -1,3 +1,7 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
 <section id="menu" class="menu-section">
     <div class="container">
         <div class="header-center">
@@ -14,10 +18,10 @@
                         <h3>Lava Cheese</h3>
                         <span class="price">₹260</span>
                     </div>
-                    <p>RS Puram's obsession. A volcano of cheese inside crispy chicken.</p>
+                    <p>RS Puram's obsession. A molten cheese core exploding inside a crispy chicken patty. Warning: Highly Addictive.</p>
                     <button class="order-btn">Order Now</button>
                 </div>
-                <img src="/peri_burger.png" alt="Lava Cheese" class="product-img float-slow">
+                <img src={`${base}/peri_burger.png`} alt="Lava Cheese" class="product-img float-slow">
             </div>
 
             <!-- Item 2: The Side -->
@@ -27,22 +31,22 @@
                         <h3>Cheesy Fries</h3>
                         <span class="price">₹140</span>
                     </div>
-                    <p>The Palakkad Legend. Drenched in liquid gold.</p>
+                    <p>The Palakkad Legend. Crispy golden shoestrings drowned in our secret rich cheese sauce.</p>
                 </div>
-                <img src="/feast.png" alt="Fries" class="product-img scale-hover">
+                <img src={`${base}/feast.png`} alt="Fries" class="product-img scale-hover">
             </div>
 
             <!-- Item 3: The Classic -->
             <div class="spotlight-card">
                 <div class="card-content">
                     <div class="card-header">
-                        <h3>Thousand Island</h3>
-                        <span class="price">₹230</span>
+                        <h3>Smoky BBQ Beef</h3>
+                        <span class="price">₹240</span>
                     </div>
-                    <p>The OG Classic with signature zest.</p>
+                    <p>Flame-grilled juicy beef patty, caramelized lux-onions, and our thick house BBQ glaze.</p>
                 </div>
                 <!-- Reusing burger image as placeholder for variety, user can upload specific image later if needed -->
-                <img src="/burger.png" alt="Burger" class="product-img scale-hover">
+                <img src={`${base}/burger.png`} alt="Burger" class="product-img scale-hover">
             </div>
         </div>
     </div>
@@ -201,3 +205,6 @@
         .spotlight-card { height: 350px; }
     }
 </style>
+---
+const base = import.meta.env.BASE_URL;
+---

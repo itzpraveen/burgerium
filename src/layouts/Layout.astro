@@ -6,15 +6,16 @@ interface Props {
 }
 
 const { title } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="Burgerium - Premium Cafe Experience by Burger Tree Brand" />
+		<meta name="description" content="Burgerium - The Burger Tree Legacy in Chennai. Signature Grilled Burgers, Homemade Buns & Premium Shakes." />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" href={`${base}/favicon.png`} />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
         <!-- Google Fonts -->

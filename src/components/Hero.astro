@@ -1,9 +1,13 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
 <section id="home" class="hero-wrapper">
     <!-- Dynamic Background -->
     <div class="bg-layer">
-        <video autoplay muted loop playsinline poster="/chennai_hero.png" class="bg-video">
+        <video autoplay muted loop playsinline poster={`${base}/chennai_hero.png`} class="bg-video">
             <!-- Fallback to image if no video, using the generated Chennai image with a parallax effect -->
-            <img src="/chennai_hero.png" alt="Atmosphere" class="parallax-img"> 
+            <img src={`${base}/chennai_hero.png`} alt="Atmosphere" class="parallax-img">
         </video>
         <div class="overlay"></div>
     </div>
@@ -12,17 +16,18 @@
         <!-- Text Content -->
         <div class="hero-text">
             <div class="badge-pill slide-in-1">
-                <span class="dot"></span> Now in Chennai
+                <span class="dot"></span> The Burger Tree Legacy • Now in Chennai
             </div>
             
             <h1 class="mega-title">
-                <span class="line slide-in-2">Taste The</span>
-                <span class="line text-gradient slide-in-3">Evolution</span>
+                <span class="line slide-in-2">A Legacy of</span>
+                <span class="line text-gradient slide-in-3">Flavor</span>
             </h1>
 
             <p class="hero-desc slide-in-4">
-                The legend from Calicut & Coimbatore has arrived. 
-                <b>Burgerium</b> isn't just a burger—it's a <i>lifestyle</i>.
+                From the heart of <b>Calicut (1998)</b> to the streets of <b>Coimbatore</b> & <b>Palakkad</b>. 
+                We bring our signature house-made buns and flame-grilled perfection to Chennai.
+                <b>Burgerium</b> is the evolution of a legend.
             </p>
 
             <div class="cta-box slide-in-5">
@@ -36,7 +41,7 @@
         <div class="hero-visual">
             <div class="circle-bg pulse-anim"></div>
             <!-- Floating Burger with interaction -->
-            <img src="/peri_burger.png" alt="Lava Cheese Burger" class="hero-burger float-anim tilt-element">
+        <img src={`${base}/peri_burger.png`} alt="Lava Cheese Burger" class="hero-burger float-anim tilt-element">
             
             <div class="float-card glass-card">
                 <span class="emoji">🔥</span>

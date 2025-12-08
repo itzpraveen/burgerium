@@ -1,10 +1,14 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
 <nav class="navbar">
     <div class="container nav-content">
         <!-- Logo Section -->
         <a href="#home" class="brand-wrapper">
             <!-- Brand Mark Box -->
             <div class="logo-box">
-                <img src="/logo.png" alt="Burgerium" />
+                <img src={`${base}/logo.png`} alt="Burgerium" />
             </div>
         </a>
 
@@ -53,7 +57,7 @@
     }
 
     .logo-box img {
-        height: 48px;
+        height: 90px; /* Significantly larger for brand impact */
         width: auto;
         /* Ensure distinct visibility */
         filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));

@@ -5,4 +5,5 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   // Update if repo/owner changes
   site: 'https://itzpraveen.github.io/burgerium',
+  base: '/burgerium',
 });

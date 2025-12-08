@@ -1,10 +1,14 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
 <section id="about" class="section-padding about-section">
     <div class="container">
         <div class="grid-layout">
             <!-- Left: Visual Stack -->
             <div class="visual-col reveal">
                 <div class="img-frame">
-                    <img src="/bg.png" alt="Cafe Interior" class="main-img">
+                    <img src={`${base}/bg.png`} alt="Cafe Interior" class="main-img">
                     <div class="stat-box">
                         <span class="stat-num">25+</span>
                         <span class="stat-label">Years of <br>Legacy</span>
@@ -18,16 +22,17 @@
                 <h2 class="section-title">From <span class="text-orange">Roots</span> to <span class="text-orange">Revolution</span></h2>
                 
                 <p class="story-text">
-                    What started in 1998 as a humble passion in <b>Calicut</b> has grown into a South Indian phenomenon. 
-                    <b>Burger Tree</b> built its legacy in <b>Coimbatore (Peelamedu)</b> and <b>Palakkad</b> on one simple promise: 
-                    <i>Real food, made with love.</i>
+                    It started in <b>1998</b> with a simple dream in <b>Calicut</b>: to serve burgers that feel like home. 
+                    <b>The Burger Tree</b> became a cult favorite in <b>Coimbatore (Peelamedu & RS Puram)</b> and <b>Palakkad</b> for its 
+                    freshly baked house-made buns and juicy, flame-grilled patties.
+                    <i>Real food, made with love, served with pride.</i>
                 </p>
 
                 <div class="timeline-box">
                     <div class="timeline-step">
                         <div class="step-icon old-logo">
                             <!-- Placeholder for Old Logo Img or stylized text -->
-                            <img src="/burgertree_logo.png" alt="1998">
+                        <img src={`${base}/burgertree_logo.png`} alt="1998">
                         </div>
                         <div class="step-info">
                             <h4>The Roots</h4>
@@ -39,7 +44,7 @@
                     
                     <div class="timeline-step">
                         <div class="step-icon new-logo">
-                            <img src="/logo.png" alt="2025">
+                        <img src={`${base}/logo.png`} alt="2025">
                         </div>
                         <div class="step-info">
                             <h4>The Future</h4>
