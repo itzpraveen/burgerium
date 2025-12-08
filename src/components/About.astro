@@ -185,7 +185,19 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     }
 
     @media (max-width: 900px) {
-        .grid-layout { grid-template-columns: 1fr; }
-        .timeline-box { width: 100%; justify-content: space-between; }
+        .grid-layout { grid-template-columns: 1fr; gap: 3rem; }
+        
+        .img-frame { height: 300px; margin-bottom: 2rem; }
+        .main-img { height: 100%; object-fit: cover; }
+        
+        .timeline-box { 
+            width: 100%; 
+            justify-content: space-between; 
+            padding: 1.5rem;
+        }
+        
+        .connector-line { width: 30px; margin: 0 0.5rem; }
+        
+        .section-title { font-size: 2.2rem; }
     }
 </style>
