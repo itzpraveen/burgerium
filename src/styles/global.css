@@ -1,22 +1,15 @@
 :root {
-    --bg-color: #0c0c0e;
-    --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-    --accent-orange: #FAA227;
-    /* User specified Brand Orange */
-    --accent-gold: #FAA227;
-    --accent-cream: #ffe4c4;
-
-    --glass-bg: rgba(25, 25, 28, 0.6);
-    --glass-border: rgba(250, 162, 39, 0.2);
-    /* #FAA227 alpha 0.2 */
-    --glass-highlight: rgba(250, 162, 39, 0.1);
+    --bg-dark: #0a0a0a;
+    --bg-card: #141414;
+    --brand-orange: #FAA227;
+    --text-white: #ffffff;
+    --text-gray: #a1a1aa;
 
     --font-heading: 'Anton', sans-serif;
-    /* Matching the wordmark style */
     --font-body: 'Outfit', sans-serif;
 
-    --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    --container-width: 1280px;
+    --header-height: 80px;
 }
 
 * {
@@ -25,39 +18,31 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
-    background-color: var(--bg-color);
-    color: var(--text-primary);
+    background-color: var(--bg-dark);
+    color: var(--text-white);
     font-family: var(--font-body);
     line-height: 1.6;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
 h1,
 h2,
 h3,
-h4 {
+h4,
+h5,
+h6 {
     font-family: var(--font-heading);
-    font-weight: 700;
-    color: var(--text-primary);
     text-transform: uppercase;
+    font-weight: 400;
+    /* Anton is naturally bold */
     letter-spacing: 1px;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
-    transition: var(--transition);
-}
-
-a:focus-visible,
-button:focus-visible {
-    outline: 2px solid var(--accent-orange);
-    outline-offset: 3px;
-}
-
-ul {
-    list-style: none;
+    line-height: 1;
 }
 
 img {
@@ -65,134 +50,101 @@ img {
     display: block;
 }
 
-/* Utils */
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: 0.3s ease;
+}
+
 .container {
-    max-width: 1200px;
+    max-width: var(--container-width);
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 1.5rem;
 }
 
 .section-padding {
-    padding: clamp(4rem, 5vw, 6rem) 0;
+    padding: 8rem 0;
 }
 
-.text-gradient {
-    color: var(--accent-orange);
-    background: none;
-    -webkit-text-fill-color: initial;
-    text-shadow: 0 0 20px rgba(250, 162, 39, 0.3);
+/* Typography Utils */
+.display-text {
+    font-size: clamp(3.5rem, 8vw, 6rem);
+    color: var(--text-white);
+}
+
+.section-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: 2rem;
+}
+
+.text-orange {
+    color: var(--brand-orange);
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: rgba(250, 162, 39, 0.1);
+    color: var(--brand-orange);
+    border: 1px solid var(--brand-orange);
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1.5rem;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .btn-primary {
-    display: inline-block;
-    padding: 1rem 2.5rem;
-    background: var(--accent-orange);
-    color: #000000;
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 500;
-    border-radius: 4px;
-    /* Squarer buttons for industrial look */
-    box-shadow: 0 10px 30px rgba(250, 162, 39, 0.2);
-    border: none;
-    cursor: pointer;
+    background: var(--brand-orange);
+    color: #000;
 }
 
 .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(250, 162, 39, 0.4);
-    background: #ffb043;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(250, 162, 39, 0.4);
 }
 
-.btn-secondary {
-    display: inline-block;
-    padding: 1rem 2.5rem;
+.btn-outline {
+    border: 1px solid rgba(255, 255, 255, 0.2);
     background: transparent;
-    border: 1px solid var(--glass-border);
-    color: var(--text-primary);
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 500;
-    border-radius: 4px;
-    margin-left: 1rem;
-    cursor: pointer;
+    color: var(--text-white);
 }
 
-.btn-secondary:hover {
-    background: var(--glass-highlight);
-    border-color: var(--accent-orange);
+.btn-outline:hover {
+    border-color: var(--brand-orange);
+    color: var(--brand-orange);
 }
 
-/* Card Style (Industrial) */
-.glass {
-    background: rgba(20, 20, 23, 0.95);
-    border: 1px solid rgba(250, 162, 39, 0.15);
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
-}
-
-.glass:hover {
-    border-color: var(--accent-orange);
-}
-
-/* Animations */
-.fade-in-up {
+/* Utility Animations */
+.reveal {
     opacity: 0;
     transform: translateY(30px);
-    animation: fadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes fadeInUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.scroll-reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-.scroll-reveal.active {
+.reveal.active {
     opacity: 1;
     transform: translateY(0);
 }
 
-.delay-1 {
-    transition-delay: 0.1s;
-}
-
-.delay-2 {
-    transition-delay: 0.2s;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-    .container {
-        padding: 0 1.5rem;
-    }
-}
-
-@media (max-width: 600px) {
-    :root {
-        --section-padding: 4rem 0;
-    }
-
-    .container {
-        padding: 0 1rem;
-    }
-
-    h1 {
-        font-size: 3rem !important;
-    }
-
-    h2 {
-        font-size: 2.2rem !important;
+@media (max-width: 768px) {
+    .section-padding {
+        padding: 5rem 0;
     }
 }

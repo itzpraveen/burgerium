@@ -2,4 +2,7 @@
 import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
-export default defineConfig({});
+export default defineConfig({
+  // Update if repo/owner changes
+  site: 'https://itzpraveen.github.io/burgerium',
+});
