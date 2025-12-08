@@ -1,0 +1,120 @@
+---
+---
+
+<section class="reviews-section">
+    <div class="container">
+        <h2 class="section-title center">Voices from the <span class="text-orange">South</span></h2>
+        
+        <div class="reviews-grid">
+            <!-- Review 1 -->
+            <div class="review-card scroll-reveal">
+                <div class="stars">★★★★★</div>
+                <p class="review-text">"Hands down the best burger in Coimbatore. The bun is so soft it melts, and the beef patty is just... perfection."</p>
+                <div class="reviewer">
+                    <div class="avatar">A</div>
+                    <div class="details">
+                        <strong>Arjun Nair</strong>
+                        <small>Peelamedu Regular</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review 2 -->
+            <div class="review-card scroll-reveal delay-100">
+                <div class="stars">★★★★★</div>
+                <p class="review-text">"I drive from Palakkad just for the Loaded Fries and Lava Cheese. Worth every kilometer. Can't wait for Chennai!"</p>
+                <div class="reviewer">
+                    <div class="avatar">D</div>
+                    <div class="details">
+                        <strong>Divya S.</strong>
+                        <small>Food Blogger</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review 3 -->
+            <div class="review-card scroll-reveal delay-200">
+                <div class="stars">★★★★★</div>
+                <p class="review-text">"Finally, a real burger place. No frozen patties, just fresh meat and great vibes. The legacy is real."</p>
+                <div class="reviewer">
+                    <div class="avatar">R</div>
+                    <div class="details">
+                        <strong>Rahul Krishnan</strong>
+                        <small>RS Puram Fan</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .reviews-section {
+        padding: 5rem 0;
+        background: url('/burgerium/bg.png') center/cover fixed no-repeat;
+        position: relative;
+    }
+
+    .reviews-section::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.85); /* Dark overlay */
+    }
+
+    .section-title {
+        position: relative;
+        z-index: 2;
+        margin-bottom: 4rem;
+        text-align: center;
+    }
+
+    .reviews-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .review-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        padding: 2rem;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stars {
+        color: var(--brand-orange);
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .review-text {
+        color: #ddd;
+        font-style: italic;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+        min-height: 80px;
+    }
+
+    .reviewer {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .avatar {
+        width: 40px; height: 40px;
+        background: var(--brand-orange);
+        color: #000;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+    }
+
+    .details strong { display: block; color: #fff; }
+    .details small { color: #888; }
+</style>
