@@ -1,46 +1,48 @@
-<section id="home" class="hero-section">
-    <!-- Visual Layer -->
-    <div class="hero-visual">
-        <img src="/chennai_hero.png" alt="Chennai Crowd at Burgerium" class="hero-img">
-        <div class="gradient-overlay"></div>
+<section id="home" class="hero-wrapper">
+    <!-- Dynamic Background -->
+    <div class="bg-layer">
+        <video autoplay muted loop playsinline poster="/chennai_hero.png" class="bg-video">
+            <!-- Fallback to image if no video, using the generated Chennai image with a parallax effect -->
+            <img src="/chennai_hero.png" alt="Atmosphere" class="parallax-img"> 
+        </video>
+        <div class="overlay"></div>
     </div>
 
-    <!-- Content Layer -->
-    <div class="container hero-container">
-        <div class="hero-content reveal">
-            <div class="hero-badges">
-                <span class="badge">Est. 1998</span>
-                <span class="badge" style="background:var(--text-white); color:#000; border:none;">Chennai Launch</span>
+    <div class="container hero-grid">
+        <!-- Text Content -->
+        <div class="hero-text">
+            <div class="badge-pill slide-in-1">
+                <span class="dot"></span> Now in Chennai
             </div>
             
-            <h1 class="display-text">
-                The Legend <br>
-                <span class="text-stroke">Has Arrived.</span>
+            <h1 class="mega-title">
+                <span class="line slide-in-2">Taste The</span>
+                <span class="line text-gradient slide-in-3">Evolution</span>
             </h1>
-            
-            <p class="hero-sub">
-                From the roots of <b>Burger Tree</b> (Calicut • Coimbatore • Palakkad) comes an elevated dining experience. 
-                Welcome to <span class="text-orange">Burgerium</span>.
+
+            <p class="hero-desc slide-in-4">
+                The legend from Calicut & Coimbatore has arrived. 
+                <b>Burgerium</b> isn't just a burger—it's a <i>lifestyle</i>.
             </p>
-            
-            <div class="cta-group">
-                <a href="#menu" class="btn btn-primary">
-                    Explore Menu <i class="fas fa-arrow-right"></i>
-                </a>
-                <a href="#about" class="btn btn-outline">
-                    Our Roots
+
+            <div class="cta-box slide-in-5">
+                <a href="#menu" class="btn-primary">
+                    See The Menu <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </div>
 
-        <!-- Floating Feature Card -->
-        <div class="hero-feature reveal delay-200">
-            <div class="product-card">
-                <img src="/peri_burger.png" alt="Signature Peri Peri" class="burger-float">
-                <div class="card-meta">
-                    <span class="meta-label">Must Try</span>
-                    <h4>Lava Cheese Peri Peri</h4>
-                    <span class="meta-city">Coimbatore Favorite</span>
+        <!-- 3D Featured Product -->
+        <div class="hero-visual">
+            <div class="circle-bg pulse-anim"></div>
+            <!-- Floating Burger with interaction -->
+            <img src="/peri_burger.png" alt="Lava Cheese Burger" class="hero-burger float-anim tilt-element">
+            
+            <div class="float-card glass-card">
+                <span class="emoji">🔥</span>
+                <div class="card-text">
+                    <strong>Lava Cheese</strong>
+                    <small>Best Seller</small>
                 </div>
             </div>
         </div>
@@ -48,129 +50,162 @@
 </section>
 
 <style>
-    .hero-section {
+    .hero-wrapper {
         position: relative;
         height: 100vh;
         min-height: 700px;
         display: flex;
         align-items: center;
         overflow: hidden;
-        padding-top: var(--header-height);
     }
 
-    .hero-visual {
+    /* Background handling */
+    .bg-layer {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        top: 0; left: 0; width: 100%; height: 100%;
         z-index: -1;
     }
 
-    .hero-img {
-        width: 100%;
-        height: 100%;
+    .parallax-img {
+        width: 100%; height: 100%;
         object-fit: cover;
-        /* Slight zoom effect animation could go here */
+        transform: scale(1.1); /* Zoomed in for parallax room */
+        filter: brightness(0.4);
     }
 
-    .gradient-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle at 70% 50%, rgba(0,0,0,0.4), var(--bg-dark) 90%);
+    .overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 100%);
     }
 
-    .hero-container {
+    .hero-grid {
         display: grid;
         grid-template-columns: 1.2fr 0.8fr;
         align-items: center;
         width: 100%;
+        padding-top: 80px; /* Header offset */
     }
 
-    .hero-content {
-        max-width: 700px;
+    /* Text Animations */
+    .mega-title {
+        font-size: clamp(4rem, 8vw, 7rem);
+        line-height: 0.9;
+        margin-bottom: 2rem;
+        color: #fff;
     }
 
-    .hero-badges {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .text-stroke {
-        -webkit-text-stroke: 2px var(--brand-orange);
+    .mega-title .line { display: block; }
+    
+    .text-gradient {
+        background: linear-gradient(to right, #fff, var(--brand-orange));
+        -webkit-background-clip: text;
         color: transparent;
-        font-weight: 700;
     }
 
-    .hero-sub {
-        font-size: 1.25rem;
-        opacity: 0.9;
-        margin: 2rem 0;
-        max-width: 500px;
-        border-left: 3px solid var(--brand-orange);
-        padding-left: 1.5rem;
-    }
-
-    .cta-group {
-        display: flex;
-        gap: 1.5rem;
-    }
-
-    /* Product Feature Card */
-    .product-card {
-        position: relative;
-        background: rgba(20,20,20,0.8);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(255,255,255,0.1);
-        padding: 2rem;
-        border-radius: 20px;
-        text-align: center;
-        transform: rotate(-3deg);
-        transition: 0.4s ease;
-    }
-
-    .product-card:hover {
-        transform: rotate(0) scale(1.02);
-        border-color: var(--brand-orange);
-    }
-
-    .burger-float {
-        width: 280px;
-        margin: -4rem auto 1rem;
-        filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
-    }
-
-    .card-meta h4 {
-        font-size: 1.5rem;
-        color: var(--text-white);
-        margin: 0.5rem 0;
-    }
-
-    .meta-label {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: var(--brand-orange);
-        font-weight: 700;
-    }
-
-    .meta-city {
+    .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        padding: 8px 16px;
+        border-radius: 50px;
         font-size: 0.9rem;
-        color: var(--text-gray);
-        font-style: italic;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(5px);
     }
 
-    @media (max-width: 968px) {
-        .hero-container { grid-template-columns: 1fr; text-align: center; }
-        .hero-content { margin: 0 auto; }
-        .hero-badges { justify-content: center; }
-        .hero-sub { margin: 2rem auto; border: none; padding: 0; }
-        .cta-group { justify-content: center; }
-        .hero-feature { display: none; /* Hide floating burger on mobile for cleanliness */ }
-        .gradient-overlay { background: rgba(0,0,0,0.7); }
+    .dot {
+        width: 8px; height: 8px;
+        background: var(--brand-orange);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--brand-orange);
+        animation: blink 2s infinite;
+    }
+
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    .hero-desc {
+        font-size: 1.25rem;
+        color: #ccc;
+        max-width: 500px;
+        margin-bottom: 3rem;
+        line-height: 1.6;
+    }
+
+    /* Staggered Entrance */
+    .slide-in-1 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.1s; }
+    .slide-in-2 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.3s; }
+    .slide-in-3 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.5s; }
+    .slide-in-4 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.7s; }
+    .slide-in-5 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.9s; }
+
+    /* Visual Side */
+    .hero-visual {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .circle-bg {
+        position: absolute;
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(250,162,39,0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        z-index: -1;
+        animation: pulse-glow 4s infinite ease-in-out;
+    }
+
+    .hero-burger {
+        width: 120%; /* Large overflow */
+        max-width: 600px;
+        filter: drop-shadow(0 30px 50px rgba(0,0,0,0.6));
+        transform-origin: center center;
+    }
+
+    .float-card {
+        position: absolute;
+        bottom: 10%; right: 0;
+        background: rgba(20,20,20,0.8);
+        border: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 1rem 1.5rem;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        animation: float 5s ease-in-out infinite reverse;
+    }
+
+    .float-card .emoji { font-size: 2rem; }
+    .float-card strong { display: block; color: var(--brand-orange); font-size: 1.1rem; }
+    .float-card small { color: #888; text-transform: uppercase; font-size: 0.7rem; }
+
+    @media (max-width: 900px) {
+        .hero-grid { grid-template-columns: 1fr; text-align: center; }
+        .hero-desc { margin: 0 auto 2rem; }
+        .hero-visual { margin-top: 3rem; }
+        .hero-burger { width: 90%; max-width: 350px; }
+        .mega-title { font-size: 3.5rem; }
+        .slide-in-1, .slide-in-2, .slide-in-3, .slide-in-4, .slide-in-5 { opacity: 1; animation: none; } /* Simplify mobile */
     }
 </style>
+
+<script>
+    // Parallax Effect for Background and Burger
+    document.addEventListener('mousemove', (e) => {
+        const x = (window.innerWidth - e.pageX * 2) / 100;
+        const y = (window.innerHeight - e.pageY * 2) / 100;
+
+        const burger = document.querySelector('.hero-burger');
+        // @ts-ignore
+        if(burger) burger.style.transform = `translateX(${x}px) translateY(${y}px)`;
+        
+        const card = document.querySelector('.float-card');
+        // @ts-ignore
+        if(card) card.style.transform = `translateX(${-x}px) translateY(${-y}px)`;
+    });
+</script>

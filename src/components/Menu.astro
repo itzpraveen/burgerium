@@ -1,208 +1,203 @@
----
----
-<section id="menu" class="menu-preview section-padding">
+<section id="menu" class="menu-section">
     <div class="container">
-        <div class="section-header center-text scroll-reveal">
-            <span class="section-tag">Curated Favorites</span>
-            <h2>The Highlights</h2>
+        <div class="header-center">
+            <span class="sub-head">Taste The Hype</span>
+            <h2 class="title-head">Crowd <span class="text-stroke">Favorites</span></h2>
         </div>
-        
-        <div class="menu-grid">
-            <!-- Item 1 -->
-            <div class="menu-card glass scroll-reveal">
-                <div class="card-image">
-                    <img src="/peri_burger.png" alt="Lava Cheese Chicken" loading="lazy">
-                </div>
-                <div class="card-info">
+
+        <div class="spotlight-grid">
+            <!-- Item 1: The Star -->
+            <div class="spotlight-card featured">
+                <div class="card-bg"></div>
+                <div class="card-content">
                     <div class="card-header">
-                        <h3>Lava Cheese Chicken</h3>
+                        <h3>Lava Cheese</h3>
                         <span class="price">₹260</span>
                     </div>
-                    <p class="description"><b>Coimbatore's Cult Favorite (RS Puram).</b> A molten core of cheese inside a juicy chicken patty. Warning: Highly Addictive.</p>
-                    <button class="btn-text">Order Now <i class="fas fa-arrow-right"></i></button>
+                    <p>RS Puram's obsession. A volcano of cheese inside crispy chicken.</p>
+                    <button class="order-btn">Order Now</button>
                 </div>
+                <img src="/peri_burger.png" alt="Lava Cheese" class="product-img float-slow">
             </div>
 
-            <!-- Item 2 -->
-            <div class="menu-card glass scroll-reveal delay-1">
-                <div class="card-image">
-                    <!-- Using the feast image to represent sides/fries -->
-                    <img src="/feast.png" alt="Cheesy Fries Spread" style="object-position: center;" loading="lazy"> 
-                </div>
-                <div class="card-info">
+            <!-- Item 2: The Side -->
+            <div class="spotlight-card">
+                <div class="card-content">
                     <div class="card-header">
-                        <h3>Cheesy French Fries</h3>
+                        <h3>Cheesy Fries</h3>
                         <span class="price">₹140</span>
                     </div>
-                    <p class="description"><b>The Palakkad Legend (Stadium Bypass).</b> Crispy shoestring fries drowned in our secret house-made liquid gold cheese sauce.</p>
-                    <button class="btn-text">Order Now <i class="fas fa-arrow-right"></i></button>
+                    <p>The Palakkad Legend. Drenched in liquid gold.</p>
                 </div>
+                <img src="/feast.png" alt="Fries" class="product-img scale-hover">
             </div>
 
-            <!-- Item 3 -->
-            <div class="menu-card glass scroll-reveal delay-2">
-                <div class="card-image">
-                     <!-- Retaining original burger image for variety -->
-                    <img src="/burger.png" alt="Thousand Island Burger" style="filter: brightness(1.1);" loading="lazy">
-                </div>
-                <div class="card-info">
+            <!-- Item 3: The Classic -->
+            <div class="spotlight-card">
+                <div class="card-content">
                     <div class="card-header">
                         <h3>Thousand Island</h3>
                         <span class="price">₹230</span>
                     </div>
-                    <p class="description"><b>The OG Classic.</b> Grilled supreme patty slathered in our signature zesty Thousand Island dressing.</p>
-                    <button class="btn-text">Order Now <i class="fas fa-arrow-right"></i></button>
+                    <p>The OG Classic with signature zest.</p>
                 </div>
-            </div>
-        </div>
-        <div class="menu-cta glass scroll-reveal delay-1">
-            <div>
-                <p class="eyebrow">Craving more?</p>
-                <h3>Full menu available in-store & for pickup.</h3>
-                <p class="muted">Call ahead to reserve a table or pre-order your favorites.</p>
-            </div>
-            <div class="menu-cta-actions">
-                <a class="btn-primary" href="#contact">Reserve Table</a>
-                <a class="btn-secondary" href="tel:+916362006008">Call 6362 006 008</a>
+                <!-- Reusing burger image as placeholder for variety, user can upload specific image later if needed -->
+                <img src="/burger.png" alt="Burger" class="product-img scale-hover">
             </div>
         </div>
     </div>
 </section>
 
 <style>
-    .menu-preview {
-        background: radial-gradient(circle at top right, #1a1a20 0%, var(--bg-color) 40%);
+    .menu-section {
+        background: #080808;
+        padding: 8rem 0;
+        overflow: hidden;
     }
 
-    .center-text {
+    .header-center {
         text-align: center;
-        margin-bottom: 4rem;
+        margin-bottom: 5rem;
     }
 
-    .center-text h2 {
-        font-size: 3rem;
+    .sub-head {
+        color: var(--brand-orange);
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-size: 0.9rem;
+        display: block;
+        margin-bottom: 1rem;
     }
 
-    .menu-grid {
+    .title-head {
+        font-size: 3.5rem;
+        color: #fff;
+    }
+
+    .text-stroke {
+        -webkit-text-stroke: 1px #fff;
+        color: transparent;
+    }
+
+    /* Grid Layout */
+    .spotlight-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: 1.5fr 1fr 1fr;
+        grid-template-rows: 400px;
         gap: 2rem;
     }
 
-    .menu-card {
+    /* Card Styling */
+    .spotlight-card {
+        position: relative;
+        background: #111;
         border-radius: 20px;
-        overflow: hidden;
-        transition: var(--transition);
-        border: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .menu-card:hover {
-        transform: translateY(-10px);
-        border-color: var(--accent-gold);
-    }
-
-    .card-image {
-        height: 250px;
-        overflow: hidden;
-    }
-
-    .card-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.6s ease;
-    }
-
-    .menu-card:hover .card-image img {
-        transform: scale(1.1);
-    }
-
-    .card-info {
         padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.05);
+        transition: 0.4s;
+    }
+
+    .spotlight-card:hover {
+        border-color: var(--brand-orange);
+        transform: translateY(-5px);
+    }
+
+    .spotlight-card.featured {
+        background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    }
+
+    .card-bg {
+        position: absolute;
+        top: 0; right: 0;
+        width: 300px; height: 300px;
+        background: radial-gradient(circle, rgba(250,162,39,0.2) 0%, transparent 70%);
+        border-radius: 50%;
+        transform: translate(30%, -30%);
     }
 
     .card-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
         margin-bottom: 1rem;
+        z-index: 2;
+        position: relative;
     }
 
     .card-header h3 {
-        font-size: 1.4rem;
-        font-family: var(--font-heading);
+        font-size: 1.8rem;
+        max-width: 150px;
+        line-height: 1;
     }
 
     .price {
+        font-family: var(--font-body);
         font-weight: 700;
-        color: var(--accent-gold);
+        color: var(--brand-orange);
         font-size: 1.2rem;
     }
 
-    .description {
-        color: var(--text-secondary);
-        margin-bottom: 1.5rem;
-        font-size: 0.95rem;
+    .spotlight-card p {
+        color: #888;
+        font-size: 1rem;
+        z-index: 2;
+        position: relative;
+        max-width: 60%;
     }
 
-    .btn-text {
-        background: none;
+    .order-btn {
+        background: #fff;
+        color: #000;
         border: none;
-        color: var(--text-primary);
-        font-weight: 600;
+        padding: 0.8rem 1.5rem;
+        border-radius: 30px;
+        font-weight: 700;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        margin-top: 1.5rem;
+        width: fit-content;
         transition: 0.3s;
+        z-index: 2;
+        position: relative;
     }
 
-    .btn-text:hover {
-        color: var(--accent-gold);
-        gap: 0.8rem;
+    .order-btn:hover {
+        background: var(--brand-orange);
+        box-shadow: 0 0 15px rgba(250,162,39,0.5);
     }
 
-    .menu-cta {
-        margin-top: 3rem;
-        padding: 1.8rem 2rem;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1.5rem;
-        border: 1px solid rgba(255,255,255,0.05);
+    /* Image Handling */
+    .product-img {
+        position: absolute;
+        bottom: -20px;
+        right: -20px;
+        width: 280px;
+        transition: 0.5s ease;
+        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
     }
 
-    .menu-cta h3 {
-        margin-bottom: 0.4rem;
-        font-size: 1.6rem;
+    .spotlight-card.featured .product-img {
+        width: 380px;
+        right: -50px;
+        bottom: -50px;
     }
 
-    .muted {
-        color: var(--text-secondary);
+    .spotlight-card:hover .product-img {
+        transform: scale(1.1) rotate(-5deg);
     }
 
-    .eyebrow {
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        color: var(--text-secondary);
+    .float-slow {
+        animation: float 6s ease-in-out infinite;
     }
 
-    .menu-cta-actions {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
-
-    @media (max-width: 700px) {
-        .menu-cta {
-            flex-direction: column;
-            align-items: flex-start;
+    @media (max-width: 1024px) {
+        .spotlight-grid {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto;
         }
-        .menu-cta-actions {
-            justify-content: flex-start;
-        }
+        .spotlight-card { height: 350px; }
     }
 </style>

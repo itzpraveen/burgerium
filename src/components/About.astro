@@ -1,183 +1,186 @@
-<section id="about" class="about section-padding">
+<section id="about" class="section-padding about-section">
     <div class="container">
-        <div class="row">
-            <div class="col-text scroll-reveal">
-                <span class="section-tag">A Tale of Two Cities</span>
-                <h2>From Calicut to Chennai: <br> The Evolution</h2>
-                <p>It began in <b>1998</b> as a family passion in Calicut. Over the decades, <b>Burger Tree</b> grew into a sentiment, creating memories in <b>Coimbatore (Peelamedu & RS Puram)</b> and <b>Palakkad (Stadium Bypass)</b>.</p>
-                <div class="brand-evolution">
-                    <div class="brand-old">
-                        <img src="/burgertree_logo.png" alt="Burger Tree Original Logo" loading="lazy">
-                        <span>The Roots (1998)</span>
-                    </div>
-                    <div class="arrow">
-                        <i class="fas fa-long-arrow-alt-right"></i>
-                    </div>
-                    <div class="brand-new">
-                        <img src="/logo.png" alt="Burgerium New Logo" loading="lazy">
-                        <span>The Future (2025)</span>
+        <div class="grid-layout">
+            <!-- Left: Visual Stack -->
+            <div class="visual-col reveal">
+                <div class="img-frame">
+                    <img src="/bg.png" alt="Cafe Interior" class="main-img">
+                    <div class="stat-box">
+                        <span class="stat-num">25+</span>
+                        <span class="stat-label">Years of <br>Legacy</span>
                     </div>
                 </div>
-                <p>Now, we distill 25+ years of mastery into <b>Burgerium</b>. We aren't just opening a store in <b>Anna Nagar, Chennai</b>; we are bringing you the <i>Lava Cheese</i> you crave and the <i>Peri Peri</i> you love, elevated to an art form.</p>
-                <ul class="features-list">
-                    <li><i class="fas fa-check-circle"></i> Famous House-Made Buns</li>
-                    <li><i class="fas fa-check-circle"></i> The Original Coimby Taste</li>
-                    <li><i class="fas fa-check-circle"></i> Premium "Industrial-Cozy" Vibe</li>
-                    <li><i class="fas fa-check-circle"></i> 2.5k+ Five-Star Reviews</li>
-                </ul>
             </div>
-            <div class="col-image scroll-reveal delay-2">
-                <div class="image-stack">
-                    <img src="/bg.png" alt="Interior Vibe" class="img-back" loading="lazy">
-                    <div class="experience-card glass">
-                        <h3>2.5k+</h3>
-                        <div class="stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
+
+            <!-- Right: Story -->
+            <div class="content-col reveal delay-200">
+                <span class="badge">The Evolution</span>
+                <h2 class="section-title">From <span class="text-orange">Roots</span> to <span class="text-orange">Revolution</span></h2>
+                
+                <p class="story-text">
+                    What started in 1998 as a humble passion in <b>Calicut</b> has grown into a South Indian phenomenon. 
+                    <b>Burger Tree</b> built its legacy in <b>Coimbatore (Peelamedu)</b> and <b>Palakkad</b> on one simple promise: 
+                    <i>Real food, made with love.</i>
+                </p>
+
+                <div class="timeline-box">
+                    <div class="timeline-step">
+                        <div class="step-icon old-logo">
+                            <!-- Placeholder for Old Logo Img or stylized text -->
+                            <img src="/burgertree_logo.png" alt="1998">
                         </div>
-                        <p>5-Star Reviews in Kovai & Palakkad</p>
+                        <div class="step-info">
+                            <h4>The Roots</h4>
+                            <span>1998 • Calicut</span>
+                        </div>
+                    </div>
+                    
+                    <div class="connector-line"></div>
+                    
+                    <div class="timeline-step">
+                        <div class="step-icon new-logo">
+                            <img src="/logo.png" alt="2025">
+                        </div>
+                        <div class="step-info">
+                            <h4>The Future</h4>
+                            <span>2025 • Chennai</span>
+                        </div>
                     </div>
                 </div>
+
+                <p class="story-footer">
+                    Now launching <b>Burgerium</b> in Anna Nagar. The same soul, a bolder spirit.
+                </p>
             </div>
         </div>
     </div>
 </section>
 
 <style>
-    .about {
-        position: relative;
-        background: var(--bg-color);
-    }
-
-    .row {
+    .grid-layout {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 4rem;
+        gap: 5rem;
         align-items: center;
     }
 
-    .section-tag {
-        color: var(--accent-orange);
-        font-family: var(--font-body);
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        font-size: 0.85rem;
-        margin-bottom: 1rem;
+    .img-frame {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .main-img {
+        width: 100%;
+        filter: grayscale(20%) contrast(110%);
+        transition: 0.5s;
+    }
+
+    .img-frame:hover .main-img {
+        filter: grayscale(0%);
+        transform: scale(1.05);
+    }
+
+    .stat-box {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        background: var(--brand-orange);
+        padding: 2rem;
+        color: #000;
+    }
+
+    .stat-num {
         display: block;
-    }
-
-    .col-text h2 {
+        font-family: var(--font-heading);
         font-size: 3.5rem;
-        margin-bottom: 1.5rem;
-        line-height: 1.1;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-weight: 700;
         text-transform: uppercase;
+        font-size: 0.85rem;
     }
 
-    .col-text p {
-        color: var(--text-secondary);
-        margin-bottom: 1.5rem;
-        font-size: 1.1rem;
+    .story-text {
+        font-size: 1.15rem;
+        color: #ccc;
+        margin-bottom: 2.5rem;
     }
 
-    .brand-evolution {
+    /* Timeline Stylization */
+    .timeline-box {
+        background: #1a1a1a;
+        padding: 2rem;
+        border-radius: 12px;
         display: flex;
         align-items: center;
-        gap: 2rem;
-        margin: 2.5rem 0;
-        padding: 1.5rem;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--glass-border);
-        border-radius: 8px;
+        width: fit-content;
+        border: 1px solid rgba(255,255,255,0.05);
     }
 
-    .brand-old, .brand-new {
+    .timeline-step {
         display: flex;
         flex-direction: column;
         align-items: center;
+        text-align: center;
         gap: 0.5rem;
     }
 
-    .brand-old img {
-        height: 60px;
-        opacity: 0.9;
-    }
-
-    .brand-new img {
-        height: 42px;
-        background-color: #FAA227;
-        padding: 4px 12px;
-        border-radius: 4px;
+    .step-icon img {
+        height: 40px;
         width: auto;
     }
+    
+    .new-logo img {
+        /* Ensure logo contrast */
+        background: var(--brand-orange);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
 
-    .brand-old span, .brand-new span {
+    .step-info h4 {
+        font-size: 1rem;
+        color: var(--text-white);
+        margin: 0;
+    }
+
+    .step-info span {
         font-size: 0.75rem;
+        color: var(--text-gray);
         text-transform: uppercase;
         letter-spacing: 1px;
-        color: var(--text-secondary);
     }
 
-    .arrow {
-        font-size: 1.5rem;
-        color: var(--accent-orange);
-    }
-
-    .features-list {
-        margin-top: 2rem;
-    }
-
-    .features-list li {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1rem;
-        font-size: 1.05rem;
-    }
-
-    .features-list i {
-        color: var(--accent-orange);
-    }
-
-    .image-stack {
+    .connector-line {
+        width: 60px;
+        height: 2px;
+        background: var(--brand-orange);
+        margin: 0 1.5rem;
         position: relative;
     }
-
-    .image-stack .img-back {
-        border-radius: 8px;
-        opacity: 0.9;
-        border: 1px solid var(--glass-border);
-    }
-
-    .experience-card {
+    
+    .connector-line::after {
+        content: '';
         position: absolute;
-        bottom: -30px;
-        right: -30px;
-        padding: 2rem;
-        text-align: center;
-        min-width: 200px;
-        background: #111;
-        border: 1px solid var(--accent-orange);
+        right: 0;
+        top: -4px;
+        width: 0; 
+        height: 0; 
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        border-left: 5px solid var(--brand-orange);
     }
 
-    .experience-card h3 {
-        font-size: 2.5rem;
-        color: var(--accent-orange);
-    }
-
-    .experience-card .stars {
-        color: var(--accent-orange);
-        margin: 0.5rem 0;
-        font-size: 0.9rem;
+    .story-footer {
+        margin-top: 2rem;
+        font-style: italic;
+        color: var(--brand-orange);
     }
 
     @media (max-width: 900px) {
-        .row { grid-template-columns: 1fr; }
-        .col-text h2 { font-size: 2.6rem; }
-        .brand-evolution { flex-direction: column; gap: 1rem; text-align: center; }
-        .arrow { transform: rotate(90deg); }
+        .grid-layout { grid-template-columns: 1fr; }
+        .timeline-box { width: 100%; justify-content: space-between; }
     }
 </style>

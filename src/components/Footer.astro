@@ -1,140 +1,164 @@
----
----
-<footer id="contact">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <img src="/logo.png" alt="Burgerium" class="footer-logo" loading="lazy">
-                <p>Born in Calicut. Perfected in Coimbatore & Palakkad. Now serving Chennai.</p>
-                <div class="social-links">
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+<footer id="locations">
+    <!-- Top Bar Call to Action -->
+    <div class="footer-cta">
+        <div class="container cta-content">
+            <h3>Hungry? Visit us today.</h3>
+            <a href="#menu" class="btn btn-primary inverted">See Locations</a>
+        </div>
+    </div>
+
+    <!-- Main Footer -->
+    <div class="main-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Brand Col -->
+                <div class="f-col brand-col">
+                    <img src="/logo.png" alt="Burgerium" class="f-logo">
+                    <p>Born in Calicut (1998).<br>Elevated in Chennai (2025).</p>
+                    <div class="socials">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    </div>
+                </div>
+
+                <!-- Locs -->
+                <div class="f-col">
+                    <h5>Locations</h5>
+                    <ul class="f-list">
+                        <li><span>Coimbatore</span> <small>Peelamedu & RS Puram</small></li>
+                        <li><span>Palakkad</span> <small>Stadium Bypass Rd</small></li>
+                        <li class="active"><span>Chennai</span> <small>Anna Nagar (Coming Soon)</small></li>
+                    </ul>
+                </div>
+
+                <!-- Links -->
+                <div class="f-col">
+                    <h5>Quick Links</h5>
+                    <ul class="f-list">
+                        <li><a href="#about">Our Roots</a></li>
+                        <li><a href="#menu">Menu Highlights</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
                 </div>
             </div>
-             <div class="footer-col">
-                <h4>Our Roots</h4>
-                <p><b>Calicut</b> (Since 1998)<br><span class="text-sm">The Origin Story</span></p>
-                <p><b>Coimbatore</b><br><span class="text-sm">Peelamedu & RS Puram</span></p>
-                <p><b>Palakkad</b><br><span class="text-sm">Stadium Bypass Road</span></p>
-             </div>
-             <div class="footer-col">
-                <h4>Visit Chennai</h4>
-                <p class="highlight">Coming Soon</p>
-                <p>Anna Nagar, Chennai</p>
-                <br>
-                <h4>Hours</h4>
-                <p>Mon - Sun: 11am - 11pm</p>
-                <p><a href="tel:+916362006008" class="call-link">Call 6362 006 008</a></p>
-             </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 Burgerium. An evolution of Burger Tree Brand. All rights reserved.</p>
+
+            <div class="sub-footer">
+                <p>&copy; 2025 Burgerium. A Burger Tree Brand Legacy.</p>
+            </div>
         </div>
     </div>
 </footer>
 
 <style>
-    footer {
-        border-top: none;
-        background: #FAA227; /* Full Width Orange */
-        padding: 5rem 0 2rem;
-        color: #000;
+    /* CTA Bar */
+    .footer-cta {
+        background-color: #000; 
+        /* Slightly different from header to differentiate top/bottom */
+        padding: 3rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
-    .footer-content {
+    .cta-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cta-content h3 {
+        color: #fff;
+        font-size: 2rem;
+    }
+
+    /* Main Footer */
+    .main-footer {
+        background: var(--brand-orange); 
+        color: #000;
+        padding-top: 4rem;
+    }
+
+    .footer-grid {
         display: grid;
         grid-template-columns: 1.5fr 1fr 1fr;
-        gap: 4rem;
-        margin-bottom: 4rem;
+        gap: 3rem;
+        padding-bottom: 3rem;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
     }
 
-    .footer-brand .footer-logo {
-        width: 280px;
-        margin-bottom: 1rem;
-        border-radius: 0;
-        background-color: transparent; /* Seamless integration */
-        padding: 0;
+    .f-logo {
+        width: 200px;
+        margin-bottom: 1.5rem;
     }
 
-    .footer-brand p {
-        color: #000; /* Black text */
-        margin: 1.5rem 0;
-        max-width: 300px;
+    .brand-col p {
         font-weight: 500;
+        margin-bottom: 1.5rem;
     }
 
-    .social-links {
+    .socials {
         display: flex;
         gap: 1rem;
     }
 
-    .social-links a {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: rgba(0,0,0,0.1); /* Darker glass on orange */
+    .socials a {
+        width: 36px;
+        height: 36px;
+        background: #000;
+        color: var(--brand-orange);
         display: flex;
-        justify-content: center;
         align-items: center;
-        border: 1px solid rgba(0,0,0,0.1);
-        color: #000;
+        justify-content: center;
+        border-radius: 50%;
         transition: 0.3s;
     }
 
-    .social-links a:hover {
-        background: #000;
-        color: #FAA227;
-        border-color: #000;
+    .socials a:hover {
+        transform: translateY(-3px);
+        background: #fff;
+        color: #000;
     }
 
-    .footer-col h4 {
+    .f-col h5 {
+        font-weight: 800;
+        text-transform: uppercase;
         margin-bottom: 1.5rem;
         font-size: 1.1rem;
-        letter-spacing: 1px;
-        color: #000;
-        font-weight: 700;
-        text-transform: uppercase;
     }
 
-    .footer-col p {
-        color: #222; /* Dark gray for readability */
+    .f-list {
+        list-style: none;
+    }
+
+    .f-list li {
         margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
     }
 
-    .footer-col b {
-        color: #000;
+    .f-list li span {
+        font-weight: 700;
+        font-size: 1.05rem;
     }
 
-    .text-sm {
+    .f-list li small {
         font-size: 0.85rem;
+        opacity: 0.7;
+    }
+
+    .f-list li.active span {
+        text-decoration: underline;
+    }
+
+    .sub-footer {
+        padding: 1.5rem 0;
+        text-align: center;
+        font-size: 0.85rem;
+        font-weight: 500;
         opacity: 0.8;
     }
 
-    .highlight {
-        color: #000 !important; /* Black highlight */
-        font-weight: 800;
-        text-transform: uppercase;
-        text-decoration: underline;
-    }
-
-    .call-link {
-        color: #000;
-        text-decoration: underline;
-    }
-
-    .footer-bottom {
-        text-align: center;
-        padding-top: 2rem;
-        border-top: 1px solid rgba(0,0,0,0.1);
-        color: #333;
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-
-    @media (max-width: 900px) {
-        .footer-content { grid-template-columns: 1fr; text-align: center; }
-        .footer-brand { justify-items: center; align-items: center; display: flex; flex-direction: column; }
-        .social-links { justify-content: center; }
+    @media (max-width: 768px) {
+        .cta-content { flex-direction: column; text-align: center; gap: 1rem; }
+        .footer-grid { grid-template-columns: 1fr; text-align: center; }
+        .brand-col { display: flex; flex-direction: column; align-items: center; }
     }
 </style>
