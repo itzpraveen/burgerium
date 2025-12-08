@@ -96,12 +96,12 @@ import Footer from '../components/Footer.astro';
 
     @media (max-width: 900px) {
         .marquee-container {
-            transform: rotate(-2deg) scale(1.05); /* Restore tilt */
+            transform: rotate(-2deg) scale(1.1); /* Restore tilt, increased scale for coverage */
             margin: -2rem 0 4rem 0; /* Slight negative margin for overlap */
             border-width: 2px;
             padding: 0.8rem 0;
-            width: 110%; /* Wider to cover edges when tilted */
-            left: -5%; /* Center adjustment */
+            width: 100%; /* Fix overflow */
+            left: 0;
             margin-left: 0;
         }
 
