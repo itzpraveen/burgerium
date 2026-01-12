@@ -1,0 +1,204 @@
+---
+const locations = [
+    {
+        city: 'Palakkad',
+        name: 'Tharekkad',
+        address: ['18/80, S.M. Complex', 'College Road, Tharekkad', 'Palakkad, Kerala - 678001'],
+        phone: '+91 9544 600 900',
+        map: 'https://goo.gl/maps/QXPBitWrTPqSk2ie7',
+    },
+    {
+        city: 'Coimbatore',
+        name: 'RS Puram',
+        address: [
+            'Door No.8, Sree Nandhini Complex',
+            'Venkataswamy Road, West R.S. Puram',
+            'Coimbatore, Tamil Nadu - 641002',
+        ],
+        phone: '+91 9535 600 900',
+        map: 'https://www.google.com/maps/place/Burger+Tree/@11.0121828,76.9495792,15z/data=!4m6!3m5!1s0x3ba859ad4ecb88b3:0x4ae2d47dc812ecde!8m2!3d11.0121828!4d76.9495792!16s%2Fg%2F11gvyqp2jc?hl=en_GB&coh=164777&entry=tt',
+    },
+    {
+        city: 'Coimbatore',
+        name: 'Race Course',
+        address: ['16 Abdul Rahim Road', 'Race Course', 'Coimbatore, Tamil Nadu - 641018'],
+        phone: '+91 9605 600 900',
+        map: 'https://maps.app.goo.gl/j9TznKQyZnUkqrHVA',
+    },
+];
+---
+
+<section id="locations" class="section-padding locations-section">
+    <div class="container">
+        <div class="locations-head">
+            <div>
+                <p class="eyebrow">Verified Locations</p>
+                <h2 class="section-title">Burger Tree Addresses</h2>
+                <p class="lede">
+                    Pulled directly from the Burger Tree website. Tharekkad is the only live Palakkad outlet. RS Puram and Race Course are the
+                    verified Coimbatore stores.
+                </p>
+                <p class="legal-pill">A Unit of Urban Eats and Kitchen LLP</p>
+            </div>
+            <div class="note">
+                <strong>Coimbatore outlet #3</strong>: not listed on the Burger Tree site. Share the new location and we will publish it alongside these verified addresses.
+            </div>
+        </div>
+
+        <div class="locations-grid">
+            {locations.map((loc) => (
+                <article class="location-card scroll-reveal">
+                    <div class="card-top">
+                        <span class="pill">{loc.city}</span>
+                        <h3>{loc.name}</h3>
+                        <p class="address">
+                            {loc.address.map((line) => (
+                                <>
+                                    {line}<br />
+                                </>
+                            ))}
+                        </p>
+                    </div>
+                    <div class="card-actions">
+                        <a class="btn-primary" href={loc.map} target="_blank" rel="noreferrer">Get Directions</a>
+                        <a class="phone" href={`tel:${loc.phone.replace(/\s+/g, '')}`}>{loc.phone}</a>
+                    </div>
+                </article>
+            ))}
+        </div>
+    </div>
+</section>
+
+<style>
+    .locations-section {
+        background: #0a0a0a;
+    }
+
+    .locations-head {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        align-items: center;
+        margin-bottom: 3rem;
+    }
+
+    .eyebrow {
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        color: var(--brand-orange);
+        margin-bottom: 0.5rem;
+    }
+
+    .lede {
+        color: #d8d8d8;
+        margin: 1rem 0 0.75rem;
+        line-height: 1.6;
+    }
+
+    .legal-pill {
+        display: inline-block;
+        background: rgba(250, 162, 39, 0.15);
+        color: var(--brand-orange);
+        padding: 0.4rem 0.8rem;
+        border-radius: 999px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.8rem;
+        border: 1px solid rgba(250, 162, 39, 0.4);
+    }
+
+    .note {
+        background: #111;
+        border: 1px dashed rgba(250, 162, 39, 0.6);
+        padding: 1.5rem;
+        border-radius: 12px;
+        color: #f8f8f8;
+        line-height: 1.5;
+    }
+
+    .locations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .location-card {
+        background: #111;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .location-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 80% 0%, rgba(250, 162, 39, 0.12), transparent 50%);
+        pointer-events: none;
+    }
+
+    .card-top h3 {
+        font-size: 1.6rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .pill {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(250, 162, 39, 0.16);
+        color: var(--brand-orange);
+        font-weight: 800;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .address {
+        color: #c6c6c6;
+        line-height: 1.5;
+    }
+
+    .card-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .card-actions .btn-primary {
+        padding: 0.8rem 1.6rem;
+        font-size: 1rem;
+    }
+
+    .phone {
+        color: #fff;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 900px) {
+        .locations-head {
+            grid-template-columns: 1fr;
+        }
+
+        .card-actions {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .card-actions .btn-primary {
+            width: 100%;
+            justify-content: center;
+            text-align: center;
+        }
+    }
+</style>

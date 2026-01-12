@@ -9,6 +9,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             <!-- Brand Mark Box -->
             <div class="logo-box">
                 <img src={`${base}/logo.png`} alt="Burgerium" />
+                <span class="legal-tag">A Unit of Urban Eats and Kitchen LLP</span>
             </div>
         </a>
 
@@ -62,6 +63,16 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         width: auto;
         /* Ensure distinct visibility */
         filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
+    .legal-tag {
+        display: block;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #000;
+        font-weight: 700;
+        margin-top: -6px;
     }
     
     @media (min-width: 901px) {
@@ -187,6 +198,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
            Wait, HTML shows 2 bars? Let's check HTML. 
            Ah, I should check HTML content first or just stick to 2 bar cross.
         */
+
+        .legal-tag {
+            color: #fff;
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
+        }
     }
 
     /* Fixing the Toggle Animation for 2 bars if that's what we have, or 3. 
