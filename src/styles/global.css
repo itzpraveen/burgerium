@@ -4,7 +4,6 @@
     --brand-orange: #FAA227;
     --brand-orange-light: #FFB84D;
     --header-height: 120px;
-    --sticky-cta-height: 72px;
     /* Increased for premium brand visibility */
     --brand-glow: rgba(250, 162, 39, 0.4);
     --text-white: #ffffff;
@@ -25,7 +24,14 @@
 @media (max-width: 900px) {
     :root {
         --header-height: 80px;
+        font-size: 17px;
         /* Smaller header for mobile */
+    }
+}
+
+@media (max-width: 600px) {
+    :root {
+        font-size: 18px;
     }
 }
 
@@ -330,36 +336,6 @@ html.reveal-enabled .scroll-reveal.active {
 .scroll-reveal.delay-200 { transition-delay: 0.2s; }
 .scroll-reveal.delay-300 { transition-delay: 0.3s; }
 
-/* Mobile sticky CTA */
-.sticky-cta {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    min-height: var(--sticky-cta-height);
-    padding: 0.75rem 1.5rem calc(0.75rem + env(safe-area-inset-bottom));
-    background: rgba(5, 5, 5, 0.92);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    z-index: 900;
-    display: none;
-    align-items: center;
-}
-
-.sticky-cta .btn-primary {
-    width: 100%;
-    justify-content: center;
-}
-
-@media (max-width: 900px) {
-    body {
-        padding-bottom: calc(var(--sticky-cta-height) + env(safe-area-inset-bottom));
-    }
-
-    .sticky-cta {
-        display: flex;
-    }
-}
 
 /* Glass morphism utility */
 .glass {
