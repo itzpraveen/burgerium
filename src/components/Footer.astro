@@ -1,13 +1,28 @@
 ---
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const currentYear = new Date().getFullYear();
+
+const quickLinks = [
+    { href: '#about', label: 'Our Roots' },
+    { href: '#menu', label: 'Menu Highlights' },
+    { href: '#locations', label: 'Locations' },
+];
+
+const socialLinks = [
+    { href: 'https://instagram.com', icon: 'fa-instagram', label: 'Follow us on Instagram' },
+    { href: 'https://facebook.com', icon: 'fa-facebook-f', label: 'Follow us on Facebook' },
+];
 ---
 
-<footer>
+<footer role="contentinfo">
     <!-- Top Bar Call to Action -->
     <div class="footer-cta">
         <div class="container cta-content">
-            <h3>Hungry? Visit us today.</h3>
-            <a href="#locations" class="btn btn-primary inverted">See Locations</a>
+            <h3>Craving Excellence? Visit Us.</h3>
+            <a href="#locations" class="btn-primary">
+                See Locations
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </a>
         </div>
     </div>
 
@@ -17,39 +32,49 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             <div class="footer-grid">
                 <!-- Brand Col -->
                 <div class="f-col brand-col">
-                    <img src={`${base}/logo.png`} alt="Burgerium" class="f-logo">
-                    <p>Born in Calicut (1998).<br>Elevated in Chennai (2025).</p>
+                    <img src={`${base}/logo.png`} alt="Burgerium" class="f-logo" loading="lazy" />
                     <p class="legal-line">A Unit of Urban Eats and Kitchen LLP</p>
-                    <div class="socials">
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <div class="socials" role="list" aria-label="Social media links">
+                        {socialLinks.map((social) => (
+                            <a
+                                href={social.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={social.label}
+                                role="listitem"
+                            >
+                                <i class={`fab ${social.icon}`} aria-hidden="true"></i>
+                            </a>
+                        ))}
                     </div>
                 </div>
 
-                <!-- Locs -->
+                <!-- Locations -->
                 <div class="f-col">
                     <h5>Locations</h5>
-                    <ul class="f-list">
-                        <li><span>Palakkad</span> <small>Tharekkad</small></li>
-                        <li><span>Coimbatore</span> <small>RS Puram & Race Course</small></li>
-                        <li class="active"><span>Chennai</span> <small>Anna Nagar (Coming Soon)</small></li>
-                        <li><small class="pending">Third Coimbatore outlet: not listed on Burger Tree site yet — awaiting confirmation.</small></li>
+                    <ul class="f-list" role="list">
+                        <li class="active" role="listitem">
+                            <span>Chennai</span>
+                            <small>Anna Nagar (Opening Q1 2025)</small>
+                        </li>
                     </ul>
                 </div>
 
                 <!-- Links -->
-                <div class="f-col">
+                <nav class="f-col" aria-label="Footer navigation">
                     <h5>Quick Links</h5>
-                    <ul class="f-list">
-                        <li><a href="#about">Our Roots</a></li>
-                        <li><a href="#menu">Menu Highlights</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                    <ul class="f-list" role="list">
+                        {quickLinks.map((link) => (
+                            <li role="listitem">
+                                <a href={link.href}>{link.label}</a>
+                            </li>
+                        ))}
                     </ul>
-                </div>
+                </nav>
             </div>
 
             <div class="sub-footer">
-                <p>&copy; 2025 Burgerium. Powered by the Burger Tree legacy. <strong>A Unit of Urban Eats and Kitchen LLP</strong>.</p>
+                <p>&copy; {currentYear} Burgerium. <strong>A Unit of Urban Eats and Kitchen LLP</strong>.</p>
             </div>
         </div>
     </div>
@@ -58,26 +83,30 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 <style>
     /* CTA Bar */
     .footer-cta {
-        background-color: #000; 
-        /* Slightly different from header to differentiate top/bottom */
-        padding: 3rem 0;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        background: linear-gradient(135deg, #0a0a0a 0%, #111 100%);
+        padding: 4rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
     }
 
     .cta-content {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 2rem;
     }
 
     .cta-content h3 {
         color: #fff;
-        font-size: 2rem;
+        font-size: clamp(1.5rem, 3vw, 2rem);
+    }
+
+    .cta-content .btn-primary {
+        flex-shrink: 0;
     }
 
     /* Main Footer */
     .main-footer {
-        background: var(--brand-orange); 
+        background: var(--brand-orange);
         color: #000;
         padding-top: 4rem;
     }
@@ -91,36 +120,41 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     }
 
     .f-logo {
-        width: 200px;
+        width: 180px;
         margin-bottom: 1.5rem;
     }
 
     .brand-col p {
         font-weight: 500;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
+        line-height: 1.6;
     }
 
     .legal-line {
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.85rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        opacity: 0.7;
+        margin-bottom: 1.5rem;
     }
 
     .socials {
         display: flex;
-        gap: 1rem;
+        gap: 0.75rem;
     }
 
     .socials a {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         background: #000;
         color: var(--brand-orange);
         display: flex;
         align-items: center;
         justify-content: center;
         border-radius: 50%;
-        transition: 0.3s;
+        transition: transform 0.3s ease, background 0.3s ease;
+        font-size: 1rem;
     }
 
     .socials a:hover {
@@ -129,11 +163,16 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         color: #000;
     }
 
+    .socials a:focus-visible {
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.3);
+    }
+
     .f-col h5 {
         font-weight: 800;
         text-transform: uppercase;
         margin-bottom: 1.5rem;
-        font-size: 1.1rem;
+        font-size: 1rem;
+        letter-spacing: 1px;
     }
 
     .f-list {
@@ -141,42 +180,100 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     }
 
     .f-list li {
-        margin-bottom: 1rem;
-        display: flex;
-        flex-direction: column;
+        margin-bottom: 0.75rem;
+    }
+
+    .f-list li a {
+        font-weight: 600;
+        transition: opacity 0.3s ease;
+        display: inline-block;
+        padding: 0.25rem 0;
+    }
+
+    .f-list li a:hover {
+        opacity: 0.7;
+    }
+
+    .f-list li a:focus-visible {
+        box-shadow: var(--focus-ring-light);
+        border-radius: 4px;
     }
 
     .f-list li span {
         font-weight: 700;
-        font-size: 1.05rem;
+        font-size: 1rem;
+        display: block;
     }
 
     .f-list li small {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         opacity: 0.7;
-    }
-
-    .pending {
         display: block;
-        color: #111;
-        opacity: 0.8;
+        margin-top: 0.25rem;
     }
 
     .f-list li.active span {
-        text-decoration: underline;
+        position: relative;
+    }
+
+    .f-list li.active span::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: #000;
     }
 
     .sub-footer {
         padding: 1.5rem 0;
         text-align: center;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         font-weight: 500;
         opacity: 0.8;
     }
 
+    .sub-footer strong {
+        font-weight: 700;
+    }
+
     @media (max-width: 768px) {
-        .cta-content { flex-direction: column; text-align: center; gap: 1rem; }
-        .footer-grid { grid-template-columns: 1fr; text-align: center; }
-        .brand-col { display: flex; flex-direction: column; align-items: center; }
+        .footer-cta {
+            padding: 3rem 0;
+        }
+
+        .cta-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 1.5rem;
+        }
+
+        .cta-content .btn-primary {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .footer-grid {
+            grid-template-columns: 1fr;
+            text-align: center;
+            gap: 2.5rem;
+        }
+
+        .brand-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .socials {
+            justify-content: center;
+        }
+
+        .f-list li.active span::after {
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+        }
     }
 </style>

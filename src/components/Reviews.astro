@@ -52,8 +52,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 <style>
     .reviews-section {
         padding: 5rem 0;
-        background: var(--reviews-bg, url('/bg.png')) center/cover fixed no-repeat;
+        background: var(--reviews-bg, url('/bg.png')) center/cover no-repeat;
         position: relative;
+    }
+
+    @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+        .reviews-section {
+            background-attachment: fixed;
+        }
     }
 
     .reviews-section::before {

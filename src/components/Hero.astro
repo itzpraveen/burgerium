@@ -2,47 +2,51 @@
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
-<section id="home" class="hero-wrapper">
+<section id="home" class="hero-wrapper" aria-label="Welcome to Burgerium">
     <!-- Dynamic Background -->
-    <div class="bg-layer">
-        <video autoplay muted loop playsinline poster={`${base}/chennai_hero.png`} class="bg-video">
-            <!-- Fallback to image if no video, using the generated Chennai image with a parallax effect -->
-            <img src={`${base}/chennai_hero.png`} alt="Atmosphere" class="parallax-img">
-        </video>
+    <div class="bg-layer" aria-hidden="true">
+        <img
+            src={`${base}/chennai_hero.png`}
+            alt=""
+            class="parallax-img"
+            loading="eager"
+            fetchpriority="high"
+        />
         <div class="overlay"></div>
     </div>
 
     <div class="container hero-grid">
         <!-- Text Content -->
         <div class="hero-text">
-            <div class="badge-pill slide-in-1">
-                <span class="dot"></span> Burgerium • Built on Craft, Made for Now
-            </div>
-            
             <h1 class="mega-title">
-                <span class="line slide-in-2">BURGERIUM</span>
-                <span class="line text-gradient slide-in-3">Fresh Flame. Real Dough.</span>
+                <span class="line text-gradient slide-in-1">Every Bite Counts.</span>
             </h1>
 
-            <p class="hero-desc slide-in-4">
-                A flagship burger house born from decades of baking and grilling. We hand-bake the buns, flame-sear the patties, and finish every stack with obsessive detail. Crafted for Chennai, powered by the heritage that started in 1998.
+            <p class="hero-desc slide-in-2">
+                25 years of craft. House-baked buns. Charcoal-seared patties. Chennai's new burger destination.
             </p>
 
-            <div class="cta-box slide-in-5">
+            <div class="cta-box slide-in-3">
                 <a href="#menu" class="btn-primary">
-                    See The Menu <i class="fas fa-arrow-right"></i>
+                    View Menu
+                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
                 </a>
             </div>
         </div>
 
         <!-- 3D Featured Product -->
         <div class="hero-visual">
-            <div class="circle-bg pulse-anim"></div>
-            
-            <!-- Single Packed Hero Image -->
-            <img src={`${base}/monster_stack.png`} alt="The Monster Stack" class="hero-burger float-anim tilt-element">
-            
-            <div class="float-card glass-card">
+            <div class="circle-bg pulse-anim" aria-hidden="true"></div>
+
+            <!-- Hero burger image -->
+            <img
+                src={`${base}/monster_stack.png`}
+                alt="The Monster Stack - Burgerium's signature multi-patty burger"
+                class="hero-burger float-anim tilt-element"
+                loading="eager"
+            />
+
+            <div class="float-card glass-card" aria-hidden="true">
                 <span class="emoji">🔥</span>
                 <div class="card-text">
                     <strong>The Real Deal</strong>
@@ -50,6 +54,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator" aria-hidden="true">
+        <div class="mouse">
+            <div class="wheel"></div>
+        </div>
+        <span>Scroll to explore</span>
     </div>
 </section>
 
@@ -68,18 +80,71 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         position: absolute;
         top: 0; left: 0; width: 100%; height: 100%;
         z-index: -1;
+        overflow: hidden;
     }
 
     .parallax-img {
         width: 100%; height: 100%;
         object-fit: cover;
-        transform: scale(1.1); /* Zoomed in for parallax room */
-        filter: brightness(0.4);
+        transform: scale(1.1);
+        filter: brightness(0.35);
+        transition: transform 0.1s ease-out;
     }
 
     .overlay {
         position: absolute; inset: 0;
-        background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 100%);
+        background: linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 100%);
+    }
+
+    /* Scroll Indicator */
+    .scroll-indicator {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        opacity: 0;
+        animation: fadeInUp 1s ease forwards 1.5s;
+    }
+
+    .mouse {
+        width: 24px;
+        height: 40px;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        position: relative;
+    }
+
+    .wheel {
+        width: 4px;
+        height: 8px;
+        background: var(--brand-orange);
+        border-radius: 2px;
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: scrollWheel 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollWheel {
+        0%, 100% { opacity: 1; top: 8px; }
+        50% { opacity: 0.3; top: 20px; }
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .scroll-indicator span {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: rgba(255, 255, 255, 0.5);
     }
 
     .hero-grid {
@@ -106,31 +171,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         color: transparent;
     }
 
-    .badge-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
-        padding: 8px 16px;
-        border-radius: 50px;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 1.5rem;
-        backdrop-filter: blur(5px);
-    }
-
-    .dot {
-        width: 8px; height: 8px;
-        background: var(--brand-orange);
-        border-radius: 50%;
-        box-shadow: 0 0 10px var(--brand-orange);
-        animation: blink 2s infinite;
-    }
-
-    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-
     .hero-desc {
         font-size: 1.25rem;
         color: #ccc;
@@ -140,11 +180,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     }
 
     /* Staggered Entrance */
-    .slide-in-1 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.1s; }
-    .slide-in-2 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.3s; }
-    .slide-in-3 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.5s; }
-    .slide-in-4 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.7s; }
-    .slide-in-5 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.9s; }
+    .slide-in-1 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.2s; }
+    .slide-in-2 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.4s; }
+    .slide-in-3 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.6s; }
+    .slide-in-4 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.8s; }
 
     /* Visual Side */
     .hero-visual {
@@ -189,81 +228,125 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     .float-card small { color: #888; text-transform: uppercase; font-size: 0.7rem; }
 
     @media (max-width: 900px) {
-        .hero-grid { 
-            grid-template-columns: 1fr; 
+        .hero-wrapper {
+            min-height: 100svh;
+        }
+
+        .hero-grid {
+            grid-template-columns: 1fr;
             text-align: center;
-            padding-top: 150px; /* Force clearance from header */
+            padding-top: 120px;
             height: auto;
-            min-height: 100vh;
+            min-height: 100svh;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding-bottom: 4rem;
+            padding-bottom: 5rem;
+            gap: 2rem;
         }
-        
+
         .hero-text {
             display: flex;
             flex-direction: column;
             align-items: center;
-            z-index: 2; /* Text on top */
-            order: 1; /* Ensure text comes first visually if needed, though default HTML order is fine */
-        }
-        
-        .badge-pill {
-            margin-top: 1rem;
+            z-index: 2;
+            order: 1;
         }
 
-        .hero-desc { 
-            margin: 0 auto 2rem; 
-            font-size: 1.1rem;
+        .hero-desc {
+            margin: 0 auto 2rem;
+            font-size: 1rem;
             padding: 0 1rem;
-            max-width: 90%;
+            max-width: 95%;
+            line-height: 1.7;
         }
 
-        .hero-visual { 
-            margin-top: 1rem; 
+        .hero-visual {
+            margin-top: 0;
             z-index: 1;
             order: 2;
         }
 
-        .hero-burger { 
-            width: 70%; 
-            max-width: 300px; 
+        .hero-burger {
+            width: 65%;
+            max-width: 280px;
             margin-bottom: 1rem;
         }
 
-        .mega-title { 
-            font-size: 3.2rem; 
+        .mega-title {
+            font-size: clamp(2.5rem, 10vw, 3.5rem);
             margin-bottom: 1rem;
             line-height: 1.1;
         }
-        
-        /* Re-enable animations but faster/simpler */
-        .slide-in-1, .slide-in-2, .slide-in-3, .slide-in-4, .slide-in-5 { 
-            opacity: 0; 
-            animation: slideUp 0.6s ease forwards; 
+
+        .mega-title .text-gradient {
+            font-size: clamp(1rem, 4vw, 1.3rem);
+            line-height: 1.4;
+            display: block;
+            margin-top: 0.5rem;
         }
-        
+
+        /* Re-enable animations but faster */
+        .slide-in-1, .slide-in-2, .slide-in-3, .slide-in-4 {
+            opacity: 0;
+            animation: slideUp 0.6s ease forwards;
+        }
+
+        .slide-in-1 { animation-delay: 0.1s; }
+        .slide-in-2 { animation-delay: 0.2s; }
+        .slide-in-3 { animation-delay: 0.3s; }
+        .slide-in-4 { animation-delay: 0.4s; }
+
         .float-card {
-            bottom: 0;
-            right: 5%;
-            padding: 0.6rem 1rem;
+            bottom: 5%;
+            right: 10%;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .float-card .emoji {
+            font-size: 1.5rem;
+        }
+
+        .circle-bg {
+            width: 250px;
+            height: 250px;
+        }
+
+        .scroll-indicator {
+            display: none;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .mega-title {
+            font-size: 2.2rem;
+        }
+
+        .hero-burger {
+            width: 60%;
+            max-width: 220px;
         }
     }
 </style>
 
 <script>
     // Parallax Effect for Background and Burger
-    document.addEventListener('mousemove', (e) => {
-        const x = (window.innerWidth - e.pageX * 2) / 100;
-        const y = (window.innerHeight - e.pageY * 2) / 100;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canHover = window.matchMedia('(hover: hover)').matches;
 
-        const burger = document.querySelector('.hero-burger');
-        // @ts-ignore
-        if(burger) burger.style.transform = `translateX(${x}px) translateY(${y}px)`;
-        
-        const card = document.querySelector('.float-card');
-        // @ts-ignore
-        if(card) card.style.transform = `translateX(${-x}px) translateY(${-y}px)`;
-    });
+    if (!prefersReducedMotion && canHover) {
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth - e.pageX * 2) / 100;
+            const y = (window.innerHeight - e.pageY * 2) / 100;
+
+            const burger = document.querySelector('.hero-burger');
+            // @ts-ignore
+            if(burger) burger.style.transform = `translateX(${x}px) translateY(${y}px)`;
+            
+            const card = document.querySelector('.float-card');
+            // @ts-ignore
+            if(card) card.style.transform = `translateX(${-x}px) translateY(${-y}px)`;
+        });
+    }
 </script>

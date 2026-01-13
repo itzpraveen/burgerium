@@ -1,53 +1,71 @@
 ---
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const menuItems = [
+    {
+        name: 'Lava Cheese',
+        price: '₹260',
+        description: 'The Icon. A molten camembert core encased in a crisp chicken fillet, locked between fresh-baked brioche. Highly addictive.',
+        image: 'peri_burger.png',
+        featured: true,
+        tag: 'Best Seller'
+    },
+    {
+        name: 'Cheesy Fries',
+        price: '₹140',
+        description: 'Liquid Gold. Golden shoestring fries drowned in our slow-cooked artisan cheese sauce. Crisp, creamy, repeat.',
+        image: 'feast.png',
+        featured: false,
+        tag: 'Sides'
+    },
+    {
+        name: 'Smoky BBQ Beef',
+        price: '₹240',
+        description: 'Flame-grilled beef, caramelized onions, and our thick house BBQ glaze. Built for smoke and sweetness.',
+        image: 'burger.png',
+        featured: false,
+        tag: 'Classic'
+    }
+];
 ---
 
-<section id="menu" class="menu-section">
+<section id="menu" class="menu-section" aria-labelledby="menu-heading">
     <div class="container">
-        <div class="header-center">
+        <div class="header-center scroll-reveal">
             <span class="sub-head">Taste The Hype</span>
-            <h2 class="title-head">Crowd <span class="text-stroke">Favorites</span></h2>
+            <h2 class="title-head" id="menu-heading">Curated <span class="text-stroke">Classics</span></h2>
         </div>
 
-        <div class="spotlight-grid">
-            <!-- Item 1: The Star -->
-            <div class="spotlight-card featured">
-                <div class="card-bg"></div>
-                <div class="card-content">
-                    <div class="card-header">
-                        <h3>Lava Cheese</h3>
-                        <span class="price">₹260</span>
+        <div class="spotlight-grid" role="list">
+            {menuItems.map((item, index) => (
+                <article
+                    class={`spotlight-card scroll-reveal ${item.featured ? 'featured' : ''}`}
+                    role="listitem"
+                    style={`--delay: ${index * 0.1}s`}
+                >
+                    {item.featured && <div class="card-bg" aria-hidden="true"></div>}
+                    {item.tag && <span class="item-tag">{item.tag}</span>}
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h3>{item.name}</h3>
+                            <span class="price">{item.price}</span>
+                        </div>
+                        <p>{item.description}</p>
+                        {item.featured && (
+                            <a class="order-btn" href="#locations">
+                                See Locations
+                                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                            </a>
+                        )}
                     </div>
-                    <p>Signature Burgerium melt: molten cheese core inside a crisp chicken patty, locked between fresh-baked buns. Highly addictive.</p>
-                    <button class="order-btn">Order Now</button>
-                </div>
-                <img src={`${base}/peri_burger.png`} alt="Lava Cheese" class="product-img float-slow">
-            </div>
-
-            <!-- Item 2: The Side -->
-            <div class="spotlight-card">
-                <div class="card-content">
-                    <div class="card-header">
-                        <h3>Cheesy Fries</h3>
-                        <span class="price">₹140</span>
-                    </div>
-                    <p>Golden shoestring fries drowned in our slow-cooked cheese sauce. Crisp, creamy, repeat.</p>
-                </div>
-                <img src={`${base}/feast.png`} alt="Fries" class="product-img scale-hover">
-            </div>
-
-            <!-- Item 3: The Classic -->
-            <div class="spotlight-card">
-                <div class="card-content">
-                    <div class="card-header">
-                        <h3>Smoky BBQ Beef</h3>
-                        <span class="price">₹240</span>
-                    </div>
-                    <p>Flame-grilled beef, caramelized onions, and our thick house BBQ glaze. Built for smoke and sweetness.</p>
-                </div>
-                <!-- Reusing burger image as placeholder for variety, user can upload specific image later if needed -->
-                <img src={`${base}/burger.png`} alt="Burger" class="product-img scale-hover">
-            </div>
+                    <img
+                        src={`${base}/${item.image}`}
+                        alt={`${item.name} - ${item.description.split('.')[0]}`}
+                        class={`product-img ${item.featured ? 'float-slow' : 'scale-hover'}`}
+                        loading="lazy"
+                    />
+                </article>
+            ))}
         </div>
     </div>
 </section>
@@ -71,10 +89,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         font-size: 0.9rem;
         display: block;
         margin-bottom: 1rem;
+        font-weight: 600;
     }
 
     .title-head {
-        font-size: 3.5rem;
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
         color: #fff;
     }
 
@@ -87,8 +106,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     .spotlight-grid {
         display: grid;
         grid-template-columns: 1.5fr 1fr 1fr;
-        grid-template-rows: 400px;
-        gap: 2rem;
+        grid-template-rows: 420px;
+        gap: 1.5rem;
     }
 
     /* Card Styling */
@@ -102,25 +121,54 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         justify-content: space-between;
         overflow: hidden;
         border: 1px solid rgba(255,255,255,0.05);
-        transition: 0.4s;
+        transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        transition-delay: var(--delay, 0s);
     }
 
     .spotlight-card:hover {
         border-color: var(--brand-orange);
-        transform: translateY(-5px);
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .spotlight-card:focus-within {
+        border-color: var(--brand-orange);
+        box-shadow: var(--focus-ring);
     }
 
     .spotlight-card.featured {
         background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
     }
 
+    /* Item tag */
+    .item-tag {
+        position: absolute;
+        top: 1.5rem;
+        left: 1.5rem;
+        background: var(--brand-orange);
+        color: #000;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        z-index: 3;
+    }
+
     .card-bg {
         position: absolute;
         top: 0; right: 0;
         width: 300px; height: 300px;
-        background: radial-gradient(circle, rgba(250,162,39,0.2) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(250,162,39,0.15) 0%, transparent 70%);
         border-radius: 50%;
         transform: translate(30%, -30%);
+        pointer-events: none;
+    }
+
+    .card-content {
+        position: relative;
+        z-index: 2;
     }
 
     .card-header {
@@ -128,14 +176,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 1rem;
-        z-index: 2;
-        position: relative;
+        margin-top: 1.5rem;
     }
 
     .card-header h3 {
-        font-size: 1.8rem;
+        font-size: clamp(1.4rem, 2vw, 1.8rem);
         max-width: 150px;
-        line-height: 1;
+        line-height: 1.1;
     }
 
     .price {
@@ -143,34 +190,51 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         font-weight: 700;
         color: var(--brand-orange);
         font-size: 1.2rem;
+        background: rgba(250, 162, 39, 0.1);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
     }
 
     .spotlight-card p {
-        color: #888;
-        font-size: 1rem;
-        z-index: 2;
-        position: relative;
-        max-width: 60%;
+        color: var(--text-gray);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        max-width: 65%;
     }
 
     .order-btn {
         background: #fff;
         color: #000;
         border: none;
-        padding: 0.8rem 1.5rem;
+        padding: 0.9rem 1.8rem;
         border-radius: 30px;
         font-weight: 700;
+        font-size: 0.9rem;
         cursor: pointer;
         margin-top: 1.5rem;
         width: fit-content;
-        transition: 0.3s;
-        z-index: 2;
-        position: relative;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .order-btn:hover {
         background: var(--brand-orange);
-        box-shadow: 0 0 15px rgba(250,162,39,0.5);
+        box-shadow: 0 0 20px rgba(250,162,39,0.5);
+        transform: scale(1.05);
+    }
+
+    .order-btn:focus-visible {
+        box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--brand-orange);
+    }
+
+    .order-btn i {
+        transition: transform 0.3s ease;
+    }
+
+    .order-btn:hover i {
+        transform: translateX(4px);
     }
 
     /* Image Handling */
@@ -178,48 +242,89 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         position: absolute;
         bottom: -20px;
         right: -20px;
-        width: 280px;
-        transition: 0.5s ease;
-        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+        width: 260px;
+        transition: transform 0.5s ease;
+        filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5));
+        pointer-events: none;
     }
 
     .spotlight-card.featured .product-img {
-        width: 380px;
-        right: -50px;
-        bottom: -50px;
+        width: 350px;
+        right: -40px;
+        bottom: -40px;
     }
 
     .spotlight-card:hover .product-img {
-        transform: scale(1.1) rotate(-5deg);
+        transform: scale(1.08) rotate(-3deg);
     }
 
     .float-slow {
         animation: float 6s ease-in-out infinite;
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: 1200px) {
         .spotlight-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr 1fr;
             grid-template-rows: auto;
         }
-        
-        .spotlight-card { 
-            height: auto; 
-            min-height: 300px;
-            padding-bottom: 8rem; /* Space for image at bottom */
+
+        .spotlight-card.featured {
+            grid-column: span 2;
         }
 
-        .title-head { font-size: 2.5rem; }
+        .spotlight-card.featured .product-img {
+            width: 300px;
+        }
+    }
 
-        .spotlight-card .product-img {
-            width: 200px;
-            bottom: -20px;
+    @media (max-width: 768px) {
+        .menu-section {
+            padding: 5rem 0;
+        }
+
+        .header-center {
+            margin-bottom: 3rem;
+        }
+
+        .spotlight-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .spotlight-card {
+            min-height: auto;
+            padding: 1.5rem;
+            padding-bottom: 10rem;
+        }
+
+        .spotlight-card.featured {
+            grid-column: span 1;
+            padding-bottom: 12rem;
+        }
+
+        .spotlight-card p {
+            max-width: 70%;
+        }
+
+        .product-img {
+            width: 180px;
+            bottom: -15px;
             right: -10px;
         }
 
         .spotlight-card.featured .product-img {
-            width: 280px;
-            right: -30px;
+            width: 240px;
+            right: -20px;
+            bottom: -20px;
+        }
+
+        .item-tag {
+            top: 1rem;
+            left: 1rem;
+        }
+
+        .card-header {
+            margin-top: 2rem;
         }
     }
 </style>

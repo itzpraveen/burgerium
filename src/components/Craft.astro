@@ -1,75 +1,109 @@
 ---
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const craftItems = [
+    {
+        image: 'craft_buns.png',
+        imageAlt: 'Fresh artisan buns being baked in the oven',
+        icon: 'fa-bread-slice',
+        title: 'Artisan Baked Daily',
+        description: 'We bake our own buns fresh every morning. No preservatives, just soft, cloud-like perfection engineered for the perfect hold.'
+    },
+    {
+        image: 'fresh_prep.png',
+        imageAlt: 'Fresh vegetables being prepared in the kitchen',
+        icon: 'fa-leaf',
+        title: 'Farm-Fresh Precision',
+        description: 'From farm to tray. We chop, slice, and prep our veggies and sauces daily. Validated freshness you can taste in every crunch.'
+    },
+    {
+        image: 'craft_grill.png',
+        imageAlt: 'Patties being grilled over charcoal flames',
+        icon: 'fa-fire-flame-curved',
+        title: 'Charcoal Seared',
+        description: 'Classic charcoal searing for that authentic smoky BBQ flavor. 100% real meat, zero fillers, pure fire.'
+    }
+];
 ---
 
-<section class="craft-section">
+<section class="craft-section section-padding" aria-labelledby="craft-heading">
     <div class="container">
-        <span class="sub-label">The Difference</span>
-        <h2 class="section-title">Why We Are <span class="text-orange">Different</span></h2>
-        
-        <div class="craft-grid">
-            <!-- Card 1 -->
-            <div class="craft-card scroll-reveal">
-                <div class="card-visual">
-                    <img src={`${base}/craft_buns.png`} alt="Baking Buns">
-                    <div class="overlay-gradient"></div>
-                </div>
-                <div class="card-info">
-                    <h3>House-Made Buns</h3>
-                    <p>We bake our own buns fresh every morning. No preservatives, just soft, cloud-like perfection.</p>
-                </div>
-            </div>
+        <div class="craft-header scroll-reveal">
+            <span class="sub-label">The Difference</span>
+            <h2 class="section-title" id="craft-heading">The <span class="text-orange">Burgerium Standard</span></h2>
+            <p class="craft-intro">Every element of our burgers is crafted with obsessive attention to detail.</p>
+        </div>
 
-            <!-- Card 2 -->
-            <div class="craft-card scroll-reveal delay-100">
-                <div class="card-visual">
-                    <img src={`${base}/fresh_prep.png`} alt="Fresh Ingredients">
-                    <div class="overlay-gradient"></div>
-                </div>
-                <div class="card-info">
-                    <h3>Freshly Prepared</h3>
-                    <p>From farm to tray. We chop, slice, and prep our veggies and sauces daily. Validated freshness you can taste.</p>
-                </div>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="craft-card scroll-reveal delay-200">
-                <div class="card-visual">
-                    <img src={`${base}/craft_grill.png`} alt="Flame Grilling">
-                    <div class="overlay-gradient"></div>
-                </div>
-                <div class="card-info">
-                    <h3>Flame Grilled</h3>
-                    <p>Classic charcoal searing for that authentic smoky BBQ flavor. 100% real meat, zero fillers.</p>
-                </div>
-            </div>
+        <div class="craft-grid" role="list">
+            {craftItems.map((item, index) => (
+                <article class={`craft-card scroll-reveal`} role="listitem" style={`--delay: ${index * 0.1}s`}>
+                    <div class="card-visual">
+                        <img src={`${base}/${item.image}`} alt={item.imageAlt} loading="lazy" />
+                        <div class="overlay-gradient" aria-hidden="true"></div>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-icon" aria-hidden="true">
+                            <i class={`fas ${item.icon}`}></i>
+                        </div>
+                        <h3>{item.title}</h3>
+                        <p>{item.description}</p>
+                    </div>
+                </article>
+            ))}
         </div>
     </div>
 </section>
 
 <style>
-    /* ... existing styles ... */
+    .craft-section {
+        background: #0a0a0a;
+    }
+
+    .craft-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .sub-label {
+        display: block;
+        color: var(--brand-orange);
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .craft-intro {
+        color: var(--text-gray);
+        font-size: 1.1rem;
+        max-width: 500px;
+        margin: 1rem auto 0;
+    }
+
     .craft-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 3 Columns now */
+        grid-template-columns: repeat(3, 1fr);
         gap: 2rem;
     }
 
     .craft-card {
-        background: #161616;
-        border-radius: 16px;
+        background: #111;
+        border-radius: 20px;
         overflow: hidden;
         border: 1px solid rgba(255,255,255,0.05);
-        transition: 0.3s;
+        transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        transition-delay: var(--delay, 0s);
     }
 
     .craft-card:hover {
         transform: translateY(-10px);
         border-color: var(--brand-orange);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
     .card-visual {
-        height: 300px;
+        height: 280px;
         position: relative;
         overflow: hidden;
     }
@@ -78,7 +112,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: 0.5s;
+        transition: transform 0.6s ease;
     }
 
     .craft-card:hover .card-visual img {
@@ -87,28 +121,78 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     .overlay-gradient {
         position: absolute;
-        bottom: 0; left: 0; width: 100%; height: 50%;
-        background: linear-gradient(to top, #161616, transparent);
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60%;
+        background: linear-gradient(to top, #111, transparent);
+        pointer-events: none;
     }
 
     .card-info {
-        padding: 2rem;
+        padding: 1.5rem 2rem 2rem;
         position: relative;
     }
 
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        background: var(--brand-orange);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.25rem;
+        font-size: 1.25rem;
+        color: #000;
+        margin-top: -40px;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 4px 15px rgba(250, 162, 39, 0.3);
+    }
+
     .card-info h3 {
-        font-size: 1.8rem;
-        margin-bottom: 1rem;
+        font-size: clamp(1.4rem, 2vw, 1.7rem);
+        margin-bottom: 0.75rem;
         color: #fff;
     }
 
     .card-info p {
-        color: #aaa;
-        line-height: 1.6;
+        color: var(--text-gray);
+        line-height: 1.7;
+        font-size: 0.95rem;
     }
 
     @media (max-width: 1024px) {
-        .craft-grid { grid-template-columns: 1fr; gap: 2rem; }
-        .card-visual { height: 250px; }
+        .craft-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .card-visual {
+            height: 220px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .craft-header {
+            margin-bottom: 3rem;
+        }
+
+        .craft-intro {
+            font-size: 1rem;
+        }
+
+        .card-info {
+            padding: 1.25rem 1.5rem 1.5rem;
+        }
+
+        .card-icon {
+            width: 45px;
+            height: 45px;
+            font-size: 1.1rem;
+        }
     }
 </style>

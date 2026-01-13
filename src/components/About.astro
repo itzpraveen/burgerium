@@ -1,68 +1,83 @@
 ---
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const timeline = [
+    {
+        logo: 'burgertree_logo.png',
+        logoAlt: 'Konari Breads and Cakes logo',
+        title: 'Bakery Roots',
+        year: '1998',
+        location: 'Calicut',
+        isNew: false
+    },
+    {
+        logo: 'burgertree_logo.png',
+        logoAlt: 'Burger Tree logo',
+        title: 'Burger Tree',
+        year: '2017',
+        location: 'Kerala & Tamil Nadu',
+        isNew: false
+    },
+    {
+        logo: 'logo.png',
+        logoAlt: 'Burgerium logo',
+        title: 'Burgerium',
+        year: '2025',
+        location: 'Chennai Launch',
+        isNew: true
+    }
+];
 ---
 
-<section id="about" class="section-padding about-section">
+<section id="about" class="section-padding about-section" aria-labelledby="about-heading">
     <div class="container">
         <div class="grid-layout">
             <!-- Left: Visual Stack -->
-            <div class="visual-col reveal">
+            <div class="visual-col scroll-reveal">
                 <div class="img-frame">
-                    <img src={`${base}/hero_feast.png`} alt="Burger Tree spread" class="main-img">
-                    <div class="stat-box">
+                    <img
+                        src={`${base}/hero_feast.png`}
+                        alt="Burgerium signature spread featuring gourmet burgers and sides"
+                        class="main-img"
+                        loading="lazy"
+                    />
+                    <div class="stat-box" aria-label="25 plus years of legacy">
                         <span class="stat-num">25+</span>
-                        <span class="stat-label">Years of <br>Legacy</span>
+                        <span class="stat-label">Years of <br/>Legacy</span>
                     </div>
                 </div>
             </div>
 
             <!-- Right: Story -->
-            <div class="content-col reveal delay-200">
-                <span class="badge">The Evolution</span>
-                <h2 class="section-title">From Oven Heat to <span class="text-orange">Burgerium</span></h2>
-                
+            <div class="content-col scroll-reveal delay-200">
+                <span class="badge">The Lineage</span>
+                <h2 class="section-title" id="about-heading">From the House of <span class="text-orange">Legends</span></h2>
+
                 <p class="story-text">
-                    <b>Burgerium</b> is our flagship — fueled by decades of dough, fire, and flavor. We started as <b>Konari Breads and Cakes</b> (1998), graduated to flame-grilled burgers with <b>Burger Tree</b> (2017), and now channel that heritage into Burgerium under <b>Urban Eats and Kitchen LLP</b>.
+                    <strong>Burgerium</strong> is a distinctive new chapter from the creators of <strong>Burger Tree</strong>. While Burger Tree continues to serve the classics, Burgerium rises as a separate, premium expression of our culinary mastery. Powered by the same 25-year legacy of dough and fire that began with <strong>Konari Breads</strong> (1998), but built for a completely new experience.
                 </p>
 
-                <div class="timeline-box">
-                    <div class="timeline-step">
-                        <div class="step-icon old-logo">
-                            <img src={`${base}/burgertree_logo.png`} alt="Konari Breads and Cakes">
-                        </div>
-                        <div class="step-info">
-                            <h4>Bakery Roots</h4>
-                            <span>1998 • Calicut</span>
-                        </div>
-                    </div>
-                    
-                    <div class="connector-line"></div>
-
-                    <div class="timeline-step">
-                        <div class="step-icon old-logo">
-                            <img src={`${base}/burgertree_logo.png`} alt="Burger Tree">
-                        </div>
-                        <div class="step-info">
-                            <h4>Burger Tree</h4>
-                            <span>2017 • Kerala & Tamil Nadu</span>
-                        </div>
-                    </div>
-                    
-                    <div class="connector-line"></div>
-                    
-                    <div class="timeline-step">
-                        <div class="step-icon new-logo">
-                        <img src={`${base}/logo.png`} alt="Burgerium">
-                        </div>
-                        <div class="step-info">
-                            <h4>Burgerium</h4>
-                            <span>2025 • Chennai</span>
-                        </div>
-                    </div>
+                <div class="timeline-box" role="list" aria-label="Company timeline">
+                    {timeline.map((item, index) => (
+                        <>
+                            <div class="timeline-step" role="listitem">
+                                <div class={`step-icon ${item.isNew ? 'new-logo' : 'old-logo'}`}>
+                                    <img src={`${base}/${item.logo}`} alt={item.logoAlt} loading="lazy" />
+                                </div>
+                                <div class="step-info">
+                                    <h4>{item.title}</h4>
+                                    <span>{item.year} • {item.location}</span>
+                                </div>
+                            </div>
+                            {index < timeline.length - 1 && (
+                                <div class="connector-line" aria-hidden="true"></div>
+                            )}
+                        </>
+                    ))}
                 </div>
 
                 <p class="story-footer">
-                    <b>Burgerium</b> leads the story — modern, bold, and Chennai-bound — powered by the legacy that began in 1998. Always a unit of <b>Urban Eats and Kitchen LLP</b>.
+                    A new standalone brand crafted for the connoisseur—<strong>Urban Eats and Kitchen LLP</strong>.
                 </p>
             </div>
         </div>
@@ -70,6 +85,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 </section>
 
 <style>
+    .about-section {
+        background: var(--bg-dark);
+    }
+
     .grid-layout {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -79,14 +98,16 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     .img-frame {
         position: relative;
-        border-radius: 8px;
+        border-radius: 12px;
         overflow: hidden;
     }
 
     .main-img {
         width: 100%;
+        aspect-ratio: 4/3;
+        object-fit: cover;
         filter: grayscale(20%) contrast(110%);
-        transition: 0.5s;
+        transition: filter 0.5s ease, transform 0.5s ease;
     }
 
     .img-frame:hover .main-img {
@@ -99,38 +120,46 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         bottom: 0;
         left: 0;
         background: var(--brand-orange);
-        padding: 2rem;
+        padding: 1.5rem 2rem;
         color: #000;
     }
 
     .stat-num {
         display: block;
         font-family: var(--font-heading);
-        font-size: 3.5rem;
+        font-size: clamp(2.5rem, 4vw, 3.5rem);
         line-height: 1;
     }
 
     .stat-label {
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
     }
 
     .story-text {
-        font-size: 1.15rem;
-        color: #ccc;
+        font-size: 1.1rem;
+        color: var(--text-gray);
         margin-bottom: 2.5rem;
+        line-height: 1.7;
+    }
+
+    .story-text strong {
+        color: var(--text-white);
     }
 
     /* Timeline Stylization */
     .timeline-box {
-        background: #1a1a1a;
-        padding: 2rem;
-        border-radius: 12px;
+        background: #111;
+        padding: 1.5rem 2rem;
+        border-radius: 16px;
         display: flex;
         align-items: center;
-        width: fit-content;
-        border: 1px solid rgba(255,255,255,0.05);
+        justify-content: center;
+        gap: 0;
+        border: 1px solid rgba(255,255,255,0.08);
+        flex-wrap: wrap;
     }
 
     .timeline-step {
@@ -138,74 +167,195 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
+        padding: 0.5rem;
+        min-width: 100px;
+    }
+
+    .step-icon {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        transition: transform 0.3s ease;
+    }
+
+    .timeline-step:hover .step-icon {
+        transform: scale(1.1);
     }
 
     .step-icon img {
-        height: 40px;
+        height: 35px;
         width: auto;
+        max-width: 50px;
+        object-fit: contain;
     }
-    
+
+    .new-logo {
+        background: var(--brand-orange) !important;
+    }
+
     .new-logo img {
-        /* Ensure logo contrast */
-        background: var(--brand-orange);
-        padding: 4px 8px;
-        border-radius: 4px;
+        filter: none;
     }
 
     .step-info h4 {
-        font-size: 1rem;
+        font-size: 0.95rem;
         color: var(--text-white);
         margin: 0;
+        font-family: var(--font-body);
+        font-weight: 700;
     }
 
     .step-info span {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         color: var(--text-gray);
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
     }
 
     .connector-line {
-        width: 60px;
+        width: 40px;
         height: 2px;
-        background: var(--brand-orange);
-        margin: 0 1.5rem;
+        background: linear-gradient(90deg, var(--brand-orange) 0%, rgba(250, 162, 39, 0.3) 100%);
+        margin: 0 0.75rem;
         position: relative;
+        flex-shrink: 0;
     }
-    
+
     .connector-line::after {
         content: '';
         position: absolute;
-        right: 0;
-        top: -4px;
-        width: 0; 
-        height: 0; 
-        border-top: 5px solid transparent;
-        border-bottom: 5px solid transparent;
-        border-left: 5px solid var(--brand-orange);
+        right: -3px;
+        top: -3px;
+        width: 0;
+        height: 0;
+        border-top: 4px solid transparent;
+        border-bottom: 4px solid transparent;
+        border-left: 6px solid var(--brand-orange);
     }
 
     .story-footer {
         margin-top: 2rem;
         font-style: italic;
         color: var(--brand-orange);
+        font-size: 0.95rem;
+    }
+
+    .story-footer strong {
+        font-style: normal;
+    }
+
+    @media (max-width: 1024px) {
+        .grid-layout {
+            gap: 4rem;
+        }
+
+        .timeline-box {
+            padding: 1.25rem;
+        }
+
+        .connector-line {
+            width: 25px;
+            margin: 0 0.5rem;
+        }
+
+        .timeline-step {
+            min-width: 80px;
+        }
     }
 
     @media (max-width: 900px) {
-        .grid-layout { grid-template-columns: 1fr; gap: 3rem; }
-        
-        .img-frame { height: 300px; margin-bottom: 2rem; }
-        .main-img { height: 100%; object-fit: cover; }
-        
-        .timeline-box { 
-            width: 100%; 
-            justify-content: space-between; 
-            padding: 1.5rem;
+        .grid-layout {
+            grid-template-columns: 1fr;
+            gap: 3rem;
         }
-        
-        .connector-line { width: 30px; margin: 0 0.5rem; }
-        
-        .section-title { font-size: 2.2rem; }
+
+        .visual-col {
+            order: 2;
+        }
+
+        .content-col {
+            order: 1;
+        }
+
+        .img-frame {
+            max-height: 350px;
+        }
+
+        .main-img {
+            height: 100%;
+        }
+
+        .timeline-box {
+            width: 100%;
+            justify-content: space-around;
+            padding: 1.5rem 1rem;
+        }
+
+        .connector-line {
+            width: 20px;
+            margin: 0 0.25rem;
+        }
+
+        .timeline-step {
+            min-width: 70px;
+        }
+
+        .step-icon {
+            width: 50px;
+            height: 50px;
+        }
+
+        .step-icon img {
+            height: 28px;
+        }
+
+        .step-info h4 {
+            font-size: 0.85rem;
+        }
+
+        .step-info span {
+            font-size: 0.65rem;
+        }
+    }
+
+    @media (max-width: 500px) {
+        .timeline-box {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .connector-line {
+            width: 2px;
+            height: 20px;
+            margin: 0;
+            background: linear-gradient(180deg, var(--brand-orange) 0%, rgba(250, 162, 39, 0.3) 100%);
+        }
+
+        .connector-line::after {
+            right: -3px;
+            top: auto;
+            bottom: -3px;
+            border-top: 6px solid var(--brand-orange);
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-bottom: none;
+        }
+
+        .timeline-step {
+            flex-direction: row;
+            gap: 1rem;
+            width: 100%;
+            justify-content: flex-start;
+            text-align: left;
+        }
+
+        .step-info {
+            text-align: left;
+        }
     }
 </style>

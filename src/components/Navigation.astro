@@ -1,30 +1,52 @@
 ---
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const navLinks = [
+    { href: '#home', label: 'Home' },
+    { href: '#about', label: 'The Story' },
+    { href: '#menu', label: 'Our Menu' },
+    { href: '#locations', label: 'Locations' },
+];
 ---
 
-<nav class="navbar">
+<nav class="navbar" aria-label="Main navigation">
     <div class="container nav-content">
         <!-- Logo Section -->
-        <a href="#home" class="brand-wrapper">
-            <!-- Brand Mark Box -->
+        <a href="#home" class="brand-wrapper" aria-label="Burgerium - Go to homepage">
             <div class="logo-box">
                 <img src={`${base}/logo.png`} alt="Burgerium" />
             </div>
         </a>
 
         <!-- Desktop Menu -->
-        <div class="nav-menu">
-            <a href="#home" class="nav-link active">Home</a>
-            <a href="#about" class="nav-link">The Story</a>
-            <a href="#menu" class="nav-link">Our Menu</a>
-            <a href="#locations" class="nav-link">Locations</a>
+        <div class="nav-menu" id="nav-menu">
+            {navLinks.map((link, index) => (
+                <a
+                    href={link.href}
+                    class={`nav-link ${index === 0 ? 'active' : ''}`}
+                    data-section={link.href.replace('#', '')}
+                >
+                    {link.label}
+                </a>
+            ))}
         </div>
 
         <!-- Mobile Toggle -->
-        <button class="menu-toggle" aria-label="Toggle Menu">
+        <button
+            class="menu-toggle"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="nav-menu"
+        >
+            <span class="bar"></span>
             <span class="bar"></span>
             <span class="bar"></span>
         </button>
+    </div>
+
+    <!-- Progress indicator -->
+    <div class="scroll-progress" aria-hidden="true">
+        <div class="scroll-progress-bar"></div>
     </div>
 </nav>
 
@@ -53,27 +75,25 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     .logo-box {
         display: flex;
         align-items: center;
-        /* No extra background needed as header is orange, but keeping logo crisp */
     }
 
     .logo-box img {
-        height: 60px; /* Reduced base size */
+        height: 60px;
         max-height: 80%;
         width: auto;
-        /* Ensure distinct visibility */
         filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        transition: transform 0.3s ease;
     }
 
-    .legal-tag {
-        display: block;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #000;
-        font-weight: 700;
-        margin-top: -6px;
+    .brand-wrapper:hover .logo-box img {
+        transform: scale(1.05);
     }
-    
+
+    .brand-wrapper:focus-visible {
+        box-shadow: var(--focus-ring-light);
+        border-radius: 8px;
+    }
+
     @media (min-width: 901px) {
         .logo-box img {
             height: 90px;
@@ -94,44 +114,80 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         letter-spacing: 1px;
         color: #000;
         position: relative;
-        opacity: 0.85;
-        transition: 0.3s;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+        padding: 0.5rem 0;
     }
 
-    .nav-link:hover, .nav-link.active {
+    .nav-link:hover,
+    .nav-link.active {
         opacity: 1;
     }
 
     .nav-link::after {
         content: '';
         position: absolute;
-        bottom: -4px;
+        bottom: 0;
         left: 0;
         width: 0%;
         height: 2px;
         background: #000;
-        transition: 0.3s ease;
+        transition: width 0.3s ease;
     }
 
-    .nav-link:hover::after {
+    .nav-link:hover::after,
+    .nav-link.active::after {
         width: 100%;
     }
 
-    /* Mobile Toggle */
+    .nav-link:focus-visible {
+        box-shadow: var(--focus-ring-light);
+        border-radius: 4px;
+    }
+
+    /* Scroll Progress */
+    .scroll-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    .scroll-progress-bar {
+        height: 100%;
+        width: 0%;
+        background: #000;
+        transition: width 0.1s linear;
+    }
+
+    /* Mobile Toggle - 3 bar hamburger */
     .menu-toggle {
         display: none;
         flex-direction: column;
-        gap: 6px;
+        justify-content: center;
+        gap: 5px;
         background: none;
         border: none;
         cursor: pointer;
+        padding: 10px;
+        width: 48px;
+        height: 48px;
     }
 
     .bar {
-        width: 28px;
-        height: 3px;
+        width: 24px;
+        height: 2px;
         background-color: #000;
         border-radius: 2px;
+        transition: all 0.3s ease;
+        transform-origin: center;
+    }
+
+    .menu-toggle:focus-visible {
+        box-shadow: var(--focus-ring-light);
+        border-radius: 8px;
     }
 
     @media (max-width: 900px) {
@@ -141,95 +197,191 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             left: 0;
             width: 100%;
             height: 100vh;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(10px);
+            height: 100dvh;
+            background: rgba(5, 5, 5, 0.98);
+            backdrop-filter: blur(20px);
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 2rem;
-            transform: translateY(-100%);
-            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            gap: 2.5rem;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             padding: 0;
-            z-index: 999; /* Below toggle but above content */
+            z-index: 999;
         }
 
         .navbar.open .nav-menu {
-            transform: translateY(0);
+            transform: translateX(0);
         }
 
         .nav-link {
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: #fff;
             opacity: 0;
             transform: translateY(20px);
-            transition: 0.3s;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .nav-link::after {
+            background: var(--brand-orange);
+            height: 3px;
         }
 
         .navbar.open .nav-link {
             opacity: 1;
             transform: translateY(0);
-            transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
         /* Stagger delays for links */
         .navbar.open .nav-link:nth-child(1) { transition-delay: 0.1s; }
-        .navbar.open .nav-link:nth-child(2) { transition-delay: 0.2s; }
-        .navbar.open .nav-link:nth-child(3) { transition-delay: 0.3s; }
-        .navbar.open .nav-link:nth-child(4) { transition-delay: 0.4s; }
+        .navbar.open .nav-link:nth-child(2) { transition-delay: 0.15s; }
+        .navbar.open .nav-link:nth-child(3) { transition-delay: 0.2s; }
+        .navbar.open .nav-link:nth-child(4) { transition-delay: 0.25s; }
 
         .menu-toggle {
             display: flex;
-            z-index: 1001; /* Stay on top */
+            z-index: 1001;
             position: relative;
         }
 
+        /* Hamburger to X animation */
         .navbar.open .bar:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 6px);
-            background: var(--brand-orange);
+            transform: translateY(7px) rotate(45deg);
+            background: #fff;
         }
 
         .navbar.open .bar:nth-child(2) {
             opacity: 0;
+            transform: scaleX(0);
         }
-        
-        /* We need 3 bars for standard hamburger, but currently have 2 in HTML. 
-           Let's assume we might need to add one or adjust. 
-           Wait, HTML shows 2 bars? Let's check HTML. 
-           Ah, I should check HTML content first or just stick to 2 bar cross.
-        */
 
-        .legal-tag {
-            color: #fff;
-            font-size: 0.65rem;
-            letter-spacing: 0.5px;
+        .navbar.open .bar:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+            background: #fff;
         }
-    }
 
-    /* Fixing the Toggle Animation for 2 bars if that's what we have, or 3. 
-       HTML has: 
-       <span class="bar"></span>
-       <span class="bar"></span>
-       
-       Let's stick to 2 bars forming an X.
-    */
-    .navbar.open .bar:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 5px);
-        background: #fff;
-    }
-    .navbar.open .bar:nth-child(2) {
-        transform: rotate(-45deg) translate(5px, -5px);
-        background: #fff;
+        .scroll-progress {
+            display: none;
+        }
     }
 </style>
 
 <script>
+    // Mobile menu toggle
     const toggle = document.querySelector('.menu-toggle');
     const navbar = document.querySelector('.navbar');
-    
-    if(toggle && navbar) {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const navMenu = document.getElementById('nav-menu');
+    const focusableLinks = Array.from(navLinks) as HTMLElement[];
+    const isMobile = () => window.matchMedia('(max-width: 900px)').matches;
+
+    const setLinkTabIndex = (disabled) => {
+        navLinks.forEach((link) => {
+            if (disabled) {
+                link.setAttribute('tabindex', '-1');
+            } else {
+                link.removeAttribute('tabindex');
+            }
+        });
+    };
+
+    const syncMenuAccessibility = () => {
+        if (!navbar) return;
+        const isOpen = navbar.classList.contains('open');
+
+        if (isMobile()) {
+            navMenu?.setAttribute('aria-hidden', String(!isOpen));
+            setLinkTabIndex(!isOpen);
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+            return;
+        }
+
+        navMenu?.removeAttribute('aria-hidden');
+        setLinkTabIndex(false);
+        document.body.style.overflow = '';
+    };
+
+    if (toggle && navbar) {
         toggle.addEventListener('click', () => {
-             // @ts-ignore
-            navbar.classList.toggle('open');
+            const isOpen = navbar.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', String(isOpen));
+            toggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+            syncMenuAccessibility();
+
+            if (isOpen && focusableLinks.length > 0) {
+                focusableLinks[0].focus();
+            }
+        });
+
+        // Close menu when clicking a link
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navbar.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.setAttribute('aria-label', 'Open menu');
+                syncMenuAccessibility();
+            });
+        });
+
+        // Close menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navbar.classList.contains('open')) {
+                navbar.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.setAttribute('aria-label', 'Open menu');
+                syncMenuAccessibility();
+                toggle.focus();
+            }
+
+            if (e.key === 'Tab' && navbar.classList.contains('open') && focusableLinks.length > 1) {
+                const first = focusableLinks[0];
+                const last = focusableLinks[focusableLinks.length - 1];
+
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
         });
     }
+
+    window.addEventListener('resize', syncMenuAccessibility);
+    syncMenuAccessibility();
+
+    // Scroll spy - highlight active section
+    const sections = document.querySelectorAll('section[id]');
+    const progressBar = document.querySelector('.scroll-progress-bar') as HTMLElement;
+
+    function updateActiveLink() {
+        const navOffset = navbar ? navbar.getBoundingClientRect().height : 0;
+        const scrollPos = window.scrollY + navOffset + 20;
+
+        sections.forEach(section => {
+            const sectionTop = (section as HTMLElement).offsetTop;
+            const sectionHeight = (section as HTMLElement).offsetHeight;
+            const sectionId = section.getAttribute('id');
+
+            if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('data-section') === sectionId) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+
+        // Update scroll progress
+        if (progressBar) {
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (window.scrollY / scrollHeight) * 100;
+            progressBar.style.width = `${scrollPercent}%`;
+        }
+    }
+
+    window.addEventListener('scroll', updateActiveLink, { passive: true });
+    updateActiveLink();
 </script>

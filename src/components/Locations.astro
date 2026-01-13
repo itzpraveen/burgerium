@@ -1,49 +1,38 @@
 ---
 const locations = [
     {
-        city: 'Palakkad',
-        name: 'Tharekkad',
-        address: ['18/80, S.M. Complex', 'College Road, Tharekkad', 'Palakkad, Kerala - 678001'],
-        phone: '+91 9544 600 900',
-        map: 'https://goo.gl/maps/QXPBitWrTPqSk2ie7',
-    },
-    {
-        city: 'Coimbatore',
-        name: 'RS Puram',
-        address: [
-            'Door No.8, Sree Nandhini Complex',
-            'Venkataswamy Road, West R.S. Puram',
-            'Coimbatore, Tamil Nadu - 641002',
-        ],
-        phone: '+91 9535 600 900',
-        map: 'https://www.google.com/maps/place/Burger+Tree/@11.0121828,76.9495792,15z/data=!4m6!3m5!1s0x3ba859ad4ecb88b3:0x4ae2d47dc812ecde!8m2!3d11.0121828!4d76.9495792!16s%2Fg%2F11gvyqp2jc?hl=en_GB&coh=164777&entry=tt',
-    },
-    {
-        city: 'Coimbatore',
-        name: 'Race Course',
-        address: ['16 Abdul Rahim Road', 'Race Course', 'Coimbatore, Tamil Nadu - 641018'],
-        phone: '+91 9605 600 900',
-        map: 'https://maps.app.goo.gl/j9TznKQyZnUkqrHVA',
-    },
+        city: 'Chennai',
+        name: 'Anna Nagar',
+        address: ['Anna Nagar West', 'Chennai, Tamil Nadu'],
+        phone: null,
+        map: null,
+        comingSoon: true,
+        launchDate: 'Q1 2025'
+    }
 ];
 ---
 
-<section id="locations" class="section-padding locations-section">
+<section id="locations" class="section-padding locations-section" aria-labelledby="locations-heading">
     <div class="container">
-        <div class="locations-head">
-            <div>
+        <div class="locations-head scroll-reveal">
+            <div class="head-content">
                 <p class="eyebrow">Verified Locations</p>
-                <h2 class="section-title">Burger Tree Addresses</h2>
+                <h2 class="section-title" id="locations-heading">The <span class="text-orange">Destination</span></h2>
                 <p class="lede">
-                    Pulled directly from the Burger Tree website. Tharekkad is the only live Palakkad outlet. RS Puram and Race Course are the verified Coimbatore stores.
+                    Burgerium is launching exclusively in Chennai. Be the first to experience the future of burgers.
                 </p>
-                <p class="legal-pill">A Unit of Urban Eats and Kitchen LLP</p>
             </div>
         </div>
 
-        <div class="locations-grid">
+        <div class="locations-grid" role="list">
             {locations.map((loc) => (
-                <article class="location-card scroll-reveal">
+                <article class={`location-card scroll-reveal ${loc.comingSoon ? 'coming-soon' : ''}`} role="listitem">
+                    {loc.comingSoon && (
+                        <div class="coming-soon-badge">
+                            <i class="fas fa-clock" aria-hidden="true"></i>
+                            <span>Opening {loc.launchDate}</span>
+                        </div>
+                    )}
                     <div class="card-top">
                         <span class="pill">{loc.city}</span>
                         <h3>{loc.name}</h3>
@@ -55,12 +44,41 @@ const locations = [
                             ))}
                         </p>
                     </div>
-                    <div class="card-actions">
-                        <a class="btn-primary" href={loc.map} target="_blank" rel="noreferrer">Get Directions</a>
-                        <a class="phone" href={`tel:${loc.phone.replace(/\s+/g, '')}`}>{loc.phone}</a>
-                    </div>
+
+                    {loc.comingSoon ? (
+                        <div class="card-actions coming-soon-actions">
+                            <div class="notify-box">
+                                <p class="notify-text">Get notified when we open</p>
+                                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="btn-primary btn-notify">
+                                    <i class="fab fa-instagram" aria-hidden="true"></i>
+                                    Follow for Updates
+                                </a>
+                            </div>
+                        </div>
+                    ) : (
+                        <div class="card-actions">
+                            <a class="btn-primary" href={loc.map} target="_blank" rel="noopener noreferrer">
+                                Get Directions
+                                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                            </a>
+                            {loc.phone && (
+                                <a class="phone" href={`tel:${loc.phone.replace(/\s+/g, '')}`}>
+                                    <i class="fas fa-phone" aria-hidden="true"></i>
+                                    {loc.phone}
+                                </a>
+                            )}
+                        </div>
+                    )}
                 </article>
             ))}
+        </div>
+
+        <!-- Expansion teaser -->
+        <div class="expansion-teaser scroll-reveal delay-200">
+            <div class="teaser-content">
+                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                <p>More locations coming to <strong>Kerala</strong> and <strong>Karnataka</strong> soon.</p>
+            </div>
         </div>
     </div>
 </section>
@@ -71,96 +89,111 @@ const locations = [
     }
 
     .locations-head {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 2rem;
-        align-items: center;
+        text-align: center;
         margin-bottom: 3rem;
     }
 
     .eyebrow {
-        letter-spacing: 2px;
+        letter-spacing: 3px;
         text-transform: uppercase;
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         color: var(--brand-orange);
         margin-bottom: 0.5rem;
+        font-weight: 600;
     }
 
     .lede {
-        color: #d8d8d8;
-        margin: 1rem 0 0.75rem;
-        line-height: 1.6;
-    }
-
-    .legal-pill {
-        display: inline-block;
-        background: rgba(250, 162, 39, 0.15);
-        color: var(--brand-orange);
-        padding: 0.4rem 0.8rem;
-        border-radius: 999px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-size: 0.8rem;
-        border: 1px solid rgba(250, 162, 39, 0.4);
-    }
-
-    .note {
-        background: #111;
-        border: 1px dashed rgba(250, 162, 39, 0.6);
-        padding: 1.5rem;
-        border-radius: 12px;
-        color: #f8f8f8;
-        line-height: 1.5;
+        color: var(--text-gray);
+        margin: 1rem auto 0;
+        line-height: 1.7;
+        max-width: 500px;
+        font-size: 1.05rem;
     }
 
     .locations-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 1.5rem;
+        max-width: 800px;
+        margin: 0 auto;
     }
 
     .location-card {
         background: #111;
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 18px;
-        padding: 1.75rem;
+        border-radius: 20px;
+        padding: 2rem;
         display: flex;
         flex-direction: column;
-        gap: 1.25rem;
+        gap: 1.5rem;
         position: relative;
         overflow: hidden;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .location-card:hover {
+        border-color: rgba(250, 162, 39, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
 
     .location-card::after {
         content: '';
         position: absolute;
         inset: 0;
-        background: radial-gradient(circle at 80% 0%, rgba(250, 162, 39, 0.12), transparent 50%);
+        background: radial-gradient(circle at 80% 0%, rgba(250, 162, 39, 0.1), transparent 50%);
         pointer-events: none;
     }
 
+    /* Coming soon badge */
+    .coming-soon-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--brand-orange), #e89520);
+        color: #000;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        width: fit-content;
+        animation: pulse-badge 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-badge {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(250, 162, 39, 0.4); }
+        50% { box-shadow: 0 0 0 8px rgba(250, 162, 39, 0); }
+    }
+
+    .card-top {
+        position: relative;
+        z-index: 2;
+    }
+
     .card-top h3 {
-        font-size: 1.6rem;
-        margin-bottom: 0.25rem;
+        font-size: clamp(1.5rem, 3vw, 1.8rem);
+        margin-bottom: 0.5rem;
+        color: #fff;
     }
 
     .pill {
         display: inline-block;
         padding: 0.35rem 0.75rem;
         border-radius: 999px;
-        background: rgba(250, 162, 39, 0.16);
+        background: rgba(250, 162, 39, 0.15);
         color: var(--brand-orange);
-        font-weight: 800;
+        font-weight: 700;
         letter-spacing: 1px;
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         text-transform: uppercase;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
     }
 
     .address {
-        color: #c6c6c6;
-        line-height: 1.5;
+        color: var(--text-gray);
+        line-height: 1.6;
+        font-size: 1rem;
     }
 
     .card-actions {
@@ -168,33 +201,113 @@ const locations = [
         justify-content: space-between;
         align-items: center;
         gap: 1rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .coming-soon-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .notify-box {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px dashed rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        padding: 1.25rem;
+        text-align: center;
+    }
+
+    .notify-text {
+        color: var(--text-gray);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn-notify {
+        width: 100%;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .btn-notify i {
+        font-size: 1.1rem;
     }
 
     .card-actions .btn-primary {
-        padding: 0.8rem 1.6rem;
-        font-size: 1rem;
+        padding: 0.9rem 1.8rem;
+        font-size: 0.95rem;
     }
 
     .phone {
         color: #fff;
         font-weight: 700;
         letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: color 0.3s ease;
     }
 
-    @media (max-width: 900px) {
-        .locations-head {
+    .phone:hover {
+        color: var(--brand-orange);
+    }
+
+    /* Expansion teaser */
+    .expansion-teaser {
+        margin-top: 3rem;
+        text-align: center;
+    }
+
+    .teaser-content {
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        background: rgba(250, 162, 39, 0.08);
+        border: 1px solid rgba(250, 162, 39, 0.2);
+        padding: 1rem 2rem;
+        border-radius: 50px;
+    }
+
+    .teaser-content i {
+        color: var(--brand-orange);
+        font-size: 1.1rem;
+    }
+
+    .teaser-content p {
+        color: var(--text-gray);
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    .teaser-content strong {
+        color: var(--brand-orange);
+    }
+
+    @media (max-width: 768px) {
+        .locations-grid {
             grid-template-columns: 1fr;
+        }
+
+        .location-card {
+            padding: 1.5rem;
         }
 
         .card-actions {
             flex-direction: column;
-            align-items: flex-start;
+            align-items: stretch;
         }
 
         .card-actions .btn-primary {
             width: 100%;
             justify-content: center;
-            text-align: center;
+        }
+
+        .teaser-content {
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1.25rem 1.5rem;
+            border-radius: 16px;
         }
     }
 </style>
