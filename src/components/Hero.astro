@@ -29,12 +29,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
                 25 years of craft. House-baked buns. Charcoal-seared patties. Chennai's new burger destination.
             </p>
 
-            <ul class="hero-chips slide-in-4" aria-label="Key highlights">
-                <li>House-Baked Buns</li>
-                <li>Charcoal-Seared</li>
-                <li>25+ Years</li>
-            </ul>
-
         </div>
 
         <!-- 3D Featured Product -->
@@ -198,27 +192,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         margin-bottom: 1.5rem;
     }
 
-    .hero-chips {
-        list-style: none;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        padding: 0;
-        margin: 1.25rem 0 0;
-    }
-
-    .hero-chips li {
-        padding: 0.4rem 0.8rem;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #e8e8e8;
-    }
 
     /* Staggered Entrance */
     .slide-in-1 { animation: slideUp 0.8s ease forwards; opacity: 0; animation-delay: 0.2s; }
@@ -367,9 +340,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             margin-bottom: 1rem;
         }
 
-        .hero-chips {
-            display: flex;
-        }
     }
 
     @media (max-width: 400px) {
