@@ -3,22 +3,67 @@ import '../styles/global.css';
 
 interface Props {
 	title: string;
+	description?: string;
+	image?: string;
 }
 
-const { title } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const defaultDescription =
+	'Burgerium — born from the Burger Tree legacy. Chennai launch with house-baked buns, flame-grilled burgers, and heritage outlets in Palakkad & Coimbatore.';
+
+const {
+	title,
+	description = defaultDescription,
+	image = `${base}/og-burgerium.png`,
+} = Astro.props;
+
+const site = Astro.site ?? new URL('https://burgerium.in');
+const canonicalURL = new URL(Astro.url.pathname, site);
+const ogImageURL = new URL(image, site);
+const logoURL = new URL(`${base}/logo.png`, site);
+
+const structuredData = {
+	'@context': 'https://schema.org',
+	'@type': 'Organization',
+	name: 'Burgerium',
+	url: site.href,
+	logo: logoURL.href,
+	image: ogImageURL.href,
+	description,
+};
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="Burgerium — born from the Burger Tree legacy. Chennai launch with house-baked buns, flame-grilled burgers, and heritage outlets in Palakkad & Coimbatore." />
+		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="theme-color" content="#FAA227" />
+		<meta name="robots" content="index,follow" />
 		<link rel="icon" type="image/png" href={`${base}/favicon.png`} />
+		<link rel="canonical" href={canonicalURL.href} />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+
+		<meta property="og:site_name" content="Burgerium" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonicalURL.href} />
+		<meta property="og:image" content={ogImageURL.href} />
+		<meta property="og:image:alt" content="Burgerium logo on brand orange" />
+		<meta property="og:locale" content="en_IN" />
+
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImageURL.href} />
+		<meta name="twitter:image:alt" content="Burgerium logo on brand orange" />
+
+		<script type="application/ld+json" is:inline>
+			{JSON.stringify(structuredData)}
+		</script>
 
         <!-- Preconnect for performance -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

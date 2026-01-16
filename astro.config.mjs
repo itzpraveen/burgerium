@@ -1,7 +1,9 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  // Vercel deploys at the root by default.
+  site: 'https://burgerium.in',
+  integrations: [sitemap()],
 });
