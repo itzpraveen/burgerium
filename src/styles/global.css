@@ -1,42 +1,44 @@
 :root {
-    --bg-dark: #fff6de;
-    --bg-card: #fff8ed;
-    --bg-surface: #fff0c9;
-    --bg-surface-strong: #ffd978;
-    --bg-panel: rgba(255, 249, 237, 0.94);
+    --bg-dark: #f9efd8;
+    --bg-card: #fff9ef;
+    --bg-surface: #ffe9b8;
+    --bg-surface-strong: #ffd36d;
+    --bg-panel: rgba(255, 250, 241, 0.9);
     --brand-orange: #FAA227;
-    --brand-orange-light: #FFB84D;
-    --brand-orange-deep: #b86800;
-    --header-height: 120px;
-    /* Increased for premium brand visibility */
-    --brand-glow: rgba(250, 162, 39, 0.28);
-    --text-white: #1f1609;
-    --text-gray: #5f5039;
-    --text-muted: #84755d;
-    --line-soft: rgba(71, 45, 6, 0.12);
-    --line-strong: rgba(71, 45, 6, 0.22);
-    --shadow-soft: 0 18px 40px rgba(106, 66, 7, 0.12);
+    --brand-orange-light: #ffbe59;
+    --brand-orange-deep: #9d5d00;
+    --brand-ink: #26180b;
+    --brand-ink-soft: #5f4a33;
+    --header-height: 108px;
+    --brand-glow: rgba(250, 162, 39, 0.22);
+    --text-white: var(--brand-ink);
+    --text-gray: var(--brand-ink-soft);
+    --text-muted: #8a7558;
+    --line-soft: rgba(75, 47, 10, 0.11);
+    --line-strong: rgba(75, 47, 10, 0.2);
+    --shadow-soft: 0 18px 40px rgba(93, 60, 10, 0.1);
+    --shadow-strong: 0 28px 64px rgba(75, 47, 10, 0.14);
+    --radius-sm: 16px;
+    --radius-md: 24px;
+    --radius-lg: 32px;
 
     --font-heading: 'Anton', sans-serif;
     --font-body: 'Outfit', sans-serif;
 
-    --container-width: 1400px;
-    /* Wider for modern feel */
+    --container-width: 1360px;
 
-    /* Focus ring for accessibility */
     --focus-ring: 0 0 0 3px rgba(250, 162, 39, 0.6);
     --focus-ring-light: 0 0 0 3px rgba(0, 0, 0, 0.4);
 }
 
 @media (max-width: 900px) {
     :root {
-        --header-height: 80px;
+        --header-height: 82px;
         font-size: 17px;
-        /* Smaller header for mobile */
     }
 
     .section-padding {
-        padding: 4.75rem 0;
+        padding: 4.8rem 0;
     }
 
     .container {
@@ -74,8 +76,9 @@ html,
 body {
     width: 100%;
     background:
-        radial-gradient(circle at top left, rgba(250, 162, 39, 0.14), transparent 24%),
-        linear-gradient(180deg, #fff8e9 0%, var(--bg-dark) 100%);
+        radial-gradient(circle at top left, rgba(250, 162, 39, 0.13), transparent 22%),
+        radial-gradient(circle at 85% 0%, rgba(250, 162, 39, 0.08), transparent 20%),
+        linear-gradient(180deg, #fff9ed 0%, var(--bg-dark) 100%);
     color: var(--text-white);
     font-family: var(--font-body);
     overflow-x: hidden;
@@ -94,7 +97,7 @@ h2,
 h3 {
     font-family: var(--font-heading);
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
 }
 
 img {
@@ -116,6 +119,11 @@ textarea:focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
     border-radius: 4px;
+}
+
+::selection {
+    background: rgba(250, 162, 39, 0.28);
+    color: var(--brand-ink);
 }
 
 /* Respect reduced motion preferences */
@@ -162,11 +170,6 @@ textarea:focus-visible {
     background: var(--brand-orange);
     border-radius: 4px;
 }
-
-/* 
-   ANIMATION LIBRARY 
-   Define reusable animations for that "WOW" factor
-*/
 
 @keyframes float {
     0% {
@@ -247,7 +250,7 @@ textarea:focus-visible {
 }
 
 .section-padding {
-    padding: 6rem 0;
+    padding: 6.5rem 0;
 }
 
 .container {
@@ -256,30 +259,35 @@ textarea:focus-visible {
     padding: 0 2rem;
 }
 
-/* Button Styles - High Impact */
 .btn-primary {
-    background: var(--brand-orange);
+    background: linear-gradient(180deg, var(--brand-orange-light) 0%, var(--brand-orange) 100%);
     color: #000;
-    padding: 1rem 2.5rem;
+    padding: 0.95rem 1.65rem;
     font-family: var(--font-heading);
-    font-size: 1.2rem;
-    letter-spacing: 1px;
-    border: none;
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    border: 1px solid rgba(0, 0, 0, 0.14);
     cursor: pointer;
-    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    /* Bouncy */
+    transition:
+        transform 0.24s ease,
+        box-shadow 0.24s ease,
+        border-color 0.24s ease,
+        background 0.24s ease;
     text-transform: uppercase;
     position: relative;
     overflow: hidden;
     display: inline-flex;
     align-items: center;
     gap: 10px;
+    min-height: 56px;
+    border-radius: 18px;
+    box-shadow: 0 12px 24px rgba(157, 93, 0, 0.16);
     will-change: transform;
 }
 
 .btn-primary:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 30px var(--brand-glow);
+    transform: translateY(-2px);
+    box-shadow: 0 18px 32px rgba(157, 93, 0, 0.22);
 }
 
 .btn-primary::after {
@@ -289,8 +297,8 @@ textarea:focus-visible {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transition: 0.5s;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.26), transparent);
+    transition: left 0.45s ease;
 }
 
 .btn-primary:hover::after {
@@ -298,35 +306,37 @@ textarea:focus-visible {
 }
 
 .btn-primary:focus-visible {
-    box-shadow: var(--focus-ring), 0 0 30px var(--brand-glow);
-    transform: scale(1.02);
+    box-shadow: var(--focus-ring), 0 16px 30px rgba(157, 93, 0, 0.18);
+    transform: translateY(-1px);
 }
 
-/* Secondary button style */
 .btn-secondary {
     background: transparent;
     color: var(--text-white);
-    padding: 1rem 2.5rem;
+    padding: 0.95rem 1.65rem;
     font-family: var(--font-heading);
-    font-size: 1.1rem;
-    letter-spacing: 1px;
-    border: 2px solid rgba(39, 24, 3, 0.16);
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    border: 1px solid rgba(39, 24, 3, 0.16);
     cursor: pointer;
-    transition: 0.3s ease;
+    transition: transform 0.24s ease, border-color 0.24s ease, background 0.24s ease, box-shadow 0.24s ease;
     text-transform: uppercase;
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    border-radius: 4px;
+    min-height: 56px;
+    border-radius: 18px;
+    background: rgba(255, 251, 244, 0.58);
 }
 
 .btn-secondary:hover {
+    transform: translateY(-2px);
     border-color: var(--brand-orange);
     color: var(--brand-orange-deep);
     background: rgba(250, 162, 39, 0.1);
+    box-shadow: 0 12px 24px rgba(157, 93, 0, 0.08);
 }
 
-/* Section title styles */
 .section-title {
     font-size: clamp(2.5rem, 5vw, 3.5rem);
     margin-bottom: 1rem;

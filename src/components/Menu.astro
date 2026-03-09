@@ -20,10 +20,10 @@ const getItems = (section) => section.blocks.flatMap((block) => block.items);
     <div class="menu-preview-copy scroll-reveal">
       <span class="menu-kicker">Digital Menu</span>
       <h2 id="menu-preview-heading">
-        The full Burgerium menu is now built for the web.
+        The menu is easier to browse now.
       </h2>
       <p class="menu-copy">
-        Browse burgers, wraps, bowls, fries, shakes, coffee, and desserts in a proper digital menu instead of a PDF-only layout.
+        Check sections, prices, and a few crowd favourites before you visit.
       </p>
 
       <div class="menu-stats" aria-label="Menu highlights">
@@ -42,12 +42,12 @@ const getItems = (section) => section.blocks.flatMap((block) => block.items);
       </div>
 
       <div class="menu-actions">
-        <a class="btn-primary" href="/menu">Browse Full Menu</a>
-        <a class="btn-secondary" href="#locations">See Location</a>
+        <a class="btn-primary" href="/menu">Open Full Menu</a>
+        <a class="btn-secondary" href="#locations">Find Chennai House</a>
       </div>
 
       <p class="menu-meta">
-        Freshly prepared on request. All prices exclude GST.
+        Prices exclude GST. Food is prepared once you order.
       </p>
     </div>
 
@@ -71,7 +71,7 @@ const getItems = (section) => section.blocks.flatMap((block) => block.items);
             <h3>{section.title}</h3>
 
             <p class="preview-count">
-              {items.length} items live on the digital menu
+              {items.length} items in this section
             </p>
 
             <ul class="preview-list">
@@ -81,7 +81,7 @@ const getItems = (section) => section.blocks.flatMap((block) => block.items);
             </ul>
 
             <span class="preview-link">
-              Open section
+              See section
               <i class="fas fa-arrow-right" aria-hidden="true"></i>
             </span>
           </a>

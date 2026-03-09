@@ -2,6 +2,9 @@
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const currentPath = Astro.url.pathname === "" ? "/" : Astro.url.pathname;
 const isHomePage = currentPath === "/";
+const utilityLink = currentPath === "/menu"
+    ? { href: isHomePage ? "#locations" : "/#locations", label: "Visit Burgerium" }
+    : { href: "/menu", label: "View Menu" };
 
 const navLinks = [
     {
@@ -33,40 +36,47 @@ const navLinks = [
 
 <nav class="navbar" aria-label="Main navigation">
     <div class="container nav-content">
-        <!-- Logo Section -->
         <a href={isHomePage ? "#home" : "/"} class="brand-wrapper" aria-label="Burgerium - Go to homepage">
             <div class="logo-box">
                 <img src={`${base}/logo.png`} alt="Burgerium" />
             </div>
+            <div class="brand-copy" aria-hidden="true">
+                <span class="brand-kicker">Since 1998</span>
+                <span class="brand-caption">Crafted In The South</span>
+            </div>
         </a>
 
-        <!-- Desktop Menu -->
-        <div class="nav-menu" id="nav-menu">
-            {navLinks.map((link, index) => (
-                <a
-                    href={link.href}
-                    class={`nav-link ${link.isActive ? 'active' : ''}`}
-                    data-section={link.sectionId}
-                >
-                    {link.label}
-                </a>
-            ))}
-        </div>
+        <div class="nav-right">
+            <div class="nav-menu" id="nav-menu">
+                {navLinks.map((link) => (
+                    <a
+                        href={link.href}
+                        class={`nav-link ${link.isActive ? 'active' : ''}`}
+                        data-section={link.sectionId}
+                    >
+                        {link.label}
+                    </a>
+                ))}
+            </div>
 
-        <!-- Mobile Toggle -->
-        <button
-            class="menu-toggle"
-            aria-label="Open menu"
-            aria-expanded="false"
-            aria-controls="nav-menu"
-        >
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-        </button>
+            <a href={utilityLink.href} class="nav-cta">
+                {utilityLink.label}
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </a>
+
+            <button
+                class="menu-toggle"
+                aria-label="Open menu"
+                aria-expanded="false"
+                aria-controls="nav-menu"
+            >
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </div>
     </div>
 
-    <!-- Progress indicator -->
     <div class="scroll-progress" aria-hidden="true">
         <div class="scroll-progress-bar"></div>
     </div>
@@ -78,12 +88,20 @@ const navLinks = [
         top: 0;
         left: 0;
         width: 100%;
-        background: linear-gradient(180deg, #ffc04f 0%, #faa227 100%);
+        background: rgba(255, 248, 230, 0.78);
+        backdrop-filter: blur(18px);
         height: var(--header-height);
         z-index: 1000;
         display: flex;
         align-items: center;
-        box-shadow: 0 8px 24px rgba(137, 84, 6, 0.18);
+        border-bottom: 1px solid rgba(75, 47, 10, 0.08);
+        transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .navbar.is-scrolled {
+        background: rgba(255, 248, 230, 0.94);
+        border-bottom-color: rgba(75, 47, 10, 0.14);
+        box-shadow: 0 18px 36px rgba(75, 47, 10, 0.08);
     }
 
     .nav-content {
@@ -91,24 +109,58 @@ const navLinks = [
         justify-content: space-between;
         align-items: center;
         width: 100%;
+        gap: 1.2rem;
     }
 
-    /* Logo Styling */
+    .brand-wrapper {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.85rem;
+        min-width: 0;
+    }
+
     .logo-box {
         display: flex;
         align-items: center;
+        justify-content: center;
+        padding: 0.65rem 0.9rem;
+        border-radius: 20px;
+        border: 1px solid rgba(75, 47, 10, 0.08);
+        background: linear-gradient(180deg, rgba(255, 252, 243, 0.92), rgba(255, 242, 208, 0.74));
+        box-shadow: 0 12px 24px rgba(75, 47, 10, 0.08);
     }
 
     .logo-box img {
-        height: 60px;
+        height: 52px;
         max-height: 80%;
         width: auto;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
         transition: transform 0.3s ease;
     }
 
     .brand-wrapper:hover .logo-box img {
         transform: scale(1.05);
+    }
+
+    .brand-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        color: var(--text-white);
+        text-transform: uppercase;
+    }
+
+    .brand-kicker {
+        font-size: 0.72rem;
+        letter-spacing: 0.16em;
+        color: var(--brand-orange-deep);
+        font-weight: 800;
+    }
+
+    .brand-caption {
+        font-size: 0.82rem;
+        letter-spacing: 0.08em;
+        font-weight: 700;
     }
 
     .brand-wrapper:focus-visible {
@@ -118,48 +170,66 @@ const navLinks = [
 
     @media (min-width: 901px) {
         .logo-box img {
-            height: 90px;
+            height: 60px;
         }
     }
 
-    /* Links */
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-left: auto;
+    }
+
     .nav-menu {
         display: flex;
-        gap: 2.5rem;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.4rem;
+        border-radius: 999px;
+        border: 1px solid rgba(75, 47, 10, 0.08);
+        background: rgba(255, 252, 244, 0.72);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
     .nav-link {
         font-family: var(--font-body);
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.95rem;
-        letter-spacing: 1px;
-        color: #000;
+        font-size: 0.82rem;
+        letter-spacing: 0.1em;
+        color: var(--text-white);
         position: relative;
-        opacity: 0.7;
-        transition: opacity 0.3s ease;
-        padding: 0.5rem 0;
+        opacity: 0.8;
+        transition: opacity 0.25s ease, background 0.25s ease, color 0.25s ease;
+        padding: 0.8rem 1rem;
+        border-radius: 999px;
     }
 
     .nav-link:hover,
     .nav-link.active {
         opacity: 1;
+        background: rgba(250, 162, 39, 0.13);
+        color: var(--brand-orange-deep);
     }
 
     .nav-link::after {
         content: '';
         position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 0%;
+        bottom: 0.45rem;
+        left: 1rem;
+        width: calc(100% - 2rem);
         height: 2px;
-        background: #000;
-        transition: width 0.3s ease;
+        background: var(--brand-orange-deep);
+        transform: scaleX(0);
+        transform-origin: center;
+        transition: transform 0.25s ease;
     }
 
     .nav-link:hover::after,
     .nav-link.active::after {
-        width: 100%;
+        width: calc(100% - 2rem);
+        transform: scaleX(1);
     }
 
     .nav-link:focus-visible {
@@ -167,41 +237,64 @@ const navLinks = [
         border-radius: 4px;
     }
 
-    /* Scroll Progress */
+    .nav-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        min-height: 50px;
+        padding: 0.85rem 1.2rem;
+        border-radius: 18px;
+        background: linear-gradient(180deg, var(--brand-orange-light) 0%, var(--brand-orange) 100%);
+        border: 1px solid rgba(0, 0, 0, 0.14);
+        box-shadow: 0 12px 24px rgba(157, 93, 0, 0.14);
+        color: #000;
+        font-family: var(--font-heading);
+        font-size: 0.92rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: transform 0.24s ease, box-shadow 0.24s ease;
+    }
+
+    .nav-cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 30px rgba(157, 93, 0, 0.2);
+    }
+
     .scroll-progress {
         position: absolute;
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 3px;
-        background: rgba(0, 0, 0, 0.12);
+        height: 2px;
+        background: rgba(0, 0, 0, 0.06);
     }
 
     .scroll-progress-bar {
         height: 100%;
         width: 0%;
-        background: #000;
+        background: linear-gradient(90deg, var(--brand-orange-deep), var(--brand-orange));
         transition: width 0.1s linear;
     }
 
-    /* Mobile Toggle - 3 bar hamburger */
     .menu-toggle {
         display: none;
         flex-direction: column;
         justify-content: center;
         gap: 5px;
-        background: none;
-        border: none;
+        background: rgba(255, 251, 244, 0.78);
+        border: 1px solid rgba(75, 47, 10, 0.1);
         cursor: pointer;
         padding: 10px;
         width: 48px;
         height: 48px;
+        border-radius: 16px;
+        box-shadow: 0 10px 20px rgba(75, 47, 10, 0.08);
     }
 
     .bar {
         width: 24px;
         height: 2px;
-        background-color: #000;
+        background-color: var(--text-white);
         border-radius: 2px;
         transition: all 0.3s ease;
         transform-origin: center;
@@ -213,15 +306,20 @@ const navLinks = [
     }
 
     @media (max-width: 900px) {
+        .brand-copy,
+        .nav-cta {
+            display: none;
+        }
+
         .nav-menu {
             position: fixed;
-            top: calc(var(--header-height) + 0.6rem);
+            top: calc(var(--header-height) + 0.45rem);
             right: 0.8rem;
             left: auto;
             width: min(320px, calc(100vw - 1.6rem));
             min-height: 320px;
             max-height: calc(100dvh - var(--header-height) - 1.2rem);
-            background: rgba(255, 246, 222, 0.98);
+            background: rgba(255, 249, 238, 0.98);
             backdrop-filter: blur(20px);
             flex-direction: column;
             justify-content: flex-start;
@@ -235,8 +333,8 @@ const navLinks = [
             visibility: hidden;
             pointer-events: none;
             border: 1px solid rgba(71, 45, 6, 0.12);
-            border-radius: 24px;
-            box-shadow: 0 24px 60px rgba(71, 45, 6, 0.18);
+            border-radius: 28px;
+            box-shadow: 0 24px 60px rgba(71, 45, 6, 0.14);
             overflow-y: auto;
         }
 
@@ -254,13 +352,14 @@ const navLinks = [
             padding: 0.95rem 1rem;
             border-radius: 16px;
             border: 1px solid transparent;
-            background: rgba(255, 251, 242, 0.72);
-            font-size: 1.15rem;
+            background: rgba(255, 251, 242, 0.82);
+            font-size: 1rem;
             color: var(--text-white);
             opacity: 0;
             transform: translateY(14px);
             transition: opacity 0.4s ease, transform 0.4s ease;
             width: 100%;
+            justify-content: space-between;
         }
 
         .nav-link::after {
@@ -278,7 +377,6 @@ const navLinks = [
             transform: translateY(0);
         }
 
-        /* Stagger delays for links */
         .navbar.open .nav-link:nth-child(1) { transition-delay: 0.1s; }
         .navbar.open .nav-link:nth-child(2) { transition-delay: 0.15s; }
         .navbar.open .nav-link:nth-child(3) { transition-delay: 0.2s; }
@@ -290,10 +388,9 @@ const navLinks = [
             position: relative;
         }
 
-        /* Hamburger to X animation */
         .navbar.open .bar:nth-child(1) {
             transform: translateY(7px) rotate(45deg);
-            background: #000;
+            background: var(--text-white);
         }
 
         .navbar.open .bar:nth-child(2) {
@@ -303,7 +400,7 @@ const navLinks = [
 
         .navbar.open .bar:nth-child(3) {
             transform: translateY(-7px) rotate(-45deg);
-            background: #000;
+            background: var(--text-white);
         }
 
         .scroll-progress {
@@ -417,6 +514,10 @@ const navLinks = [
     function updateActiveLink() {
         const navOffset = navbar ? navbar.getBoundingClientRect().height : 0;
         const scrollPos = window.scrollY + navOffset + 20;
+
+        if (navbar) {
+            navbar.classList.toggle('is-scrolled', window.scrollY > 12);
+        }
 
         if (scrollSpyLinks.length > 0) {
             sections.forEach(section => {

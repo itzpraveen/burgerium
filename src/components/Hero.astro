@@ -19,7 +19,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         <div class="hero-text">
             <div class="hero-copy-shell">
                 <div class="launch-badge slide-in-1">
-                    Chennai Launch • Q1 2025
+                    Nungambakkam • Chennai
                 </div>
                 <h1 class="mega-title">
                     <span class="line slide-in-2">Every Bite</span>
@@ -27,13 +27,22 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
                 </h1>
 
                 <p class="hero-desc slide-in-4">
-                    25 years of craft. House-baked buns. Charcoal-seared patties. Chennai's new burger destination.
+                    From bakery roots to burger buns, Burgerium brings a more serious burger house to Chennai, with in-house bread, proper patties, and a full menu built for repeat visits.
                 </p>
 
-                <div class="hero-highlights slide-in-5" aria-label="Burgerium highlights">
-                    <span>25+ years of burger craft</span>
-                    <span>House-baked buns every day</span>
-                    <span>Digital menu now live</span>
+                <div class="hero-proof slide-in-5" aria-label="Burgerium highlights">
+                    <article>
+                        <strong>25+</strong>
+                        <span>Years behind the bun</span>
+                    </article>
+                    <article>
+                        <strong>Chennai House</strong>
+                        <span>Nungambakkam is where Burgerium begins</span>
+                    </article>
+                    <article>
+                        <strong>Menu Live</strong>
+                        <span>Check sections and prices before you drop by</span>
+                    </article>
                 </div>
 
                 <div class="hero-actions slide-in-5">
@@ -67,8 +76,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
                 <div class="float-card glass-card" aria-hidden="true">
                     <span class="emoji">🔥</span>
                     <div class="card-text">
-                        <strong>The Real Deal</strong>
-                        <small>Only at Burgerium</small>
+                        <strong>Monster Stack</strong>
+                        <small>House favourite</small>
                     </div>
                 </div>
             </div>
@@ -87,8 +96,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 <style>
     .hero-wrapper {
         position: relative;
-        height: 100vh;
-        min-height: 700px;
+        min-height: min(920px, 100svh);
         display: flex;
         align-items: center;
         overflow: hidden;
@@ -182,9 +190,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
         align-items: center;
         width: 100%;
-        gap: clamp(2.5rem, 5vw, 6rem);
-        padding-top: calc(var(--header-height) + 2.2rem);
-        padding-bottom: 7rem;
+        gap: clamp(2.5rem, 4.2vw, 5.2rem);
+        padding-top: calc(var(--header-height) + 2rem);
+        padding-bottom: 5.5rem;
         position: relative;
         z-index: 1;
     }
@@ -192,16 +200,16 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     .hero-copy-shell {
         max-width: 42rem;
         padding: clamp(1.8rem, 4vw, 2.8rem);
-        background: linear-gradient(145deg, rgba(255, 251, 241, 0.9), rgba(255, 242, 208, 0.78));
+        background: linear-gradient(145deg, rgba(255, 251, 241, 0.95), rgba(255, 242, 208, 0.82));
         border: 1px solid rgba(96, 61, 10, 0.12);
-        border-radius: 34px;
-        box-shadow: 0 26px 60px rgba(105, 68, 9, 0.12);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-strong);
         backdrop-filter: blur(10px);
     }
 
     .mega-title {
-        font-size: clamp(4rem, 8vw, 6.8rem);
-        line-height: 0.88;
+        font-size: clamp(3.8rem, 7.4vw, 6.1rem);
+        line-height: 0.9;
         margin-bottom: 1.2rem;
         color: var(--text-white);
         letter-spacing: -0.03em;
@@ -217,43 +225,44 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     }
 
     .hero-desc {
-        font-size: 1.18rem;
+        font-size: 1.08rem;
         color: var(--text-gray);
         max-width: 32rem;
         margin-bottom: 1.5rem;
-        line-height: 1.6;
+        line-height: 1.72;
     }
 
-    .hero-highlights {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.8rem;
+    .hero-proof {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.85rem;
         margin-bottom: 2rem;
     }
 
-    .hero-highlights span {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.7rem;
-        min-height: 42px;
-        padding: 0.65rem 0.95rem;
-        border-radius: 999px;
+    .hero-proof article {
+        min-height: 118px;
+        padding: 1rem;
+        border-radius: 22px;
         background: rgba(255, 250, 239, 0.92);
         border: 1px solid var(--line-soft);
-        color: var(--text-white);
-        font-size: 0.92rem;
-        font-weight: 600;
-        box-shadow: 0 10px 24px rgba(96, 61, 10, 0.06);
+        box-shadow: 0 10px 24px rgba(96, 61, 10, 0.05);
     }
 
-    .hero-highlights span::before {
-        content: '';
-        width: 9px;
-        height: 9px;
-        border-radius: 50%;
-        background: var(--brand-orange);
-        box-shadow: 0 0 0 4px rgba(250, 162, 39, 0.16);
-        flex: 0 0 9px;
+    .hero-proof strong {
+        display: block;
+        margin-bottom: 0.35rem;
+        font-family: var(--font-heading);
+        font-size: 1.55rem;
+        line-height: 0.95;
+        letter-spacing: 0.02em;
+        color: var(--brand-orange-deep);
+    }
+
+    .hero-proof span {
+        display: block;
+        color: var(--text-gray);
+        line-height: 1.55;
+        font-size: 0.92rem;
     }
 
     .hero-actions {
@@ -280,9 +289,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         background: rgba(255, 252, 244, 0.78);
         color: var(--text-white);
         font-family: var(--font-heading);
-        font-size: 1.05rem;
+        font-size: 1rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
+        border-radius: 18px;
         transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
     }
 
@@ -311,8 +321,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         border-radius: 999px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        font-size: 0.8rem;
+        letter-spacing: 0.12em;
+        font-size: 0.76rem;
         margin-bottom: 1.5rem;
     }
 
@@ -334,21 +344,21 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     .circle-bg {
         position: absolute;
-        width: 540px;
-        height: 540px;
+        width: 500px;
+        height: 500px;
         background: radial-gradient(circle, rgba(250, 162, 39, 0.2) 0%, rgba(250, 162, 39, 0.06) 42%, transparent 72%);
         border-radius: 50%;
         z-index: -1;
-        animation: pulse-glow 4s infinite ease-in-out;
+        animation: pulse-glow 5s infinite ease-in-out;
     }
 
     .visual-stage {
         position: relative;
         padding: clamp(1rem, 2vw, 1.3rem);
-        border-radius: 36px;
+        border-radius: 38px;
         background: linear-gradient(160deg, rgba(255, 252, 244, 0.7), rgba(255, 233, 183, 0.4));
         border: 1px solid rgba(71, 45, 6, 0.12);
-        box-shadow: 0 30px 70px rgba(71, 45, 6, 0.14);
+        box-shadow: 0 30px 70px rgba(71, 45, 6, 0.12);
         backdrop-filter: blur(10px);
     }
 
@@ -426,10 +436,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             line-height: 1.7;
         }
 
-        .hero-highlights {
-            justify-content: center;
-        }
-
         .hero-actions {
             width: 100%;
             justify-content: center;
@@ -450,6 +456,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         .hero-burger {
             width: 100%;
             max-width: 360px;
+        }
+
+        .hero-proof {
+            grid-template-columns: 1fr;
+            text-align: left;
         }
 
         .mega-title {
@@ -505,24 +516,3 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         }
     }
 </style>
-
-<script>
-    // Parallax Effect for Background and Burger
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const canHover = window.matchMedia('(hover: hover)').matches;
-
-    if (!prefersReducedMotion && canHover) {
-        document.addEventListener('mousemove', (e) => {
-            const x = (window.innerWidth - e.pageX * 2) / 100;
-            const y = (window.innerHeight - e.pageY * 2) / 100;
-
-            const burger = document.querySelector('.hero-burger');
-            // @ts-ignore
-            if(burger) burger.style.transform = `translateX(${x}px) translateY(${y}px)`;
-            
-            const card = document.querySelector('.float-card');
-            // @ts-ignore
-            if(card) card.style.transform = `translateX(${-x}px) translateY(${-y}px)`;
-        });
-    }
-</script>

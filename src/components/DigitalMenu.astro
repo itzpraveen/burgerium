@@ -7,50 +7,15 @@ const getSectionCount = (section) =>
 ---
 
 <section class="digital-menu-hero">
-  <div class="container hero-shell">
+    <div class="container hero-shell">
     <div class="hero-copy scroll-reveal">
-      <span class="hero-kicker">Burgerium Digital Menu</span>
-      <h1>Fresh burgers, bowls, coffee, shakes, and desserts. Fully online.</h1>
+      <span class="hero-kicker">Burgerium Menu</span>
+      <h1>The full house menu, laid out properly for the web.</h1>
       <p>
-        This menu is built from the latest Burgerium house menu so customers can actually browse on the website without pinching through a PDF.
+        Search by item, jump between sections, and get a feel for what you want before you arrive.
       </p>
 
-      <div class="hero-actions">
-        <a class="btn-primary" href="/#locations">Visit Burgerium</a>
-        <a class="hero-link" href="/#about">Read The Story</a>
-      </div>
-    </div>
-
-    <div class="hero-notes scroll-reveal">
-      <article class="hero-note">
-        <strong>{menuItemCount}</strong>
-        <span>menu items</span>
-      </article>
-      <article class="hero-note">
-        <strong>{menuSectionCount}</strong>
-        <span>menu sections</span>
-      </article>
-      <article class="hero-note">
-        <strong>20-25 min</strong>
-        <span>minimum prep time</span>
-      </article>
-      <article class="hero-note hero-note-wide">
-        <strong>Freshly made. Never frozen.</strong>
-        <span>All prices exclude GST. Orders are prepared fresh on request.</span>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section id="menu" class="digital-menu-directory" aria-labelledby="digital-menu-heading">
-  <div class="container">
-    <div class="directory-top scroll-reveal">
-      <div>
-        <span class="directory-kicker">Full Menu</span>
-        <h2 id="digital-menu-heading">Browse by section or search the full menu.</h2>
-      </div>
-
-      <div class="search-panel">
+      <div class="search-panel hero-search-panel">
         <label class="search-label" for="menu-search">Search the menu</label>
         <div class="search-field">
           <i class="fas fa-search" aria-hidden="true"></i>
@@ -69,6 +34,44 @@ const getSectionCount = (section) =>
           {menuItemCount} items across {menuSectionCount} sections.
         </p>
       </div>
+
+      <div class="hero-actions">
+        <a class="btn-primary" href="/#locations">See Chennai House</a>
+        <a class="hero-link" href="/#about">Our Story</a>
+      </div>
+    </div>
+
+    <div class="hero-notes scroll-reveal">
+      <article class="hero-note">
+        <strong>{menuItemCount}</strong>
+        <span>items on the menu</span>
+      </article>
+      <article class="hero-note">
+        <strong>{menuSectionCount}</strong>
+        <span>sections to browse</span>
+      </article>
+      <article class="hero-note">
+        <strong>Fresh Prep</strong>
+        <span>Food is prepared once you order</span>
+      </article>
+      <article class="hero-note hero-note-wide">
+        <strong>Prices shown before GST.</strong>
+        <span>The kitchen works to order, so timings can vary during rush hours.</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="menu" class="digital-menu-directory" aria-labelledby="digital-menu-heading">
+  <div class="container">
+    <div class="directory-top scroll-reveal">
+      <div>
+        <span class="directory-kicker">Full Menu</span>
+        <h2 id="digital-menu-heading">Pick a section and start browsing.</h2>
+      </div>
+      <p class="directory-note">
+        Use the sticky rail below to move from burgers and fries to coffee, shakes, and desserts.
+      </p>
     </div>
 
     <div class="section-rail scroll-reveal" aria-label="Menu sections">
@@ -218,22 +221,27 @@ const getSectionCount = (section) =>
 
 <style>
   .digital-menu-hero {
-    padding: calc(var(--header-height) + 4rem) 0 3rem;
+    padding: calc(var(--header-height) + 3.6rem) 0 2.8rem;
     background:
-      radial-gradient(circle at top right, rgba(250, 162, 39, 0.18), transparent 32%),
+      radial-gradient(circle at top right, rgba(250, 162, 39, 0.16), transparent 30%),
       radial-gradient(circle at left center, rgba(250, 162, 39, 0.08), transparent 28%),
-      linear-gradient(180deg, #fff8e8 0%, #ffe09d 100%);
+      linear-gradient(180deg, #fff8eb 0%, #ffe4a8 100%);
+    border-bottom: 1px solid rgba(75, 47, 10, 0.08);
   }
 
   .hero-shell {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
-    gap: 1.5rem;
+    gap: 1.75rem;
     align-items: end;
   }
 
   .hero-copy {
-    padding: 1.6rem 0;
+    padding: 1.7rem;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 250, 241, 0.74);
+    box-shadow: var(--shadow-soft);
   }
 
   .hero-kicker,
@@ -253,24 +261,28 @@ const getSectionCount = (section) =>
   }
 
   .hero-copy h1 {
-    margin: 1rem 0 1rem;
-    max-width: 11ch;
-    font-size: clamp(3rem, 7vw, 5.9rem);
-    line-height: 0.9;
+    margin: 1rem 0 0.9rem;
+    max-width: 12ch;
+    font-size: clamp(2.9rem, 6vw, 5.1rem);
+    line-height: 0.92;
   }
 
   .hero-copy p {
-    max-width: 56ch;
+    max-width: 58ch;
     color: var(--text-gray);
     font-size: 1.04rem;
-    line-height: 1.75;
+    line-height: 1.72;
+  }
+
+  .hero-search-panel {
+    margin-top: 1.4rem;
   }
 
   .hero-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.9rem;
-    margin-top: 1.75rem;
+    margin-top: 1.25rem;
   }
 
   .hero-link {
@@ -282,9 +294,11 @@ const getSectionCount = (section) =>
     border: 1px solid var(--line-strong);
     color: var(--text-white);
     font-family: var(--font-heading);
-    font-size: 1.02rem;
+    font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+    border-radius: 18px;
+    background: rgba(255, 251, 244, 0.6);
     transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
   }
 
@@ -304,9 +318,11 @@ const getSectionCount = (section) =>
     min-height: 132px;
     padding: 1rem;
     border: 1px solid var(--line-soft);
+    border-radius: 24px;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.36)),
       linear-gradient(150deg, rgba(250, 162, 39, 0.16), transparent 55%);
+    box-shadow: 0 12px 24px rgba(75, 47, 10, 0.05);
   }
 
   .hero-note strong {
@@ -332,28 +348,37 @@ const getSectionCount = (section) =>
   .digital-menu-directory {
     padding: 1rem 0 6rem;
     background:
-      linear-gradient(180deg, #fff6de 0%, #fff0c9 100%);
+      linear-gradient(180deg, #fff7e0 0%, #fff0cd 100%);
   }
 
   .directory-top {
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.8fr);
-    gap: 1.4rem;
-    align-items: end;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.7fr);
+    gap: 1.2rem;
+    align-items: center;
     margin-bottom: 1.5rem;
   }
 
   .directory-top h2 {
     margin-top: 1rem;
-    max-width: 15ch;
-    font-size: clamp(2.3rem, 5vw, 4rem);
+    max-width: 14ch;
+    font-size: clamp(2.2rem, 4.5vw, 3.7rem);
     line-height: 0.95;
+  }
+
+  .directory-note {
+    max-width: 31ch;
+    margin-left: auto;
+    color: var(--text-gray);
+    line-height: 1.7;
   }
 
   .search-panel {
     padding: 1.1rem;
     border: 1px solid var(--line-soft);
     background: rgba(255, 249, 237, 0.88);
+    border-radius: 26px;
+    box-shadow: 0 12px 24px rgba(75, 47, 10, 0.05);
   }
 
   .search-label {
@@ -375,6 +400,7 @@ const getSectionCount = (section) =>
     padding: 0 1rem;
     border: 1px solid var(--line-soft);
     background: rgba(255, 255, 255, 0.5);
+    border-radius: 18px;
   }
 
   .search-field i {
@@ -405,6 +431,7 @@ const getSectionCount = (section) =>
     padding: 0.5rem 0.8rem;
     font-weight: 700;
     cursor: pointer;
+    border-radius: 999px;
   }
 
   .search-status {
@@ -426,6 +453,8 @@ const getSectionCount = (section) =>
     background: rgba(255, 248, 232, 0.86);
     backdrop-filter: blur(16px);
     scroll-snap-type: x proximity;
+    border-radius: 24px;
+    box-shadow: 0 12px 20px rgba(75, 47, 10, 0.04);
   }
 
   .section-chip {
@@ -458,6 +487,7 @@ const getSectionCount = (section) =>
   .catalog-section {
     padding: 1.3rem;
     border: 1px solid var(--line-soft);
+    border-radius: 28px;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.34)),
       linear-gradient(160deg, rgba(250, 162, 39, 0.12), transparent 45%);
@@ -505,6 +535,7 @@ const getSectionCount = (section) =>
     padding: 1rem;
     border: 1px solid var(--line-soft);
     background: rgba(255, 250, 240, 0.86);
+    border-radius: 22px;
   }
 
   .block-head {
@@ -589,6 +620,11 @@ const getSectionCount = (section) =>
     .section-rail {
       top: calc(var(--header-height) + 0.5rem);
     }
+
+    .directory-note {
+      margin-left: 0;
+      max-width: none;
+    }
   }
 
   @media (max-width: 720px) {
@@ -601,7 +637,8 @@ const getSectionCount = (section) =>
     }
 
     .hero-copy {
-      padding: 0;
+      padding: 1.2rem;
+      border-radius: 26px;
     }
 
     .hero-copy h1 {

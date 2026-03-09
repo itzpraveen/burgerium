@@ -9,7 +9,7 @@ const locations = [
         phone: null,
         map: null,
         comingSoon: true,
-        launchDate: 'Q1 2025'
+        launchDate: 'Opening Updates'
     }
 ];
 ---
@@ -18,10 +18,10 @@ const locations = [
     <div class="container">
         <div class="locations-head scroll-reveal">
             <div class="head-content">
-                <p class="eyebrow">Verified Locations</p>
-                <h2 class="section-title" id="locations-heading">The <span class="text-orange">Destination</span></h2>
+                <p class="eyebrow">Chennai House</p>
+                <h2 class="section-title" id="locations-heading">Find Burgerium In <span class="text-orange">Nungambakkam</span></h2>
                 <p class="lede">
-                    Burgerium is launching exclusively in Chennai. Be the first to experience the future of burgers.
+                    Our Chennai house is in Nungambakkam, inside E Merck House on Haddows 2nd Street. Follow Instagram for opening status, timings, and updates.
                 </p>
             </div>
         </div>
@@ -32,7 +32,7 @@ const locations = [
                     {loc.comingSoon && (
                         <div class="coming-soon-badge">
                             <i class="fas fa-clock" aria-hidden="true"></i>
-                            <span>Opening {loc.launchDate}</span>
+                            <span>{loc.launchDate}</span>
                         </div>
                     )}
                     <div class="card-top">
@@ -50,7 +50,7 @@ const locations = [
                     {loc.comingSoon ? (
                         <div class="card-actions coming-soon-actions">
                             <div class="notify-box">
-                                <p class="notify-text">Get notified when we open</p>
+                                <p class="notify-text">Follow Instagram for opening dates and service updates</p>
                                 <a href={instagramUrl} target="_blank" rel="noopener noreferrer" class="btn-primary btn-notify">
                                     <i class="fab fa-instagram" aria-hidden="true"></i>
                                     Follow {instagramHandle}
@@ -79,7 +79,7 @@ const locations = [
         <div class="expansion-teaser scroll-reveal delay-200">
             <div class="teaser-content">
                 <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                <p>More locations coming to <strong>Kerala</strong> and <strong>Karnataka</strong> soon.</p>
+                <p>More Burgerium houses are planned for <strong>Kerala</strong> and <strong>Karnataka</strong>.</p>
             </div>
         </div>
     </div>
@@ -87,7 +87,7 @@ const locations = [
 
 <style>
     .locations-section {
-        background: linear-gradient(180deg, #ffe4aa 0%, #fff5de 100%);
+        background: linear-gradient(180deg, #ffe7b3 0%, #fff6e1 100%);
     }
 
     .locations-head {
@@ -123,7 +123,7 @@ const locations = [
     .location-card {
         background: rgba(255, 249, 238, 0.94);
         border: 1px solid var(--line-soft);
-        border-radius: 20px;
+        border-radius: 28px;
         padding: 2rem;
         display: flex;
         flex-direction: column;
@@ -146,13 +146,13 @@ const locations = [
         pointer-events: none;
     }
 
-    /* Coming soon badge */
     .coming-soon-badge {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: linear-gradient(135deg, var(--brand-orange), #e89520);
-        color: #000;
+        background: rgba(250, 162, 39, 0.16);
+        color: var(--brand-orange-deep);
+        border: 1px solid rgba(157, 93, 0, 0.12);
         padding: 0.5rem 1rem;
         border-radius: 25px;
         font-weight: 700;
@@ -160,12 +160,6 @@ const locations = [
         text-transform: uppercase;
         letter-spacing: 1px;
         width: fit-content;
-        animation: pulse-badge 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse-badge {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(250, 162, 39, 0.4); }
-        50% { box-shadow: 0 0 0 8px rgba(250, 162, 39, 0); }
     }
 
     .card-top {
@@ -213,9 +207,9 @@ const locations = [
     }
 
     .notify-box {
-        background: rgba(255, 255, 255, 0.48);
-        border: 1px dashed rgba(184, 104, 0, 0.22);
-        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.56);
+        border: 1px solid rgba(184, 104, 0, 0.16);
+        border-radius: 18px;
         padding: 1.25rem;
         text-align: center;
     }
@@ -268,7 +262,8 @@ const locations = [
         background: rgba(255, 249, 236, 0.75);
         border: 1px solid rgba(250, 162, 39, 0.2);
         padding: 1rem 2rem;
-        border-radius: 50px;
+        border-radius: 999px;
+        box-shadow: 0 12px 24px rgba(75, 47, 10, 0.05);
     }
 
     .teaser-content i {

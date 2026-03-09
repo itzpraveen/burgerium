@@ -158,6 +158,19 @@ const structuredData = {
             // PRELOADER LOGIC
             const preloader = document.getElementById('preloader');
             let preloaderHidden = false;
+            let hasSeenPreloader = false;
+
+            try {
+                hasSeenPreloader = window.sessionStorage.getItem('burgerium-preloader') === '1';
+            } catch {
+                hasSeenPreloader = false;
+            }
+
+            const markPreloaderSeen = () => {
+                try {
+                    window.sessionStorage.setItem('burgerium-preloader', '1');
+                } catch {}
+            };
 
             const hidePreloader = (delay = 0) => {
                 if (!preloader || preloaderHidden) return;
@@ -165,7 +178,7 @@ const structuredData = {
 
                 const run = () => {
                     preloader.classList.add('fade-out');
-                    setTimeout(() => preloader.style.display = 'none', 500);
+                    setTimeout(() => preloader.style.display = 'none', 360);
                 };
 
                 if (delay > 0) {
@@ -175,11 +188,20 @@ const structuredData = {
                 }
             };
 
-            if (prefersReducedMotion) {
+            if (prefersReducedMotion || hasSeenPreloader) {
                 hidePreloader();
+            } else if (document.readyState === 'complete') {
+                markPreloaderSeen();
+                hidePreloader(120);
             } else {
-                window.addEventListener('load', () => hidePreloader(500));
-                setTimeout(() => hidePreloader(), 3500);
+                window.addEventListener('load', () => {
+                    markPreloaderSeen();
+                    hidePreloader(120);
+                }, { once: true });
+                setTimeout(() => {
+                    markPreloaderSeen();
+                    hidePreloader();
+                }, 1600);
             }
 
             // SMOOTH SCROLL (LENIS)
@@ -213,7 +235,7 @@ const structuredData = {
                         const x = (e as MouseEvent).clientX - position.left - position.width / 2;
                         const y = (e as MouseEvent).clientY - position.top - position.height / 2;
 
-                        (btn as HTMLElement).style.transform = `translate3d(${x * 0.12}px, ${y * 0.18}px, 0) scale(1.05)`;
+                        (btn as HTMLElement).style.transform = `translate3d(${x * 0.08}px, ${y * 0.12}px, 0) scale(1.02)`;
                     });
 
                     btn.addEventListener('mouseleave', () => {
@@ -249,12 +271,15 @@ const structuredData = {
                 position: fixed;
                 top: 0; left: 0;
                 width: 100%; height: 100%;
-                background: var(--brand-orange, #FAA227);
+                background:
+                    radial-gradient(circle at top left, rgba(250, 162, 39, 0.22), transparent 26%),
+                    radial-gradient(circle at 80% 20%, rgba(250, 162, 39, 0.14), transparent 22%),
+                    linear-gradient(180deg, #fff8e9 0%, #f9efd8 100%);
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 z-index: 9999;
-                transition: opacity 0.5s ease;
+                transition: opacity 0.36s ease, visibility 0.36s ease;
             }
 
             .loader-content {
@@ -262,29 +287,30 @@ const structuredData = {
             }
 
             .loader-logo {
-                width: 180px;
+                width: 160px;
                 height: auto;
                 opacity: 0;
                 animation: fadeUp 0.8s forwards;
+                filter: drop-shadow(0 16px 24px rgba(93, 60, 10, 0.08));
             }
 
             .loader-bar {
-                width: 200px;
-                height: 3px;
-                background: rgba(0, 0, 0, 0.2);
-                margin: 20px auto 0;
+                width: 156px;
+                height: 4px;
+                background: rgba(75, 47, 10, 0.12);
+                margin: 18px auto 0;
                 position: relative;
                 overflow: hidden;
-                border-radius: 2px;
+                border-radius: 999px;
             }
 
             .bar-fill {
                 position: absolute;
                 top: 0; left: 0;
                 width: 0%; height: 100%;
-                background: #000;
-                border-radius: 2px;
-                animation: fillBar 1.2s ease-in-out forwards;
+                background: linear-gradient(90deg, var(--brand-orange-deep), var(--brand-orange));
+                border-radius: 999px;
+                animation: fillBar 0.9s ease-in-out forwards;
             }
 
             .fade-out {
