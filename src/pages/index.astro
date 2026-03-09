@@ -9,6 +9,15 @@ import Craft from '../components/Craft.astro';
 import Reviews from '../components/Reviews.astro';
 import Locations from '../components/Locations.astro';
 import Footer from '../components/Footer.astro';
+
+const marqueeItems = [
+    'Burgerium',
+    'Bakery roots since 1998',
+    'From the Burger Tree family',
+    'Nungambakkam, Chennai',
+    'Full menu and prices online',
+    'Opening updates land on Instagram first'
+];
 ---
 
 <Layout
@@ -18,14 +27,25 @@ import Footer from '../components/Footer.astro';
     <Navigation />
     <div class="page">
         <Hero />
-        
-        <div class="heritage-band" aria-label="Burgerium signature traits">
-            <div class="container heritage-items">
-                <span>Bakery roots since 1998</span>
-                <span>From the Burger Tree family</span>
-                <span>Nungambakkam, Chennai</span>
-                <span>Full menu and prices online</span>
-                <span>Opening updates land on Instagram first</span>
+
+        <div class="marquee-container" aria-label="Burgerium signature traits">
+            <div class="marquee-track">
+                <div class="marquee-group">
+                    {marqueeItems.map((item, index) => (
+                        <>
+                            <span>{item}</span>
+                            {index < marqueeItems.length - 1 && <span class="separator" aria-hidden="true">•</span>}
+                        </>
+                    ))}
+                </div>
+                <div class="marquee-group" aria-hidden="true">
+                    {marqueeItems.map((item, index) => (
+                        <>
+                            <span>{item}</span>
+                            {index < marqueeItems.length - 1 && <span class="separator" aria-hidden="true">•</span>}
+                        </>
+                    ))}
+                </div>
             </div>
         </div>
 
@@ -40,60 +60,88 @@ import Footer from '../components/Footer.astro';
 </Layout>
 
 <style>
-    .heritage-band {
+    .marquee-container {
         position: relative;
         z-index: 10;
-        margin: -1.4rem 0 5rem;
-        padding: 0.75rem 0;
-        border-top: 1px solid rgba(31, 22, 9, 0.12);
-        border-bottom: 1px solid rgba(31, 22, 9, 0.12);
-        background: rgba(255, 250, 241, 0.82);
-        backdrop-filter: blur(14px);
+        margin: -2.6rem 0 4.75rem;
+        padding: 1rem 0;
+        overflow: hidden;
+        border-top: 2px solid rgba(31, 22, 9, 0.22);
+        border-bottom: 2px solid rgba(31, 22, 9, 0.22);
+        background: linear-gradient(180deg, #ffb037 0%, #f39d20 100%);
+        box-shadow: 0 18px 34px rgba(112, 71, 7, 0.18);
+        transform: rotate(-1.2deg) scale(1.03);
     }
 
-    .heritage-items {
+    .marquee-track {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.7rem;
+        width: max-content;
+        animation: marquee-slide 20s linear infinite;
     }
 
-    .heritage-items span {
+    .marquee-group {
         display: inline-flex;
         align-items: center;
-        min-height: 42px;
-        padding: 0.55rem 1rem;
-        border-radius: 999px;
-        background: rgba(250, 162, 39, 0.12);
-        border: 1px solid rgba(157, 93, 0, 0.12);
-        color: var(--text-white);
-        font-size: 0.84rem;
+        white-space: nowrap;
+    }
+
+    .marquee-group span {
+        display: inline-flex;
+        align-items: center;
+        color: var(--brand-ink);
+        font-family: var(--font-heading);
+        font-size: 1.8rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.02em;
+        line-height: 1;
+    }
+
+    .marquee-group span:nth-child(4n + 1) {
+        color: rgba(38, 24, 11, 0.98);
+    }
+
+    .marquee-group span:nth-child(4n + 3) {
+        -webkit-text-stroke: 1px rgba(38, 24, 11, 0.94);
+        color: transparent;
+    }
+
+    .separator {
+        margin: 0 1.5rem;
+        color: rgba(38, 24, 11, 0.56);
+        font-size: 1rem;
+        transform: translateY(-2px);
+    }
+
+    @keyframes marquee-slide {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .marquee-track {
+            animation: none;
+        }
     }
 
     @media (max-width: 900px) {
-        .heritage-band {
-            margin: -0.5rem 0 4rem;
+        .marquee-container {
+            margin: -1.35rem 0 4rem;
+            padding: 0.8rem 0;
+            transform: rotate(-1deg) scale(1.04);
         }
 
-        .heritage-items {
-            justify-content: flex-start;
-            overflow-x: auto;
-            flex-wrap: nowrap;
-            scrollbar-width: none;
+        .marquee-group span {
+            font-size: 1.2rem;
         }
 
-        .heritage-items::-webkit-scrollbar {
-            display: none;
-        }
-
-        .heritage-items span {
-            flex: 0 0 auto;
-            font-size: 0.72rem;
-            min-height: 38px;
-            padding: 0.5rem 0.85rem;
+        .separator {
+            margin: 0 1rem;
         }
     }
 </style>

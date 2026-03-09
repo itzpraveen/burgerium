@@ -88,19 +88,19 @@ const navLinks = [
         top: 0;
         left: 0;
         width: 100%;
-        background: rgba(255, 248, 230, 0.78);
+        background: #FAA227;
         backdrop-filter: blur(18px);
         height: var(--header-height);
         z-index: 1000;
         display: flex;
         align-items: center;
-        border-bottom: 1px solid rgba(75, 47, 10, 0.08);
+        border-bottom: 1px solid rgba(38, 24, 11, 0.14);
         transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     }
 
     .navbar.is-scrolled {
-        background: rgba(255, 248, 230, 0.94);
-        border-bottom-color: rgba(75, 47, 10, 0.14);
+        background: #FAA227;
+        border-bottom-color: rgba(38, 24, 11, 0.22);
         box-shadow: 0 18px 36px rgba(75, 47, 10, 0.08);
     }
 
@@ -115,7 +115,7 @@ const navLinks = [
     .brand-wrapper {
         display: inline-flex;
         align-items: center;
-        gap: 0.85rem;
+        gap: 1rem;
         min-width: 0;
     }
 
@@ -123,18 +123,17 @@ const navLinks = [
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0.65rem 0.9rem;
-        border-radius: 20px;
-        border: 1px solid rgba(75, 47, 10, 0.08);
-        background: linear-gradient(180deg, rgba(255, 252, 243, 0.92), rgba(255, 242, 208, 0.74));
-        box-shadow: 0 12px 24px rgba(75, 47, 10, 0.08);
+        padding: 0;
+        border: none;
+        background: none;
+        box-shadow: none;
     }
 
     .logo-box img {
-        height: 52px;
+        height: 58px;
         max-height: 80%;
         width: auto;
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
         transition: transform 0.3s ease;
     }
 
@@ -170,7 +169,7 @@ const navLinks = [
 
     @media (min-width: 901px) {
         .logo-box img {
-            height: 60px;
+            height: 66px;
         }
     }
 
@@ -184,12 +183,11 @@ const navLinks = [
     .nav-menu {
         display: flex;
         align-items: center;
-        gap: 0.25rem;
-        padding: 0.4rem;
-        border-radius: 999px;
-        border: 1px solid rgba(75, 47, 10, 0.08);
-        background: rgba(255, 252, 244, 0.72);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        gap: 1rem;
+        padding: 0;
+        border: none;
+        background: none;
+        box-shadow: none;
     }
 
     .nav-link {
@@ -202,23 +200,23 @@ const navLinks = [
         position: relative;
         opacity: 0.8;
         transition: opacity 0.25s ease, background 0.25s ease, color 0.25s ease;
-        padding: 0.8rem 1rem;
-        border-radius: 999px;
+        padding: 0.7rem 0;
+        border-radius: 0;
     }
 
     .nav-link:hover,
     .nav-link.active {
         opacity: 1;
-        background: rgba(250, 162, 39, 0.13);
-        color: var(--brand-orange-deep);
+        background: rgba(38, 24, 11, 0.08);
+        color: var(--brand-ink);
     }
 
     .nav-link::after {
         content: '';
         position: absolute;
-        bottom: 0.45rem;
-        left: 1rem;
-        width: calc(100% - 2rem);
+        bottom: 0.15rem;
+        left: 0;
+        width: 100%;
         height: 2px;
         background: var(--brand-orange-deep);
         transform: scaleX(0);
@@ -228,7 +226,6 @@ const navLinks = [
 
     .nav-link:hover::after,
     .nav-link.active::after {
-        width: calc(100% - 2rem);
         transform: scaleX(1);
     }
 
@@ -244,10 +241,10 @@ const navLinks = [
         min-height: 50px;
         padding: 0.85rem 1.2rem;
         border-radius: 18px;
-        background: linear-gradient(180deg, var(--brand-orange-light) 0%, var(--brand-orange) 100%);
-        border: 1px solid rgba(0, 0, 0, 0.14);
-        box-shadow: 0 12px 24px rgba(157, 93, 0, 0.14);
-        color: #000;
+        background: rgba(255, 248, 230, 0.88);
+        border: 1px solid rgba(38, 24, 11, 0.16);
+        box-shadow: 0 12px 24px rgba(93, 60, 10, 0.14);
+        color: var(--brand-ink);
         font-family: var(--font-heading);
         font-size: 0.92rem;
         letter-spacing: 0.05em;
@@ -257,7 +254,7 @@ const navLinks = [
 
     .nav-cta:hover {
         transform: translateY(-2px);
-        box-shadow: 0 16px 30px rgba(157, 93, 0, 0.2);
+        box-shadow: 0 16px 30px rgba(93, 60, 10, 0.2);
     }
 
     .scroll-progress {
@@ -266,7 +263,7 @@ const navLinks = [
         left: 0;
         width: 100%;
         height: 2px;
-        background: rgba(0, 0, 0, 0.06);
+        background: rgba(38, 24, 11, 0.08);
     }
 
     .scroll-progress-bar {
@@ -336,6 +333,10 @@ const navLinks = [
             border-radius: 28px;
             box-shadow: 0 24px 60px rgba(71, 45, 6, 0.14);
             overflow-y: auto;
+        }
+
+        .logo-box img {
+            height: 54px;
         }
 
         .navbar.open .nav-menu {

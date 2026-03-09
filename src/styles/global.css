@@ -1,8 +1,8 @@
 :root {
-    --bg-dark: #f9efd8;
+    --bg-dark: #f5ddb0;
     --bg-card: #fff9ef;
-    --bg-surface: #ffe9b8;
-    --bg-surface-strong: #ffd36d;
+    --bg-surface: #ffe098;
+    --bg-surface-strong: #ffc54d;
     --bg-panel: rgba(255, 250, 241, 0.9);
     --brand-orange: #FAA227;
     --brand-orange-light: #ffbe59;
@@ -22,8 +22,8 @@
     --radius-md: 24px;
     --radius-lg: 32px;
 
-    --font-heading: 'Anton', sans-serif;
-    --font-body: 'Outfit', sans-serif;
+    --font-heading: 'Bebas Neue', sans-serif;
+    --font-body: 'Manrope', sans-serif;
 
     --container-width: 1360px;
 
@@ -76,9 +76,9 @@ html,
 body {
     width: 100%;
     background:
-        radial-gradient(circle at top left, rgba(250, 162, 39, 0.13), transparent 22%),
-        radial-gradient(circle at 85% 0%, rgba(250, 162, 39, 0.08), transparent 20%),
-        linear-gradient(180deg, #fff9ed 0%, var(--bg-dark) 100%);
+        radial-gradient(circle at top left, rgba(250, 162, 39, 0.18), transparent 24%),
+        radial-gradient(circle at 85% 0%, rgba(250, 162, 39, 0.12), transparent 22%),
+        linear-gradient(180deg, #fff8df 0%, var(--bg-dark) 100%);
     color: var(--text-white);
     font-family: var(--font-body);
     overflow-x: hidden;

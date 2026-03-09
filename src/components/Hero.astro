@@ -27,7 +27,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
                 </h1>
 
                 <p class="hero-desc slide-in-4">
-                    From bakery roots to burger buns, Burgerium brings a more serious burger house to Chennai, with in-house bread, proper patties, and a full menu built for repeat visits.
+                    Burgerium brings bakery-rooted burgers to Chennai with in-house bread, proper patties, and a full menu made for repeat visits.
                 </p>
 
                 <div class="hero-proof slide-in-5" aria-label="Burgerium highlights">
@@ -199,12 +199,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     .hero-copy-shell {
         max-width: 42rem;
-        padding: clamp(1.8rem, 4vw, 2.8rem);
-        background: linear-gradient(145deg, rgba(255, 251, 241, 0.95), rgba(255, 242, 208, 0.82));
-        border: 1px solid rgba(96, 61, 10, 0.12);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-strong);
-        backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        background: none;
+        border: 0;
+        box-shadow: none;
+        backdrop-filter: none;
     }
 
     .mega-title {
@@ -217,6 +218,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     .mega-title .line {
         display: block;
+        white-space: nowrap;
     }
 
     .mega-title .accent {
@@ -235,24 +237,34 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     .hero-proof {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 0.85rem;
+        gap: 1rem;
         margin-bottom: 2rem;
+        padding: 1.1rem 0;
+        border-top: 1px solid rgba(75, 47, 10, 0.14);
+        border-bottom: 1px solid rgba(75, 47, 10, 0.14);
     }
 
     .hero-proof article {
-        min-height: 118px;
-        padding: 1rem;
-        border-radius: 22px;
-        background: rgba(255, 250, 239, 0.92);
-        border: 1px solid var(--line-soft);
-        box-shadow: 0 10px 24px rgba(96, 61, 10, 0.05);
+        min-height: auto;
+        padding-right: 1rem;
+        position: relative;
+    }
+
+    .hero-proof article:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 0.2rem;
+        right: 0;
+        width: 1px;
+        height: calc(100% - 0.4rem);
+        background: rgba(75, 47, 10, 0.12);
     }
 
     .hero-proof strong {
         display: block;
         margin-bottom: 0.35rem;
         font-family: var(--font-heading);
-        font-size: 1.55rem;
+        font-size: 1.45rem;
         line-height: 0.95;
         letter-spacing: 0.02em;
         color: var(--brand-orange-deep);
@@ -314,9 +326,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: rgba(250, 162, 39, 0.18);
+        background: rgba(250, 162, 39, 0.24);
         color: var(--brand-orange-deep);
-        border: 1px solid rgba(184, 104, 0, 0.12);
+        border: 1px solid rgba(184, 104, 0, 0.18);
         padding: 0.4rem 0.9rem;
         border-radius: 999px;
         font-weight: 700;
@@ -346,7 +358,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         position: absolute;
         width: 500px;
         height: 500px;
-        background: radial-gradient(circle, rgba(250, 162, 39, 0.2) 0%, rgba(250, 162, 39, 0.06) 42%, transparent 72%);
+        background: radial-gradient(circle, rgba(250, 162, 39, 0.34) 0%, rgba(250, 162, 39, 0.12) 44%, transparent 74%);
         border-radius: 50%;
         z-index: -1;
         animation: pulse-glow 5s infinite ease-in-out;
@@ -354,18 +366,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     .visual-stage {
         position: relative;
-        padding: clamp(1rem, 2vw, 1.3rem);
-        border-radius: 38px;
-        background: linear-gradient(160deg, rgba(255, 252, 244, 0.7), rgba(255, 233, 183, 0.4));
-        border: 1px solid rgba(71, 45, 6, 0.12);
-        box-shadow: 0 30px 70px rgba(71, 45, 6, 0.12);
-        backdrop-filter: blur(10px);
+        padding: 0;
     }
 
     .hero-burger {
         width: min(100%, 560px);
         border-radius: 28px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 8px solid rgba(255, 248, 230, 0.86);
         box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
         transform-origin: center center;
     }
@@ -423,23 +430,22 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
         .hero-copy-shell {
             width: 100%;
-            text-align: center;
-            padding: 1.5rem;
-            border-radius: 26px;
+            text-align: left;
         }
 
         .hero-desc {
-            margin: 0 auto 1.25rem;
-            font-size: 1.05rem;
+            margin: 0 0 1rem;
+            font-size: 1rem;
             padding: 0;
-            max-width: 95%;
-            line-height: 1.7;
+            max-width: 100%;
+            line-height: 1.65;
         }
 
         .hero-actions {
             width: 100%;
-            justify-content: center;
+            justify-content: flex-start;
             padding: 0;
+            order: 4;
         }
 
         .hero-cta,
@@ -459,14 +465,31 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         }
 
         .hero-proof {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             text-align: left;
+            gap: 0.9rem 1rem;
+            order: 5;
+            margin-bottom: 0;
+            padding: 1rem 0 0;
+            border-bottom: 0;
+        }
+
+        .hero-proof article {
+            padding-right: 0;
+        }
+
+        .hero-proof article:not(:last-child)::after {
+            display: none;
+        }
+
+        .hero-proof article:last-child {
+            grid-column: 1 / -1;
         }
 
         .mega-title {
-            font-size: clamp(3.6rem, 13vw, 4.8rem);
+            font-size: clamp(2.95rem, 11.4vw, 4.2rem);
             margin-bottom: 1rem;
-            line-height: 1.05;
+            line-height: 0.92;
         }
 
         .slide-in-1, .slide-in-2, .slide-in-3, .slide-in-4, .slide-in-5 {
@@ -508,11 +531,19 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     @media (max-width: 400px) {
         .mega-title {
-            font-size: clamp(3.6rem, 14.5vw, 4.3rem);
+            font-size: clamp(2.8rem, 12.5vw, 3.6rem);
         }
 
         .hero-burger {
             max-width: 290px;
+        }
+
+        .hero-proof {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-proof article:last-child {
+            grid-column: auto;
         }
     }
 </style>
