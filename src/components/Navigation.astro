@@ -40,9 +40,6 @@ const navLinks = [
             <div class="logo-box">
                 <img src={`${base}/logo.png`} alt="Burgerium" />
             </div>
-            <div class="brand-copy" aria-hidden="true">
-                <span class="brand-caption">Burger House</span>
-            </div>
         </a>
 
         <div class="nav-right">
@@ -140,19 +137,6 @@ const navLinks = [
         transform: scale(1.05);
     }
 
-    .brand-copy {
-        display: flex;
-        flex-direction: column;
-        color: var(--text-white);
-        text-transform: uppercase;
-    }
-
-    .brand-caption {
-        font-size: 0.82rem;
-        letter-spacing: 0.08em;
-        font-weight: 700;
-    }
-
     .brand-wrapper:focus-visible {
         box-shadow: var(--focus-ring-light);
         border-radius: 8px;
@@ -190,7 +174,7 @@ const navLinks = [
         color: var(--text-white);
         position: relative;
         opacity: 0.8;
-        transition: opacity 0.25s ease, background 0.25s ease, color 0.25s ease;
+        transition: opacity 0.25s ease;
         padding: 0.7rem 0;
         border-radius: 0;
     }
@@ -198,8 +182,6 @@ const navLinks = [
     .nav-link:hover,
     .nav-link.active {
         opacity: 1;
-        background: rgba(38, 24, 11, 0.08);
-        color: var(--brand-ink);
     }
 
     .nav-link::after {
@@ -294,7 +276,6 @@ const navLinks = [
     }
 
     @media (max-width: 900px) {
-        .brand-copy,
         .nav-cta {
             display: none;
         }
