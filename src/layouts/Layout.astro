@@ -274,9 +274,9 @@ const structuredData = {
                 top: 0; left: 0;
                 width: 100%; height: 100%;
                 background:
-                    radial-gradient(circle at top left, rgba(250, 162, 39, 0.22), transparent 26%),
-                    radial-gradient(circle at 80% 20%, rgba(250, 162, 39, 0.14), transparent 22%),
-                    linear-gradient(180deg, #fff8e9 0%, #f9efd8 100%);
+                    radial-gradient(circle at 18% 18%, rgba(255, 247, 229, 0.24), transparent 28%),
+                    radial-gradient(circle at 82% 16%, rgba(38, 24, 11, 0.14), transparent 24%),
+                    var(--brand-orange);
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -286,6 +286,12 @@ const structuredData = {
 
             .loader-content {
                 text-align: center;
+                padding: 2rem 2.2rem;
+                border-radius: 28px;
+                background: rgba(255, 247, 229, 0.14);
+                border: 1px solid rgba(38, 24, 11, 0.12);
+                box-shadow: 0 24px 48px rgba(93, 60, 10, 0.16);
+                backdrop-filter: blur(10px);
             }
 
             .loader-logo {
@@ -293,13 +299,13 @@ const structuredData = {
                 height: auto;
                 opacity: 0;
                 animation: fadeUp 0.8s forwards;
-                filter: drop-shadow(0 16px 24px rgba(93, 60, 10, 0.08));
+                filter: drop-shadow(0 16px 24px rgba(93, 60, 10, 0.18));
             }
 
             .loader-bar {
                 width: 156px;
                 height: 4px;
-                background: rgba(75, 47, 10, 0.12);
+                background: rgba(38, 24, 11, 0.2);
                 margin: 18px auto 0;
                 position: relative;
                 overflow: hidden;
@@ -310,7 +316,7 @@ const structuredData = {
                 position: absolute;
                 top: 0; left: 0;
                 width: 0%; height: 100%;
-                background: linear-gradient(90deg, var(--brand-orange-deep), var(--brand-orange));
+                background: linear-gradient(90deg, var(--brand-ink), var(--brand-orange-deep));
                 border-radius: 999px;
                 animation: fillBar 0.9s ease-in-out forwards;
             }

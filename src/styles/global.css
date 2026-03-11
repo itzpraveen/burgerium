@@ -260,7 +260,7 @@ textarea:focus-visible {
 }
 
 .btn-primary {
-    background: linear-gradient(180deg, var(--brand-orange-light) 0%, var(--brand-orange) 100%);
+    background: var(--brand-orange);
     color: #000;
     padding: 0.95rem 1.65rem;
     font-family: var(--font-heading);
