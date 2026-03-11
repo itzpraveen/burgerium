@@ -5,6 +5,7 @@ import { actions } from 'astro:actions';
 import Footer from '../../components/Footer.astro';
 import Navigation from '../../components/Navigation.astro';
 import { feedbackCategories, feedbackOptions, getScoreMeta } from '../../lib/feedback';
+import { getFeedbackStorageStatus } from '../../lib/feedback-store';
 import Layout from '../../layouts/Layout.astro';
 
 const actionResult = Astro.getActionResult(actions.submitFeedback);
@@ -16,6 +17,8 @@ const fieldErrors: Record<string, string[] | undefined> =
         string[] | undefined
     >;
 const getFieldError = (field: string) => fieldErrors[field]?.[0] ?? '';
+const storageStatus = getFeedbackStorageStatus();
+const isStorageReady = storageStatus.isConfigured;
 const submission = actionResult?.data;
 const summaryMeta = submission ? getScoreMeta(submission.compositeScore) : null;
 const submittedAt = submission
@@ -90,6 +93,16 @@ const submittedAt = submission
                         <div>
                             <strong>Submission failed.</strong>
                             <p>{generalError}</p>
+                        </div>
+                    </div>
+                )}
+
+                {!isStorageReady && (
+                    <div class="feedback-alert is-error" role="alert">
+                        <div class="alert-icon" aria-hidden="true">!</div>
+                        <div>
+                            <strong>Feedback storage is not configured.</strong>
+                            <p>{storageStatus.message}</p>
                         </div>
                     </div>
                 )}
@@ -182,7 +195,9 @@ const submittedAt = submission
                         </label>
 
                         <div class="form-actions">
-                            <button type="submit" class="btn-primary">Submit feedback</button>
+                            <button type="submit" class="btn-primary" disabled={!isStorageReady}>
+                                Submit feedback
+                            </button>
                             <button type="reset" class="btn-secondary">Clear</button>
                         </div>
                     </form>
@@ -525,6 +540,12 @@ const submittedAt = submission
         color: #9b3e12;
         font-size: 0.88rem;
         font-weight: 700;
+    }
+
+    .form-actions :global(button:disabled) {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
     }
 
     @media (max-width: 1000px) {

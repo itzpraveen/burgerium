@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { feedbackCategories } from '../../lib/feedback';
-import { listFeedbackSubmissions } from '../../lib/feedback-store';
+import { getFeedbackStorageStatus, listFeedbackSubmissions } from '../../lib/feedback-store';
 
 export const prerender = false;
 
@@ -10,6 +10,18 @@ function escapeCsv(value: string | number | boolean) {
 }
 
 export const GET: APIRoute = async () => {
+    const storageStatus = getFeedbackStorageStatus();
+
+    if (!storageStatus.isConfigured) {
+        return new Response(storageStatus.message ?? 'Feedback storage is not configured.', {
+            status: 503,
+            headers: {
+                'Content-Type': 'text/plain; charset=utf-8',
+                'Cache-Control': 'no-store',
+            },
+        });
+    }
+
     const submissions = await listFeedbackSubmissions();
     const headers = [
         'id',

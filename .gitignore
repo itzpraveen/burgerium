@@ -6,6 +6,7 @@ dist
 .astro
 .turbo
 .vite
+.vercel
 
 # OS / editor
 .DS_Store

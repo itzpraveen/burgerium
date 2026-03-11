@@ -1,11 +1,12 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
-import node from '@astrojs/node';
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://burgerium.in',
-  adapter: node({ mode: 'standalone' }),
+  output: 'server',
+  adapter: vercel(),
   integrations: [sitemap()],
 });

@@ -8,9 +8,10 @@ import {
     getScoreColorClass,
     getScoreMeta,
 } from '../../lib/feedback';
-import { listFeedbackSubmissions } from '../../lib/feedback-store';
+import { getFeedbackStorageStatus, listFeedbackSubmissions } from '../../lib/feedback-store';
 import Layout from '../../layouts/Layout.astro';
 
+const storageStatus = getFeedbackStorageStatus();
 const submissions = await listFeedbackSubmissions();
 const totalResponses = submissions.length;
 const averageOverall = totalResponses
@@ -64,6 +65,13 @@ const formatDate = (value: string) =>
 
         <section class="dashboard-section">
             <div class="container">
+                {!storageStatus.isConfigured && (
+                    <div class="empty-state">
+                        <strong>Feedback storage is not configured for this deployment.</strong>
+                        <p>{storageStatus.message}</p>
+                    </div>
+                )}
+
                 <div class="stats-grid">
                     <article class="stat-card">
                         <span>Total responses</span>

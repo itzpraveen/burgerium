@@ -5,13 +5,13 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "start": "node ./dist/server/entry.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/node": "^9.5.5",
+    "@astrojs/vercel": "^9.0.5",
+    "@vercel/blob": "^2.3.1",
     "astro": "^5.16.4"
   },
   "devDependencies": {
