@@ -17,8 +17,7 @@ const fieldErrors: Record<string, string[] | undefined> =
         string[] | undefined
     >;
 const getFieldError = (field: string) => fieldErrors[field]?.[0] ?? '';
-const storageStatus = getFeedbackStorageStatus();
-const isStorageReady = storageStatus.isConfigured;
+const { isConfigured: isStorageReady } = getFeedbackStorageStatus();
 const submission = actionResult?.data;
 const summaryMeta = submission ? getScoreMeta(submission.compositeScore) : null;
 const submittedAt = submission
@@ -39,34 +38,34 @@ const submittedAt = submission
         <section class="feedback-hero">
             <div class="container hero-grid">
                 <div class="hero-copy scroll-reveal active">
-                    <span class="eyebrow">Guest feedback desk</span>
+                    <span class="eyebrow">Your visit</span>
                     <h1>Rate the visit while the table is still warm.</h1>
                     <p>
-                        This form is designed for in-store collection. Guests can score the meal in under a minute,
-                        and the Burgerium team gets a structured record instead of scattered messages.
+                        Tell us how your visit was today. Your feedback helps us improve food, service, timing, and
+                        ambience.
                     </p>
 
                     <div class="hero-notes">
                         <article>
-                            <strong>Fast collection</strong>
-                            <p>Six experience checkpoints, one contact capture, optional comments.</p>
+                            <strong>Takes a minute</strong>
+                            <p>Six quick ratings, your contact details, and an optional comment.</p>
                         </article>
                         <article>
-                            <strong>Operator view</strong>
-                            <p>Responses are stored on the server and available at <code>/feedback/admin</code>.</p>
+                            <strong>Helps us improve</strong>
+                            <p>Tell us what stood out and where we can do better next time.</p>
                         </article>
                     </div>
                 </div>
 
-                <aside class="hero-panel scroll-reveal active" aria-label="How the flow works">
-                    <div class="panel-ribbon">Live setup</div>
+                <aside class="hero-panel scroll-reveal active" aria-label="What the form covers">
+                    <div class="panel-ribbon">What we ask</div>
                     <ol>
-                        <li>Guest submits the form from the website or a QR code.</li>
-                        <li>The response is validated server-side and stored immediately.</li>
-                        <li>The team reviews trends and comments from the dashboard.</li>
+                        <li>Food, service, timing, and ambience.</li>
+                        <li>A quick overall score for the visit.</li>
+                        <li>An optional note if you want to add context.</li>
                     </ol>
                     <p class="panel-note">
-                        Low-friction enough for dine-in tables, structured enough for follow-up.
+                        Short enough to fill out before you leave the table.
                     </p>
                 </aside>
             </div>
@@ -78,11 +77,8 @@ const submittedAt = submission
                     <div class="feedback-alert is-success" role="status">
                         <div class="alert-icon" aria-hidden="true">{summaryMeta.emoji}</div>
                         <div>
-                            <strong>Feedback saved for {submission.name}.</strong>
-                            <p>
-                                Logged on {submittedAt}. Visit signal: {submission.compositeLabel}
-                                ({submission.compositeScore}/5).
-                            </p>
+                            <strong>Thanks, {submission.name}.</strong>
+                            <p>Your feedback was received on {submittedAt}.</p>
                         </div>
                     </div>
                 )}
@@ -101,8 +97,8 @@ const submittedAt = submission
                     <div class="feedback-alert is-error" role="alert">
                         <div class="alert-icon" aria-hidden="true">!</div>
                         <div>
-                            <strong>Feedback storage is not configured.</strong>
-                            <p>{storageStatus.message}</p>
+                            <strong>This feedback form is unavailable right now.</strong>
+                            <p>Please try again a little later.</p>
                         </div>
                     </div>
                 )}
@@ -110,12 +106,11 @@ const submittedAt = submission
                 <div class="form-shell scroll-reveal active">
                     <div class="form-header">
                         <div>
-                            <span class="section-tag">Feedback form</span>
-                            <h2>Capture the full guest experience.</h2>
+                            <span class="section-tag">Your feedback</span>
+                            <h2>Tell us about your visit.</h2>
                         </div>
                         <p>
-                            Match the quick rating pattern from the table form, but store it directly in the
-                            application.
+                            A few quick ratings and an optional note help us improve every service.
                         </p>
                     </div>
 

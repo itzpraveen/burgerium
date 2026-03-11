@@ -15,6 +15,7 @@ Astro marketing site for Burgerium, with a built-in feedback collection flow for
 Production storage uses Vercel Blob.
 
 - Required on Vercel: connect a Blob store so `BLOB_READ_WRITE_TOKEN` is available at runtime
+- Required for `/feedback/admin` and `/feedback/export.csv`: set `FEEDBACK_ADMIN_USERNAME` and `FEEDBACK_ADMIN_PASSWORD`
 - Local development fallback: `data/feedback-submissions.json`
 - Optional local override: `FEEDBACK_STORAGE_PATH=/absolute/path/to/feedback-submissions.json`
 
