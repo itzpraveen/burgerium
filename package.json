@@ -5,13 +5,18 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "start": "node ./dist/server/entry.mjs",
     "preview": "astro preview",
+    "check": "astro check",
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^9.5.5",
     "astro": "^5.16.4"
   },
   "devDependencies": {
-    "@astrojs/sitemap": "^3.7.0"
+    "@astrojs/check": "^0.9.7",
+    "@astrojs/sitemap": "^3.7.0",
+    "typescript": "^5.9.3"
   }
 }

@@ -5,6 +5,7 @@ interface Props {
 	title: string;
 	description?: string;
 	image?: string;
+	robots?: string;
 }
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -15,6 +16,7 @@ const {
 	title,
 	description = defaultDescription,
 	image = `${base}/og-burgerium.png`,
+	robots = 'index,follow',
 } = Astro.props;
 
 const site = Astro.site ?? new URL('https://burgerium.in');
@@ -71,7 +73,7 @@ const structuredData = {
 		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="theme-color" content="#FAA227" />
-		<meta name="robots" content="index,follow" />
+		<meta name="robots" content={robots} />
 		<link rel="icon" type="image/png" href={`${base}/favicon.png`} />
 		<link rel="canonical" href={canonicalURL.href} />
 		<meta name="generator" content={Astro.generator} />

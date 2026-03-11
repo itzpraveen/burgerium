@@ -1,0 +1,578 @@
+---
+export const prerender = false;
+
+import { actions } from 'astro:actions';
+import Footer from '../../components/Footer.astro';
+import Navigation from '../../components/Navigation.astro';
+import { feedbackCategories, feedbackOptions, getScoreMeta } from '../../lib/feedback';
+import Layout from '../../layouts/Layout.astro';
+
+const actionResult = Astro.getActionResult(actions.submitFeedback);
+const generalError =
+    actionResult?.error && !('fields' in actionResult.error) ? actionResult.error.message : '';
+const fieldErrors: Record<string, string[] | undefined> =
+    ((actionResult?.error && 'fields' in actionResult.error ? actionResult.error.fields : {}) ?? {}) as Record<
+        string,
+        string[] | undefined
+    >;
+const getFieldError = (field: string) => fieldErrors[field]?.[0] ?? '';
+const submission = actionResult?.data;
+const summaryMeta = submission ? getScoreMeta(submission.compositeScore) : null;
+const submittedAt = submission
+    ? new Intl.DateTimeFormat('en-IN', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      }).format(new Date(submission.createdAt))
+    : '';
+---
+
+<Layout
+    title="Burgerium Feedback | Rate Your Visit"
+    description="Share your Burgerium visit feedback and help the team improve food, service, timing, and ambience."
+>
+    <Navigation />
+
+    <div class="feedback-page">
+        <section class="feedback-hero">
+            <div class="container hero-grid">
+                <div class="hero-copy scroll-reveal active">
+                    <span class="eyebrow">Guest feedback desk</span>
+                    <h1>Rate the visit while the table is still warm.</h1>
+                    <p>
+                        This form is designed for in-store collection. Guests can score the meal in under a minute,
+                        and the Burgerium team gets a structured record instead of scattered messages.
+                    </p>
+
+                    <div class="hero-notes">
+                        <article>
+                            <strong>Fast collection</strong>
+                            <p>Six experience checkpoints, one contact capture, optional comments.</p>
+                        </article>
+                        <article>
+                            <strong>Operator view</strong>
+                            <p>Responses are stored on the server and available at <code>/feedback/admin</code>.</p>
+                        </article>
+                    </div>
+                </div>
+
+                <aside class="hero-panel scroll-reveal active" aria-label="How the flow works">
+                    <div class="panel-ribbon">Live setup</div>
+                    <ol>
+                        <li>Guest submits the form from the website or a QR code.</li>
+                        <li>The response is validated server-side and stored immediately.</li>
+                        <li>The team reviews trends and comments from the dashboard.</li>
+                    </ol>
+                    <p class="panel-note">
+                        Low-friction enough for dine-in tables, structured enough for follow-up.
+                    </p>
+                </aside>
+            </div>
+        </section>
+
+        <section class="feedback-section">
+            <div class="container">
+                {submission && summaryMeta && (
+                    <div class="feedback-alert is-success" role="status">
+                        <div class="alert-icon" aria-hidden="true">{summaryMeta.emoji}</div>
+                        <div>
+                            <strong>Feedback saved for {submission.name}.</strong>
+                            <p>
+                                Logged on {submittedAt}. Visit signal: {submission.compositeLabel}
+                                ({submission.compositeScore}/5).
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {generalError && (
+                    <div class="feedback-alert is-error" role="alert">
+                        <div class="alert-icon" aria-hidden="true">!</div>
+                        <div>
+                            <strong>Submission failed.</strong>
+                            <p>{generalError}</p>
+                        </div>
+                    </div>
+                )}
+
+                <div class="form-shell scroll-reveal active">
+                    <div class="form-header">
+                        <div>
+                            <span class="section-tag">Feedback form</span>
+                            <h2>Capture the full guest experience.</h2>
+                        </div>
+                        <p>
+                            Match the quick rating pattern from the table form, but store it directly in the
+                            application.
+                        </p>
+                    </div>
+
+                    <form method="POST" action={actions.submitFeedback} class="feedback-form">
+                        {feedbackCategories.map((category) => (
+                            <fieldset class="rating-group">
+                                <legend>{category.label}</legend>
+                                <div class="rating-grid">
+                                    {feedbackOptions.map((option) => {
+                                        const fieldId = `${category.key}-${option.value}`;
+                                        return (
+                                            <div class="rating-choice">
+                                                <input
+                                                    type="radio"
+                                                    id={fieldId}
+                                                    name={category.key}
+                                                    value={option.value}
+                                                    required
+                                                />
+                                                <label for={fieldId} class="rating-card">
+                                                    <span class="rating-emoji" aria-hidden="true">{option.emoji}</span>
+                                                    <span class="rating-label">{option.label}</span>
+                                                </label>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                {getFieldError(category.key) && <p class="field-error">{getFieldError(category.key)}</p>}
+                            </fieldset>
+                        ))}
+
+                        <div class="input-grid">
+                            <label class="field">
+                                <span>Name <small>(required)</small></span>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Your name"
+                                    minlength="2"
+                                    maxlength="80"
+                                    autocomplete="name"
+                                    required
+                                />
+                                {getFieldError('name') && <p class="field-error">{getFieldError('name')}</p>}
+                            </label>
+
+                            <label class="field">
+                                <span>Phone <small>(required)</small></span>
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    placeholder="10-digit phone"
+                                    inputmode="numeric"
+                                    pattern="[0-9]{10}"
+                                    maxlength="10"
+                                    autocomplete="tel"
+                                    required
+                                />
+                                {getFieldError('phone') && <p class="field-error">{getFieldError('phone')}</p>}
+                            </label>
+                        </div>
+
+                        <label class="field field-textarea">
+                            <span>Comments <small>(optional)</small></span>
+                            <textarea
+                                name="comments"
+                                rows="5"
+                                maxlength="600"
+                                placeholder="Tell us what went well or what to improve"
+                            ></textarea>
+                            {getFieldError('comments') && <p class="field-error">{getFieldError('comments')}</p>}
+                        </label>
+
+                        <label class="consent-row">
+                            <input type="checkbox" name="contactConsent" value="true" />
+                            <span>Okay to contact me about this feedback</span>
+                        </label>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Submit feedback</button>
+                            <button type="reset" class="btn-secondary">Clear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <Footer />
+</Layout>
+
+<style>
+    .feedback-page {
+        padding-top: calc(var(--header-height) + 1.5rem);
+    }
+
+    .feedback-hero {
+        position: relative;
+        padding: 2.5rem 0 2rem;
+        overflow: hidden;
+    }
+
+    .feedback-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 15% 10%, rgba(250, 162, 39, 0.2), transparent 26%),
+            radial-gradient(circle at 85% 0%, rgba(157, 93, 0, 0.14), transparent 24%);
+        pointer-events: none;
+    }
+
+    .hero-grid {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+        gap: 2rem;
+        align-items: stretch;
+    }
+
+    .hero-copy,
+    .hero-panel,
+    .form-shell {
+        border: 1px solid rgba(75, 47, 10, 0.12);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .hero-copy {
+        padding: 2.2rem;
+        border-radius: 36px;
+        background: rgba(255, 249, 238, 0.88);
+    }
+
+    .eyebrow,
+    .section-tag,
+    .panel-ribbon {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(38, 24, 11, 0.08);
+        color: var(--brand-orange-deep);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .hero-copy h1 {
+        margin-top: 1rem;
+        font-size: clamp(3rem, 7vw, 5.7rem);
+        line-height: 0.95;
+    }
+
+    .hero-copy > p {
+        max-width: 42rem;
+        margin-top: 1rem;
+        color: var(--text-gray);
+        font-size: 1.02rem;
+        line-height: 1.7;
+    }
+
+    .hero-notes {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        margin-top: 1.65rem;
+    }
+
+    .hero-notes article,
+    .hero-panel {
+        background: linear-gradient(180deg, rgba(255, 251, 243, 0.95) 0%, rgba(255, 240, 202, 0.92) 100%);
+    }
+
+    .hero-notes article {
+        padding: 1.1rem 1.15rem;
+        border-radius: 24px;
+    }
+
+    .hero-notes strong {
+        display: block;
+        margin-bottom: 0.35rem;
+        font-family: var(--font-heading);
+        font-size: 1.35rem;
+        letter-spacing: 0.04em;
+    }
+
+    .hero-notes p,
+    .hero-panel p,
+    .hero-panel li {
+        color: var(--text-gray);
+        line-height: 1.6;
+    }
+
+    .hero-panel {
+        position: relative;
+        padding: 1.9rem;
+        border-radius: 30px;
+    }
+
+    .panel-ribbon {
+        background: rgba(250, 162, 39, 0.18);
+    }
+
+    .hero-panel ol {
+        margin: 1rem 0 0 1.1rem;
+        display: grid;
+        gap: 0.8rem;
+    }
+
+    .panel-note {
+        margin-top: 1.25rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(75, 47, 10, 0.12);
+        font-weight: 600;
+    }
+
+    .feedback-section {
+        padding: 0 0 5rem;
+    }
+
+    .feedback-alert {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 1rem;
+        align-items: start;
+        margin-bottom: 1.25rem;
+        padding: 1rem 1.15rem;
+        border-radius: 22px;
+        border: 1px solid rgba(75, 47, 10, 0.12);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .feedback-alert strong {
+        display: block;
+        margin-bottom: 0.2rem;
+    }
+
+    .feedback-alert p {
+        color: var(--text-gray);
+        line-height: 1.55;
+    }
+
+    .feedback-alert.is-success {
+        background: rgba(255, 249, 238, 0.95);
+    }
+
+    .feedback-alert.is-error {
+        background: rgba(255, 237, 228, 0.92);
+        border-color: rgba(155, 62, 18, 0.22);
+    }
+
+    .alert-icon {
+        width: 2.6rem;
+        height: 2.6rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(250, 162, 39, 0.18);
+        font-size: 1.25rem;
+        font-weight: 800;
+    }
+
+    .form-shell {
+        padding: 2rem;
+        border-radius: 36px;
+        background: rgba(255, 251, 243, 0.92);
+    }
+
+    .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 2rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .form-header h2 {
+        margin-top: 0.75rem;
+        font-size: clamp(2.1rem, 4vw, 3.6rem);
+        line-height: 0.95;
+    }
+
+    .form-header p {
+        max-width: 26rem;
+        color: var(--text-gray);
+        line-height: 1.65;
+    }
+
+    .feedback-form {
+        display: grid;
+        gap: 1.35rem;
+    }
+
+    .rating-group {
+        padding: 0;
+        border: 0;
+    }
+
+    .rating-group legend {
+        margin-bottom: 0.75rem;
+        font-weight: 800;
+        color: var(--brand-ink);
+    }
+
+    .rating-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.75rem;
+    }
+
+    .rating-choice input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .rating-card {
+        display: grid;
+        justify-items: center;
+        gap: 0.4rem;
+        min-height: 5.9rem;
+        padding: 0.95rem 0.75rem;
+        border-radius: 20px;
+        border: 1px solid rgba(250, 162, 39, 0.32);
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--brand-ink);
+        transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+        cursor: pointer;
+    }
+
+    .rating-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(157, 93, 0, 0.34);
+        box-shadow: 0 14px 28px rgba(93, 60, 10, 0.12);
+        background: rgba(255, 250, 239, 0.96);
+    }
+
+    .rating-choice input:checked + .rating-card {
+        background: linear-gradient(180deg, rgba(255, 245, 222, 0.98) 0%, rgba(255, 226, 150, 0.94) 100%);
+        border-color: rgba(157, 93, 0, 0.55);
+        box-shadow: 0 18px 32px rgba(93, 60, 10, 0.16);
+        transform: translateY(-3px);
+    }
+
+    .rating-choice input:focus-visible + .rating-card {
+        box-shadow: var(--focus-ring);
+    }
+
+    .rating-emoji {
+        font-size: 1.45rem;
+        line-height: 1;
+    }
+
+    .rating-label {
+        font-size: 0.92rem;
+        font-weight: 700;
+    }
+
+    .input-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .field {
+        display: grid;
+        gap: 0.45rem;
+    }
+
+    .field span {
+        font-weight: 800;
+    }
+
+    .field small {
+        color: var(--text-muted);
+        font-weight: 700;
+    }
+
+    .field input,
+    .field textarea {
+        width: 100%;
+        padding: 0.95rem 1rem;
+        border-radius: 18px;
+        border: 1px solid rgba(75, 47, 10, 0.14);
+        background: rgba(255, 255, 255, 0.8);
+        color: var(--brand-ink);
+        font: inherit;
+    }
+
+    .field textarea {
+        resize: vertical;
+        min-height: 8.8rem;
+    }
+
+    .consent-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin-top: -0.1rem;
+        font-weight: 600;
+        color: var(--text-gray);
+    }
+
+    .consent-row input {
+        width: 1rem;
+        height: 1rem;
+        accent-color: var(--brand-orange-deep);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 0.85rem;
+        flex-wrap: wrap;
+        padding-top: 0.25rem;
+    }
+
+    .field-error {
+        color: #9b3e12;
+        font-size: 0.88rem;
+        font-weight: 700;
+    }
+
+    @media (max-width: 1000px) {
+        .hero-grid,
+        .form-header,
+        .input-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-header {
+            align-items: start;
+        }
+    }
+
+    @media (max-width: 780px) {
+        .feedback-page {
+            padding-top: calc(var(--header-height) + 1rem);
+        }
+
+        .hero-copy,
+        .hero-panel,
+        .form-shell {
+            padding: 1.3rem;
+            border-radius: 24px;
+        }
+
+        .hero-notes {
+            grid-template-columns: 1fr;
+        }
+
+        .rating-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 520px) {
+        .rating-choice:last-child {
+            grid-column: span 2;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .form-actions :global(.btn-primary),
+        .form-actions :global(.btn-secondary) {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
