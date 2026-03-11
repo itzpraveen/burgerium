@@ -19,7 +19,7 @@ const {
 	robots = 'index,follow',
 } = Astro.props;
 
-const site = Astro.site ?? new URL('https://burgerium.in');
+const site = Astro.site ?? new URL('https://www.burgerium.in');
 const siteUrl = site.href.replace(/\/$/, '');
 const canonicalURL = new URL(Astro.url.pathname, site);
 const ogImageURL = new URL(image, site);
