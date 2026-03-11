@@ -4,7 +4,7 @@ export const prerender = false;
 import { actions } from 'astro:actions';
 import Footer from '../../components/Footer.astro';
 import Navigation from '../../components/Navigation.astro';
-import { feedbackCategories, feedbackOptions, getScoreMeta } from '../../lib/feedback';
+import { feedbackCategories, feedbackOptions } from '../../lib/feedback';
 import { getFeedbackStorageStatus } from '../../lib/feedback-store';
 import Layout from '../../layouts/Layout.astro';
 
@@ -19,13 +19,10 @@ const fieldErrors: Record<string, string[] | undefined> =
 const getFieldError = (field: string) => fieldErrors[field]?.[0] ?? '';
 const { isConfigured: isStorageReady } = getFeedbackStorageStatus();
 const submission = actionResult?.data;
-const summaryMeta = submission ? getScoreMeta(submission.compositeScore) : null;
-const submittedAt = submission
-    ? new Intl.DateTimeFormat('en-IN', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      }).format(new Date(submission.createdAt))
-    : '';
+
+if (submission) {
+    return Astro.redirect('/feedback/thanks', 303);
+}
 ---
 
 <Layout
@@ -73,16 +70,6 @@ const submittedAt = submission
 
         <section class="feedback-section">
             <div class="container">
-                {submission && summaryMeta && (
-                    <div class="feedback-alert is-success" role="status">
-                        <div class="alert-icon" aria-hidden="true">{summaryMeta.emoji}</div>
-                        <div>
-                            <strong>Thanks, {submission.name}.</strong>
-                            <p>Your feedback was received on {submittedAt}.</p>
-                        </div>
-                    </div>
-                )}
-
                 {generalError && (
                     <div class="feedback-alert is-error" role="alert">
                         <div class="alert-icon" aria-hidden="true">!</div>
@@ -94,11 +81,11 @@ const submittedAt = submission
                 )}
 
                 {!isStorageReady && (
-                    <div class="feedback-alert is-error" role="alert">
-                        <div class="alert-icon" aria-hidden="true">!</div>
-                        <div>
-                            <strong>This feedback form is unavailable right now.</strong>
-                            <p>Please try again a little later.</p>
+                        <div class="feedback-alert is-error" role="alert">
+                            <div class="alert-icon" aria-hidden="true">!</div>
+                            <div>
+                                <strong>This feedback form is unavailable right now.</strong>
+                                <p>Please try again a little later.</p>
                         </div>
                     </div>
                 )}

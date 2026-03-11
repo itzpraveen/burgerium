@@ -20,7 +20,10 @@ export const server = {
                 .string()
                 .trim()
                 .regex(/^\d{10}$/, 'Enter a 10-digit phone number.'),
-            comments: z.string().trim().max(600, 'Keep comments within 600 characters.').optional().default(''),
+            comments: z.preprocess(
+                (value) => (value == null ? '' : value),
+                z.string().trim().max(600, 'Keep comments within 600 characters.')
+            ),
             contactConsent: z.boolean().default(false),
         }),
         handler: async (input) => {

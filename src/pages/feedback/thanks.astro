@@ -1,0 +1,108 @@
+---
+export const prerender = false;
+
+import Footer from '../../components/Footer.astro';
+import Navigation from '../../components/Navigation.astro';
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+    title="Thanks For Your Feedback | Burgerium"
+    description="Thank you for sharing your feedback with Burgerium."
+    robots="noindex,nofollow"
+>
+    <Navigation />
+
+    <div class="thanks-page">
+        <section class="thanks-section">
+            <div class="container">
+                <div class="thanks-card scroll-reveal active">
+                    <span class="eyebrow">Thank you</span>
+                    <h1>Thanks for your feedback.</h1>
+                    <p>
+                        Your response has been recorded. We use it to improve food, service, speed, and the overall
+                        experience.
+                    </p>
+
+                    <div class="thanks-actions">
+                        <a href="/feedback" class="btn-primary">Submit another response</a>
+                        <a href="/menu" class="btn-secondary">View menu</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <Footer />
+</Layout>
+
+<style>
+    .thanks-page {
+        padding-top: calc(var(--header-height) + 1.5rem);
+    }
+
+    .thanks-section {
+        padding: 3rem 0 5rem;
+    }
+
+    .thanks-card {
+        max-width: 44rem;
+        margin: 0 auto;
+        padding: 2.4rem;
+        border-radius: 36px;
+        border: 1px solid rgba(75, 47, 10, 0.12);
+        background:
+            radial-gradient(circle at top right, rgba(250, 162, 39, 0.18), transparent 28%),
+            rgba(255, 249, 238, 0.92);
+        box-shadow: var(--shadow-soft);
+        text-align: center;
+    }
+
+    .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(38, 24, 11, 0.08);
+        color: var(--brand-orange-deep);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .thanks-card h1 {
+        margin-top: 1rem;
+        font-size: clamp(2.8rem, 6vw, 5rem);
+        line-height: 0.95;
+    }
+
+    .thanks-card p {
+        max-width: 34rem;
+        margin: 1rem auto 0;
+        color: var(--text-gray);
+        line-height: 1.7;
+    }
+
+    .thanks-actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.9rem;
+        margin-top: 1.8rem;
+    }
+
+    @media (max-width: 720px) {
+        .thanks-section {
+            padding: 2rem 0 4rem;
+        }
+
+        .thanks-card {
+            padding: 2rem 1.4rem;
+        }
+
+        .thanks-actions {
+            flex-direction: column;
+        }
+    }
+</style>
