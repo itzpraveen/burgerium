@@ -1,0 +1,298 @@
+---
+export const prerender = false;
+
+import Footer from '../../components/Footer.astro';
+import Navigation from '../../components/Navigation.astro';
+import {
+    getFeedbackAdminConfig,
+    getFeedbackAdminDefaultRedirectPath,
+    hasValidFeedbackAdminSession,
+    sanitizeFeedbackAdminNextPath,
+} from '../../lib/feedback-admin-auth';
+import Layout from '../../layouts/Layout.astro';
+
+const config = getFeedbackAdminConfig();
+const nextPath = sanitizeFeedbackAdminNextPath(Astro.url.searchParams.get('next'));
+const error = Astro.url.searchParams.get('error');
+const loggedOut = Astro.url.searchParams.get('loggedOut') === '1';
+
+if (config.isConfigured && hasValidFeedbackAdminSession(Astro.cookies, config)) {
+    return Astro.redirect(nextPath || getFeedbackAdminDefaultRedirectPath(), 303);
+}
+
+const message =
+    error === 'invalid'
+        ? 'The username or password is incorrect.'
+        : error === 'config'
+          ? config.message ?? 'Feedback admin access is not configured for this deployment.'
+          : '';
+---
+
+<Layout
+    title="Burgerium Admin Login"
+    description="Session login for the Burgerium feedback dashboard."
+    robots="noindex,nofollow"
+>
+    <Navigation />
+
+    <div class="admin-login-page">
+        <section class="admin-login-shell">
+            <div class="container admin-login-grid">
+                <div class="admin-login-copy">
+                    <span class="eyebrow">Internal access</span>
+                    <h1>Sign in to the feedback dashboard.</h1>
+                    <p>
+                        This browser session will stay signed in until you close the browser window or use the logout
+                        action from the dashboard.
+                    </p>
+
+                    <div class="signal-list">
+                        <div>
+                            <strong>Session-only access</strong>
+                            <p>No permanent login is stored on the device.</p>
+                        </div>
+                        <div>
+                            <strong>Export still works</strong>
+                            <p>The same session unlocks the CSV export and the dashboard page.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-login-card">
+                    {loggedOut && (
+                        <div class="login-alert is-success" role="status">
+                            <strong>Signed out.</strong>
+                            <p>Your admin browser session has been cleared.</p>
+                        </div>
+                    )}
+
+                    {message && (
+                        <div class="login-alert is-error" role="alert">
+                            <strong>Unable to sign in.</strong>
+                            <p>{message}</p>
+                        </div>
+                    )}
+
+                    {!config.isConfigured ? (
+                        <div class="login-panel">
+                            <h2>Admin access is not configured.</h2>
+                            <p>{config.message}</p>
+                        </div>
+                    ) : (
+                        <form method="POST" action="/api/feedback/admin-session" class="login-panel">
+                            <input type="hidden" name="next" value={nextPath} />
+
+                            <div>
+                                <span class="form-tag">Browser session login</span>
+                                <h2>Enter admin credentials.</h2>
+                            </div>
+
+                            <label class="login-field">
+                                <span>Username</span>
+                                <input
+                                    type="text"
+                                    name="username"
+                                    autocomplete="username"
+                                    autocapitalize="none"
+                                    spellcheck="false"
+                                    required
+                                />
+                            </label>
+
+                            <label class="login-field">
+                                <span>Password</span>
+                                <input type="password" name="password" autocomplete="current-password" required />
+                            </label>
+
+                            <button type="submit" class="btn-primary login-submit">Open dashboard</button>
+                        </form>
+                    )}
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <Footer />
+</Layout>
+
+<style>
+    .admin-login-page {
+        min-height: 100vh;
+        padding-top: calc(var(--header-height) + 1.5rem);
+        background:
+            radial-gradient(circle at top left, rgba(250, 162, 39, 0.22), transparent 28%),
+            linear-gradient(180deg, rgba(255, 248, 236, 0.96), rgba(248, 238, 221, 0.94));
+    }
+
+    .admin-login-shell {
+        padding: 2rem 0 5rem;
+    }
+
+    .admin-login-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+        gap: 1.4rem;
+        align-items: start;
+    }
+
+    .admin-login-copy,
+    .admin-login-card {
+        border: 1px solid rgba(75, 47, 10, 0.12);
+        border-radius: 34px;
+        background: rgba(255, 251, 243, 0.92);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .admin-login-copy {
+        padding: 2rem;
+    }
+
+    .eyebrow {
+        display: inline-flex;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(38, 24, 11, 0.08);
+        color: var(--brand-orange-deep);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .admin-login-copy h1 {
+        margin-top: 1rem;
+        font-size: clamp(2.8rem, 6vw, 4.8rem);
+        line-height: 0.95;
+    }
+
+    .admin-login-copy p {
+        margin-top: 0.9rem;
+        max-width: 34rem;
+        color: var(--text-gray);
+        line-height: 1.72;
+    }
+
+    .signal-list {
+        display: grid;
+        gap: 0.9rem;
+        margin-top: 1.5rem;
+    }
+
+    .signal-list div {
+        padding: 1rem 1.1rem;
+        border-radius: 22px;
+        background: rgba(255, 245, 229, 0.86);
+        border: 1px solid rgba(75, 47, 10, 0.08);
+    }
+
+    .signal-list strong {
+        display: block;
+        color: var(--brand-orange-deep);
+    }
+
+    .signal-list p {
+        margin-top: 0.35rem;
+        max-width: none;
+    }
+
+    .admin-login-card {
+        padding: 1.35rem;
+    }
+
+    .login-panel {
+        display: grid;
+        gap: 1rem;
+        padding: 1.2rem;
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid rgba(75, 47, 10, 0.08);
+    }
+
+    .form-tag {
+        display: inline-flex;
+        margin-bottom: 0.8rem;
+        padding: 0.32rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(250, 162, 39, 0.16);
+        color: var(--brand-orange-deep);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .login-panel h2 {
+        font-size: 1.6rem;
+        line-height: 1.08;
+    }
+
+    .login-field {
+        display: grid;
+        gap: 0.45rem;
+    }
+
+    .login-field span {
+        font-weight: 700;
+        color: var(--brand-orange-deep);
+    }
+
+    .login-field input {
+        width: 100%;
+        min-height: 3.2rem;
+        border-radius: 16px;
+        border: 1px solid rgba(75, 47, 10, 0.14);
+        background: rgba(255, 250, 243, 0.96);
+        padding: 0.95rem 1rem;
+        font: inherit;
+        color: var(--text-dark);
+    }
+
+    .login-field input:focus-visible {
+        outline: none;
+        border-color: rgba(250, 162, 39, 0.82);
+        box-shadow: 0 0 0 4px rgba(250, 162, 39, 0.2);
+    }
+
+    .login-submit {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .login-alert {
+        margin-bottom: 1rem;
+        padding: 1rem 1.05rem;
+        border-radius: 20px;
+        border: 1px solid rgba(75, 47, 10, 0.12);
+    }
+
+    .login-alert strong {
+        display: block;
+    }
+
+    .login-alert p {
+        margin-top: 0.35rem;
+        color: var(--text-gray);
+        line-height: 1.65;
+    }
+
+    .login-alert.is-error {
+        background: rgba(255, 235, 232, 0.88);
+        border-color: rgba(184, 92, 30, 0.24);
+    }
+
+    .login-alert.is-success {
+        background: rgba(235, 248, 239, 0.9);
+        border-color: rgba(44, 107, 76, 0.2);
+    }
+
+    @media (max-width: 900px) {
+        .admin-login-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .admin-login-copy,
+        .admin-login-card {
+            border-radius: 28px;
+        }
+    }
+</style>

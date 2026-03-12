@@ -33,11 +33,16 @@ const attentionNeeded = submissions.filter(
     (submission) => submission.overall <= 2 || submission.compositeScore <= 2.5
 ).length;
 const lastResponse = submissions[0]?.createdAt;
-const formatDate = (value: string) =>
-    new Intl.DateTimeFormat('en-IN', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-    }).format(new Date(value));
+const istDateFormatter = new Intl.DateTimeFormat('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Asia/Kolkata',
+});
+const formatDate = (value: string) => `${istDateFormatter.format(new Date(value))} IST`;
 ---
 
 <Layout
@@ -59,7 +64,13 @@ const formatDate = (value: string) =>
                     </p>
                 </div>
 
-                <a href="/feedback/export.csv" class="btn-primary">Export CSV</a>
+                <div class="dashboard-actions">
+                    <a href="/feedback/export.csv" class="btn-primary">Export CSV</a>
+                    <form method="POST" action="/api/feedback/admin-session">
+                        <input type="hidden" name="intent" value="logout" />
+                        <button type="submit" class="btn-secondary">Log out</button>
+                    </form>
+                </div>
             </div>
         </section>
 
@@ -173,6 +184,33 @@ const formatDate = (value: string) =>
         box-shadow: var(--shadow-soft);
     }
 
+    .dashboard-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 3rem;
+        padding: 0.8rem 1.25rem;
+        border-radius: 999px;
+        border: 1px solid rgba(75, 47, 10, 0.16);
+        background: rgba(255, 251, 243, 0.92);
+        color: var(--brand-orange-deep);
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 24px rgba(75, 47, 10, 0.08);
+    }
+
     .eyebrow {
         display: inline-flex;
         padding: 0.35rem 0.75rem;
@@ -200,6 +238,22 @@ const formatDate = (value: string) =>
 
     .dashboard-section {
         padding: 0 0 5rem;
+    }
+
+    @media (max-width: 840px) {
+        .dashboard-header {
+            align-items: start;
+            flex-direction: column;
+        }
+
+        .dashboard-actions {
+            width: 100%;
+            justify-content: stretch;
+        }
+
+        .dashboard-actions > * {
+            flex: 1 1 0;
+        }
     }
 
     .stats-grid {

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://burgerium.in/sitemap-index.xml
+Sitemap: https://www.burgerium.in/sitemap-index.xml

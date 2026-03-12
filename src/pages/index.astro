@@ -1,6 +1,4 @@
 ---
-export const prerender = true;
-
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
 import Hero from '../components/Hero.astro';
@@ -11,23 +9,36 @@ import Craft from '../components/Craft.astro';
 import Reviews from '../components/Reviews.astro';
 import Locations from '../components/Locations.astro';
 import Footer from '../components/Footer.astro';
+import { createPublicFeedbackTestimonials, type PublicFeedbackTestimonial } from '../lib/feedback';
+import { listFeedbackSubmissions } from '../lib/feedback-store';
+
+export const prerender = false;
 
 const marqueeItems = [
     'Burgerium',
     'Bakery roots since 1998',
     'From the Burger Tree family',
     'Nungambakkam, Chennai',
-    'See menu and prices before you visit',
-    'Opening updates land on Instagram first'
+    'House-baked buns every morning',
+    'Flame-grilled burgers worth the trip'
 ];
 
 const getMarqueeItemClass = (index: number) =>
     index % 2 === 0 ? 'marquee-item is-solid' : 'marquee-item is-tag';
+
+let testimonials: PublicFeedbackTestimonial[] = [];
+
+try {
+    const submissions = await listFeedbackSubmissions();
+    testimonials = createPublicFeedbackTestimonials(submissions, 8);
+} catch {
+    testimonials = [];
+}
 ---
 
 <Layout
-    title="Burgerium | Nungambakkam, Chennai Burger House"
-    description="Burgerium is opening in Nungambakkam, Chennai (E Merck House, Haddows 2nd Street, 600006). House-baked buns and flame-grilled burgers."
+    title="Burgerium Chennai | Burgers, Coffee & Desserts in Nungambakkam"
+    description="Visit Burgerium in Nungambakkam, Chennai for house-baked buns, burgers, wraps, bowls, fries, coffee, shakes, desserts, menu prices, and guest reviews."
 >
     <Navigation />
     <div class="page">
@@ -59,7 +70,7 @@ const getMarqueeItemClass = (index: number) =>
         <Anatomy />
         <Menu />
         <Locations />
-        <Reviews />
+        <Reviews reviews={testimonials} />
     </div>
     <Footer />
 </Layout>

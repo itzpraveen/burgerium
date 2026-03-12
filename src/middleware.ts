@@ -1,35 +1,43 @@
 import { defineMiddleware } from 'astro:middleware';
+import {
+    buildFeedbackAdminLoginUrl,
+    getFeedbackAdminConfig,
+    getFeedbackAdminUnauthorizedResponse,
+    hasValidFeedbackAdminSession,
+    verifyFeedbackAdminBasicAuth,
+} from './lib/feedback-admin-auth';
 
-const protectedRoutes = ['/feedback/admin', '/feedback/export.csv'];
-const realm = 'Burgerium Feedback Admin';
+const browserProtectedRoutes = ['/feedback/admin', '/feedback/export.csv'];
+const apiProtectedRoutes = ['/api/feedback/admin'];
 
-function isProtectedPath(pathname: string) {
-    return protectedRoutes.some(
+function isProtectedPath(pathname: string, routes: string[]) {
+    return routes.some(
         (route) => pathname === route || (route.endsWith('/admin') && pathname.startsWith(`${route}/`))
     );
 }
 
-function unauthorized(message = 'Authentication required.') {
-    return new Response(message, {
-        status: 401,
-        headers: {
-            'Content-Type': 'text/plain; charset=utf-8',
-            'Cache-Control': 'no-store',
-            'WWW-Authenticate': `Basic realm="${realm}"`,
-        },
-    });
-}
+export const onRequest = defineMiddleware(async (context, next) => {
+    const { url, request, cookies } = context;
+    const hasTrailingSlash = url.pathname.length > 1 && url.pathname.endsWith('/');
 
-export const onRequest = defineMiddleware(async ({ url, request }, next) => {
-    if (!isProtectedPath(url.pathname)) {
+    if (hasTrailingSlash) {
+        const redirectUrl = new URL(url);
+        redirectUrl.pathname = url.pathname.replace(/\/+$/, '');
+
+        return Response.redirect(redirectUrl, 308);
+    }
+
+    if (
+        !isProtectedPath(url.pathname, browserProtectedRoutes) &&
+        !isProtectedPath(url.pathname, apiProtectedRoutes)
+    ) {
         return next();
     }
 
-    const username = process.env.FEEDBACK_ADMIN_USERNAME;
-    const password = process.env.FEEDBACK_ADMIN_PASSWORD;
+    const config = getFeedbackAdminConfig();
 
-    if (!username || !password) {
-        return new Response('Feedback admin access is not configured for this deployment.', {
+    if (!config.isConfigured) {
+        return new Response(config.message ?? 'Feedback admin access is not configured for this deployment.', {
             status: 503,
             headers: {
                 'Content-Type': 'text/plain; charset=utf-8',
@@ -38,32 +46,16 @@ export const onRequest = defineMiddleware(async ({ url, request }, next) => {
         });
     }
 
-    const authorization = request.headers.get('authorization');
+    const hasSession = hasValidFeedbackAdminSession(cookies, config);
+    const hasBasicAuth = verifyFeedbackAdminBasicAuth(request.headers.get('authorization'), config);
 
-    if (!authorization?.startsWith('Basic ')) {
-        return unauthorized();
+    if (hasSession || hasBasicAuth) {
+        return next();
     }
 
-    let decoded = '';
-
-    try {
-        decoded = Buffer.from(authorization.slice(6), 'base64').toString('utf8');
-    } catch {
-        return unauthorized('Invalid authorization header.');
+    if (isProtectedPath(url.pathname, apiProtectedRoutes)) {
+        return getFeedbackAdminUnauthorizedResponse();
     }
 
-    const separatorIndex = decoded.indexOf(':');
-
-    if (separatorIndex === -1) {
-        return unauthorized('Invalid credentials.');
-    }
-
-    const providedUsername = decoded.slice(0, separatorIndex);
-    const providedPassword = decoded.slice(separatorIndex + 1);
-
-    if (providedUsername !== username || providedPassword !== password) {
-        return unauthorized('Invalid credentials.');
-    }
-
-    return next();
+    return Response.redirect(buildFeedbackAdminLoginUrl(url), 303);
 });

@@ -13,3 +13,5 @@ dist
 *.log
 *.tmp
 data/feedback-submissions.json
+live-*.png
+menu-*.png

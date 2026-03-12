@@ -1,61 +1,250 @@
 ---
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+import type { PublicFeedbackTestimonial } from '../lib/feedback';
 
-const reviews = [
-    {
-        quote: 'The bun is what I remember first. Soft, light, and built for a proper burger.',
-        name: 'Arjun Nair',
-        tag: 'Bakery-first detail',
-        initial: 'A',
-        featured: true
-    },
-    {
-        quote: 'I would drive just for the loaded fries. If Chennai gets the same food, people are going to line up.',
-        name: 'Divya S.',
-        tag: 'Menu pull',
-        initial: 'D',
-        featured: false
-    },
-    {
-        quote: 'It tastes like people in the kitchen actually care about what goes out. That is rarer than it should be.',
-        name: 'Rahul Krishnan',
-        tag: 'House feel',
-        initial: 'R',
-        featured: false
-    }
-];
+interface Props {
+    reviews?: PublicFeedbackTestimonial[];
+}
+
+const { reviews = [] } = Astro.props as Props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const hasReviews = reviews.length > 0;
+const hasMultipleReviews = reviews.length > 1;
+
+const getStarString = (score: number) => '★★★★★'.slice(0, score).padEnd(5, '☆');
 ---
 
 <section class="reviews-section" style={`--reviews-bg: url('${base}/bg.png')`}>
     <div class="container">
         <div class="reviews-head">
-            <p class="badge">Why People Remember It</p>
-            <h2 class="section-title center">What <span class="text-orange">Regulars</span> Remember</h2>
+            <p class="badge">Guest reviews</p>
+            <h2 class="section-title center">What <span class="text-orange">Recent Guests</span> Are Saying</h2>
             <p class="reviews-intro">
-                The strongest praise usually sounds simple: the bun is right, the fries are worth ordering, and the food feels looked after.
+                Recent words from the Burgerium table.
             </p>
         </div>
-        
-        <div class="reviews-grid">
-            {reviews.map((review, index) => (
-                <article class={`review-card scroll-reveal ${review.featured ? 'featured' : ''} ${index === 1 ? 'delay-100' : index === 2 ? 'delay-200' : ''}`}>
-                    <div class="review-top">
-                        <span class="review-tag">{review.tag}</span>
-                        <div class="stars" aria-hidden="true">★★★★★</div>
+
+        {hasReviews ? (
+            <>
+                <div
+                    class="reviews-carousel scroll-reveal"
+                    data-reviews-carousel
+                    aria-roledescription="carousel"
+                    aria-label="Recent guest feedback"
+                >
+                    <div class="reviews-stage">
+                        {reviews.map((review, index) => (
+                            <article
+                                class:list={{
+                                    'review-card': true,
+                                    featured: review.featured,
+                                    'is-active': index === 0,
+                                }}
+                                data-review-slide
+                                aria-hidden={index === 0 ? 'false' : 'true'}
+                            >
+                                <div class="review-top">
+                                    <span class="review-tag">{review.tag}</span>
+                                    <div class="stars" aria-label={`${review.score} out of 5 stars`}>
+                                        {getStarString(review.score)}
+                                    </div>
+                                </div>
+                                <p class="review-text">"{review.quote}"</p>
+                                <div class="reviewer">
+                                    <div class="avatar">{review.initial}</div>
+                                    <div class="details">
+                                        <strong>{review.name}</strong>
+                                        <small>{review.featured ? 'Guest favourite' : 'From a recent visit'}</small>
+                                    </div>
+                                </div>
+                            </article>
+                        ))}
                     </div>
-                    <p class="review-text">"{review.quote}"</p>
-                    <div class="reviewer">
-                        <div class="avatar">{review.initial}</div>
-                        <div class="details">
-                            <strong>{review.name}</strong>
-                            <small>{review.featured ? 'Long-time family customer' : 'Heritage regular'}</small>
-                        </div>
-                    </div>
-                </article>
-            ))}
-        </div>
+
+                    {hasMultipleReviews && (
+                        <>
+                            <div class="reviews-controls">
+                                <button type="button" class="carousel-button" data-review-prev aria-label="Show previous review">
+                                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                                </button>
+                                <div class="reviews-status">
+                                    <span data-review-current>1</span>
+                                    <span aria-hidden="true">/</span>
+                                    <span>{reviews.length}</span>
+                                </div>
+                                <button type="button" class="carousel-button" data-review-next aria-label="Show next review">
+                                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                                </button>
+                            </div>
+
+                            <div class="reviews-dots" aria-label="Choose a guest review">
+                                {reviews.map((review, index) => (
+                                    <button
+                                        type="button"
+                                        class:list={{ 'review-dot': true, 'is-active': index === 0 }}
+                                        data-review-dot
+                                        data-review-index={index}
+                                        aria-label={`Show review ${index + 1} from ${review.name}`}
+                                        aria-pressed={index === 0 ? 'true' : 'false'}
+                                    ></button>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                <div class="reviews-actions">
+                    <a href="/guest-feedback" class="btn-primary">
+                        See all guest reviews
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </>
+        ) : (
+            <div class="reviews-empty">
+                <strong>Fresh guest reviews will appear here soon.</strong>
+                <p>
+                    Check back soon for more guest reviews.
+                </p>
+            </div>
+        )}
     </div>
 </section>
+
+<script is:inline>
+    (() => {
+        const carousels = Array.from(document.querySelectorAll('[data-reviews-carousel]'));
+
+        carousels.forEach((carousel) => {
+            const slides = Array.from(carousel.querySelectorAll('[data-review-slide]'));
+
+            if (slides.length <= 1) {
+                return;
+            }
+
+            const prevButton = carousel.querySelector('[data-review-prev]');
+            const nextButton = carousel.querySelector('[data-review-next]');
+            const dots = Array.from(carousel.querySelectorAll('[data-review-dot]'));
+            const currentLabel = carousel.querySelector('[data-review-current]');
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            let currentIndex = slides.findIndex((slide) => slide.classList.contains('is-active'));
+            let autoAdvanceId;
+            let touchStartX = 0;
+            let touchDeltaX = 0;
+
+            if (currentIndex < 0) {
+                currentIndex = 0;
+            }
+
+            const updateCarousel = (nextIndex) => {
+                currentIndex = (nextIndex + slides.length) % slides.length;
+
+                slides.forEach((slide, slideIndex) => {
+                    const isActive = slideIndex === currentIndex;
+                    slide.classList.toggle('is-active', isActive);
+                    slide.setAttribute('aria-hidden', String(!isActive));
+                });
+
+                dots.forEach((dot, dotIndex) => {
+                    const isActive = dotIndex === currentIndex;
+                    dot.classList.toggle('is-active', isActive);
+                    dot.setAttribute('aria-pressed', String(isActive));
+                });
+
+                if (currentLabel) {
+                    currentLabel.textContent = String(currentIndex + 1);
+                }
+            };
+
+            const stopAutoAdvance = () => {
+                if (typeof autoAdvanceId !== 'undefined') {
+                    window.clearInterval(autoAdvanceId);
+                    autoAdvanceId = undefined;
+                }
+            };
+
+            const startAutoAdvance = () => {
+                if (prefersReducedMotion) {
+                    return;
+                }
+
+                stopAutoAdvance();
+                autoAdvanceId = window.setInterval(() => {
+                    updateCarousel(currentIndex + 1);
+                }, 4600);
+            };
+
+            prevButton?.addEventListener('click', () => {
+                updateCarousel(currentIndex - 1);
+                startAutoAdvance();
+            });
+
+            nextButton?.addEventListener('click', () => {
+                updateCarousel(currentIndex + 1);
+                startAutoAdvance();
+            });
+
+            dots.forEach((dot, dotIndex) => {
+                dot.addEventListener('click', () => {
+                    updateCarousel(dotIndex);
+                    startAutoAdvance();
+                });
+            });
+
+            carousel.addEventListener('pointerenter', stopAutoAdvance);
+            carousel.addEventListener('pointerleave', startAutoAdvance);
+            carousel.addEventListener('focusin', stopAutoAdvance);
+            carousel.addEventListener('focusout', (event) => {
+                const nextFocusedElement = event.relatedTarget;
+
+                if (!(nextFocusedElement instanceof Node) || !carousel.contains(nextFocusedElement)) {
+                    startAutoAdvance();
+                }
+            });
+
+            carousel.addEventListener(
+                'touchstart',
+                (event) => {
+                    touchStartX = event.changedTouches[0]?.clientX ?? 0;
+                    touchDeltaX = 0;
+                },
+                { passive: true },
+            );
+
+            carousel.addEventListener(
+                'touchmove',
+                (event) => {
+                    touchDeltaX = (event.changedTouches[0]?.clientX ?? 0) - touchStartX;
+                },
+                { passive: true },
+            );
+
+            carousel.addEventListener(
+                'touchend',
+                () => {
+                    if (Math.abs(touchDeltaX) > 48) {
+                        updateCarousel(currentIndex + (touchDeltaX < 0 ? 1 : -1));
+                    }
+
+                    touchStartX = 0;
+                    touchDeltaX = 0;
+                    startAutoAdvance();
+                },
+                { passive: true },
+            );
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    stopAutoAdvance();
+                } else {
+                    startAutoAdvance();
+                }
+            });
+
+            updateCarousel(currentIndex);
+            startAutoAdvance();
+        });
+    })();
+</script>
 
 <style>
     .reviews-section {
@@ -86,7 +275,7 @@ const reviews = [
     .reviews-head {
         position: relative;
         z-index: 2;
-        max-width: 44rem;
+        max-width: 48rem;
         margin: 0 auto 3.5rem;
         text-align: center;
     }
@@ -99,26 +288,42 @@ const reviews = [
         font-size: 1.02rem;
     }
 
-    .reviews-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 2rem;
+    .reviews-carousel {
         position: relative;
         z-index: 2;
+        max-width: 56rem;
+        margin: 0 auto;
+    }
+
+    .reviews-stage {
+        display: grid;
     }
 
     .review-card {
+        grid-area: 1 / 1;
         background: rgba(255, 250, 240, 0.78);
         backdrop-filter: blur(10px);
         padding: 2rem;
         border-radius: 24px;
         border: 1px solid rgba(105, 65, 5, 0.12);
         box-shadow: var(--shadow-soft);
+        opacity: 0;
+        transform: translateX(36px) scale(0.985);
+        pointer-events: none;
+        transition:
+            opacity 0.42s ease,
+            transform 0.42s ease;
     }
 
     .review-card.featured {
         background: linear-gradient(180deg, rgba(255, 248, 233, 0.94), rgba(255, 238, 201, 0.92));
         border-color: rgba(184, 104, 0, 0.18);
+    }
+
+    .review-card.is-active {
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
     }
 
     .review-top {
@@ -146,14 +351,15 @@ const reviews = [
     .stars {
         color: var(--brand-orange);
         font-size: 1.05rem;
+        letter-spacing: 0.08em;
     }
 
     .review-text {
         color: var(--text-white);
         margin-bottom: 1.5rem;
         line-height: 1.7;
-        min-height: 110px;
         font-size: 1.02rem;
+        min-height: 0;
     }
 
     .reviewer {
@@ -163,7 +369,8 @@ const reviews = [
     }
 
     .avatar {
-        width: 40px; height: 40px;
+        width: 40px;
+        height: 40px;
         background: var(--brand-orange);
         color: #000;
         border-radius: 50%;
@@ -172,16 +379,145 @@ const reviews = [
         font-weight: 700;
     }
 
-    .details strong { display: block; color: var(--text-white); }
-    .details small { color: var(--text-muted); }
+    .details strong {
+        display: block;
+        color: var(--text-white);
+    }
+
+    .details small {
+        color: var(--text-muted);
+    }
+
+    .reviews-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.4rem;
+    }
+
+    .carousel-button {
+        width: 48px;
+        height: 48px;
+        border-radius: 999px;
+        border: 1px solid rgba(105, 65, 5, 0.14);
+        background: rgba(255, 250, 240, 0.82);
+        color: var(--text-white);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+            transform 0.2s ease,
+            background 0.2s ease,
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+        box-shadow: 0 12px 24px rgba(111, 70, 11, 0.08);
+    }
+
+    .carousel-button:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 247, 228, 0.94);
+        border-color: rgba(250, 162, 39, 0.35);
+        box-shadow: 0 16px 28px rgba(111, 70, 11, 0.12);
+    }
+
+    .reviews-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        min-height: 48px;
+        padding: 0.75rem 1rem;
+        border-radius: 999px;
+        background: rgba(255, 250, 240, 0.82);
+        border: 1px solid rgba(105, 65, 5, 0.1);
+        color: rgba(43, 29, 13, 0.76);
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .reviews-dots {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.55rem;
+        margin-top: 1rem;
+    }
+
+    .review-dot {
+        width: 10px;
+        height: 10px;
+        padding: 0;
+        border-radius: 999px;
+        border: none;
+        background: rgba(105, 65, 5, 0.22);
+        transition:
+            transform 0.2s ease,
+            background 0.2s ease,
+            width 0.2s ease;
+    }
+
+    .review-dot.is-active {
+        width: 28px;
+        background: var(--brand-orange);
+    }
+
+    .reviews-empty {
+        position: relative;
+        z-index: 2;
+        max-width: 38rem;
+        margin: 0 auto;
+        padding: 2rem;
+        border-radius: 24px;
+        background: rgba(255, 250, 240, 0.78);
+        border: 1px solid rgba(105, 65, 5, 0.12);
+        box-shadow: var(--shadow-soft);
+        text-align: center;
+    }
+
+    .reviews-empty strong {
+        display: block;
+        color: var(--text-white);
+        font-size: 1.15rem;
+    }
+
+    .reviews-empty p {
+        margin: 0.8rem 0 0;
+        color: var(--text-muted);
+        line-height: 1.7;
+    }
+
+    .reviews-actions {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
 
     @media (max-width: 1024px) {
-        .reviews-grid {
-            grid-template-columns: 1fr;
+        .review-card {
+            padding: 1.6rem;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .reviews-controls {
+            gap: 0.75rem;
         }
 
-        .review-text {
-            min-height: 0;
+        .reviews-status {
+            min-width: 92px;
+            justify-content: center;
+        }
+
+        .review-top {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .review-card {
+            padding: 1.3rem;
         }
     }
 </style>

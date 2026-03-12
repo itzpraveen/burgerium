@@ -7,6 +7,7 @@ import vercel from '@astrojs/vercel';
 export default defineConfig({
   site: 'https://www.burgerium.in',
   output: 'server',
+  trailingSlash: 'never',
   adapter: vercel(),
   security: {
     allowedDomains: [
@@ -15,5 +16,12 @@ export default defineConfig({
       { protocol: 'https', hostname: '**.vercel.app' },
     ],
   },
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      filter(page) {
+        const pathname = new URL(page).pathname.replace(/\/$/, '') || '/';
+        return pathname !== '/feedback' && !pathname.startsWith('/feedback/');
+      },
+    }),
+  ],
 });

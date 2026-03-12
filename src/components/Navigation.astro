@@ -398,6 +398,10 @@ const navLinks = [
     const focusableLinks = Array.from(navLinks) as HTMLElement[];
     const scrollSpyLinks = Array.from(navLinks).filter((link) => link.getAttribute('data-section'));
     const isMobile = () => window.matchMedia('(max-width: 900px)').matches;
+    const clearScrollLock = () => {
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+    };
     const closeMenu = () => {
         if (!toggle || !navbar) return;
         navbar.classList.remove('open');
@@ -429,11 +433,14 @@ const navLinks = [
             return;
         }
 
+        navbar.classList.remove('open');
+        toggle?.setAttribute('aria-expanded', 'false');
+        toggle?.setAttribute('aria-label', 'Open menu');
         navMenu?.removeAttribute('aria-hidden');
         // @ts-ignore
         if (navMenu) navMenu.inert = false;
         setLinkTabIndex(false);
-        document.body.style.overflow = '';
+        clearScrollLock();
     };
 
     if (toggle && navbar) {
@@ -485,6 +492,7 @@ const navLinks = [
     }
 
     window.addEventListener('resize', syncMenuAccessibility);
+    window.addEventListener('pageshow', syncMenuAccessibility);
     syncMenuAccessibility();
 
     // Scroll spy - highlight active section

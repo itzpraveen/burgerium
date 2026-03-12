@@ -5,11 +5,26 @@ import Layout from "../layouts/Layout.astro";
 import Navigation from "../components/Navigation.astro";
 import DigitalMenu from "../components/DigitalMenu.astro";
 import Footer from "../components/Footer.astro";
+import { menuSections } from "../data/menu";
+
+const menuStructuredData = {
+  "@type": "Menu",
+  "@id": "https://www.burgerium.in/menu#menu",
+  name: "Burgerium Menu",
+  description:
+    "Burgerium menu in Chennai with burgers, wraps, subs, bowls, fries, coffee, shakes, coolers, iced treats, and desserts.",
+  inLanguage: "en-IN",
+  hasMenuSection: menuSections.map((section) => ({
+    "@type": "MenuSection",
+    name: section.title,
+  })),
+};
 ---
 
 <Layout
   title="Burgerium Menu | Burgers, Wraps, Bowls, Coffee & Desserts"
-  description="Explore the full Burgerium digital menu for Chennai: chicken burgers, beef burgers, veg burgers, wraps, bowls, fries, milkshakes, coffee, iced treats, and desserts."
+  description="Explore the Burgerium menu for Chennai: chicken burgers, beef burgers, veg burgers, wraps, bowls, fries, milkshakes, coffee, iced treats, and desserts."
+  structuredData={menuStructuredData}
 >
   <Navigation />
   <div class="menu-page">
@@ -21,6 +36,6 @@ import Footer from "../components/Footer.astro";
 <style>
   .menu-page {
     min-height: 100vh;
-    background: var(--bg-dark);
+    background: #fff6e4;
   }
 </style>

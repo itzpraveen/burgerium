@@ -19,6 +19,14 @@ const fieldErrors: Record<string, string[] | undefined> =
 const getFieldError = (field: string) => fieldErrors[field]?.[0] ?? '';
 const { isConfigured: isStorageReady } = getFeedbackStorageStatus();
 const submission = actionResult?.data;
+const feedbackQuickCommentOptions = [
+    'Loved the burger quality.',
+    'Service was quick and helpful.',
+    'The order took longer than expected.',
+    'Dining area felt clean and comfortable.',
+    'Please call me back about this visit.',
+] as const;
+const totalFeedbackCategories = feedbackCategories.length;
 
 if (submission) {
     return Astro.redirect('/feedback/thanks', 303);
@@ -28,6 +36,7 @@ if (submission) {
 <Layout
     title="Burgerium Feedback | Rate Your Visit"
     description="Share your Burgerium visit feedback and help the team improve food, service, timing, and ambience."
+    robots="noindex,nofollow"
 >
     <Navigation />
 
@@ -35,35 +44,52 @@ if (submission) {
         <section class="feedback-hero">
             <div class="container hero-grid">
                 <div class="hero-copy scroll-reveal active">
-                    <span class="eyebrow">Your visit</span>
-                    <h1>Rate the visit while the table is still warm.</h1>
+                    <span class="eyebrow">Table feedback</span>
+                    <h1>Tap through the visit before the plates clear.</h1>
                     <p>
-                        Tell us how your visit was today. Your feedback helps us improve food, service, timing, and
-                        ambience.
+                        Tell us how the visit felt right now. The form is tuned for phones, and the Android app gives
+                        each rating a light tactile confirmation.
                     </p>
+
+                    <div class="hero-stats" aria-label="Feedback highlights">
+                        <span class="hero-stat">6 quick ratings</span>
+                        <span class="hero-stat">About a minute</span>
+                        <span class="hero-stat">Haptic feedback on Android</span>
+                    </div>
 
                     <div class="hero-notes">
                         <article>
-                            <strong>Takes a minute</strong>
-                            <p>Six quick ratings, your contact details, and an optional comment.</p>
+                            <strong>Fast to finish</strong>
+                            <p>Rate each part of the visit, add your name and phone, then submit.</p>
                         </article>
                         <article>
-                            <strong>Helps us improve</strong>
-                            <p>Tell us what stood out and where we can do better next time.</p>
+                            <strong>Useful to act on</strong>
+                            <p>Quick comments make it easier for the team to fix timing, service, or ambience issues.</p>
                         </article>
                     </div>
                 </div>
 
-                <aside class="hero-panel scroll-reveal active" aria-label="What the form covers">
-                    <div class="panel-ribbon">What we ask</div>
-                    <ol>
-                        <li>Food, service, timing, and ambience.</li>
-                        <li>A quick overall score for the visit.</li>
-                        <li>An optional note if you want to add context.</li>
-                    </ol>
-                    <p class="panel-note">
-                        Short enough to fill out before you leave the table.
+                <aside class="hero-panel scroll-reveal active" aria-label="Feedback progress">
+                    <div class="panel-ribbon">Live progress</div>
+                    <div class="panel-metric">
+                        <strong data-progress-count>0/{totalFeedbackCategories}</strong>
+                        <span>ratings complete</span>
+                    </div>
+                    <div class="progress-meter" aria-hidden="true">
+                        <span data-progress-bar></span>
+                    </div>
+                    <p class="panel-note" data-progress-copy>
+                        Tap one score for each part of the visit. The app will nudge you forward as you go.
                     </p>
+                    <ul class="progress-list">
+                        {feedbackCategories.map((category) => (
+                            <li data-progress-item={category.key}>
+                                <span>{category.shortLabel}</span>
+                                <strong data-progress-value={category.key}>Waiting</strong>
+                            </li>
+                        ))}
+                    </ul>
+                    <a href="#feedback-form" class="panel-link">Start the form</a>
                 </aside>
             </div>
         </section>
@@ -96,15 +122,29 @@ if (submission) {
                             <span class="section-tag">Your feedback</span>
                             <h2>Tell us about your visit.</h2>
                         </div>
-                        <p>
-                            A few quick ratings and an optional note help us improve every service.
-                        </p>
+                        <div class="form-header-meta">
+                            <p>
+                                Start with the six score cards, then finish with your contact details and any context
+                                worth sharing.
+                            </p>
+                            <div class="form-ready-indicator" data-form-ready-indicator>
+                                Finish the ratings, then add your name and 10-digit phone number.
+                            </div>
+                        </div>
                     </div>
 
-                    <form method="POST" action={actions.submitFeedback} class="feedback-form">
-                        {feedbackCategories.map((category) => (
-                            <fieldset class="rating-group">
-                                <legend>{category.label}</legend>
+                    <form method="POST" action={actions.submitFeedback} class="feedback-form" id="feedback-form" data-feedback-form>
+                        <p class="sr-only" aria-live="polite" data-feedback-live></p>
+
+                        {feedbackCategories.map((category, index) => (
+                            <fieldset class="rating-group" data-rating-group={category.key}>
+                                <legend class="rating-legend">
+                                    <span class="rating-step">Step {index + 1}</span>
+                                    <span class="rating-title-row">
+                                        <span>{category.label}</span>
+                                        <span class="rating-status" data-rating-status={category.key}>Waiting</span>
+                                    </span>
+                                </legend>
                                 <div class="rating-grid">
                                     {feedbackOptions.map((option) => {
                                         const fieldId = `${category.key}-${option.value}`;
@@ -117,9 +157,15 @@ if (submission) {
                                                     value={option.value}
                                                     required
                                                 />
-                                                <label for={fieldId} class="rating-card">
+                                                <label
+                                                    for={fieldId}
+                                                    class="rating-card"
+                                                    data-rating-card={category.key}
+                                                    data-rating-label={option.label}
+                                                >
                                                     <span class="rating-emoji" aria-hidden="true">{option.emoji}</span>
                                                     <span class="rating-label">{option.label}</span>
+                                                    <span class="rating-caption">{option.value}/5</span>
                                                 </label>
                                             </div>
                                         );
@@ -129,60 +175,111 @@ if (submission) {
                             </fieldset>
                         ))}
 
-                        <div class="input-grid">
-                            <label class="field">
-                                <span>Name <small>(required)</small></span>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    placeholder="Your name"
-                                    minlength="2"
-                                    maxlength="80"
-                                    autocomplete="name"
-                                    required
-                                />
-                                {getFieldError('name') && <p class="field-error">{getFieldError('name')}</p>}
+                        <div class="details-shell" data-feedback-details>
+                            <div class="details-header">
+                                <div>
+                                    <span class="section-tag">Finish up</span>
+                                    <h3>Add the details we need.</h3>
+                                </div>
+                                <p>We only use your details to understand the visit, or to follow up if you allow it.</p>
+                            </div>
+
+                            <div class="input-grid">
+                                <label class="field">
+                                    <span class="field-heading">
+                                        <span>Name <small>(required)</small></span>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        placeholder="Your name"
+                                        minlength="2"
+                                        maxlength="80"
+                                        autocomplete="name"
+                                        autocapitalize="words"
+                                        enterkeyhint="next"
+                                        required
+                                    />
+                                    {getFieldError('name') && <p class="field-error">{getFieldError('name')}</p>}
+                                </label>
+
+                                <label class="field">
+                                    <span class="field-heading">
+                                        <span>Phone <small>(required)</small></span>
+                                    </span>
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        placeholder="10-digit phone"
+                                        inputmode="numeric"
+                                        pattern="[0-9]{10}"
+                                        maxlength="10"
+                                        autocomplete="tel"
+                                        enterkeyhint="done"
+                                        required
+                                    />
+                                    {getFieldError('phone') && <p class="field-error">{getFieldError('phone')}</p>}
+                                </label>
+                            </div>
+
+                            <div class="quick-comment-panel">
+                                <div class="quick-comment-header">
+                                    <strong>Quick comment starters</strong>
+                                    <span>Tap once to drop it into the note box.</span>
+                                </div>
+
+                                <div class="quick-comment-list">
+                                    {feedbackQuickCommentOptions.map((comment) => (
+                                        <button type="button" class="quick-comment-chip" data-comment-text={comment}>
+                                            {comment}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <label class="field field-textarea">
+                                <span class="field-heading">
+                                    <span>Comments <small>(optional)</small></span>
+                                    <span class="field-counter" data-comments-count>0/600</span>
+                                </span>
+                                <textarea
+                                    name="comments"
+                                    rows="5"
+                                    maxlength="600"
+                                    placeholder="Tell us what went well or what to improve"
+                                    data-draft-field="comments"
+                                ></textarea>
+                                {getFieldError('comments') && <p class="field-error">{getFieldError('comments')}</p>}
                             </label>
 
-                            <label class="field">
-                                <span>Phone <small>(required)</small></span>
-                                <input
-                                    type="tel"
-                                    name="phone"
-                                    placeholder="10-digit phone"
-                                    inputmode="numeric"
-                                    pattern="[0-9]{10}"
-                                    maxlength="10"
-                                    autocomplete="tel"
-                                    required
-                                />
-                                {getFieldError('phone') && <p class="field-error">{getFieldError('phone')}</p>}
+                            <label class="consent-row">
+                                <input type="checkbox" name="contactConsent" value="true" data-draft-field="contactConsent" />
+                                <span>Okay to contact me about this feedback</span>
                             </label>
+
+                            <p class="form-note">
+                                The score choices and comment draft stay on this device until the form is submitted or
+                                cleared.
+                            </p>
                         </div>
 
-                        <label class="field field-textarea">
-                            <span>Comments <small>(optional)</small></span>
-                            <textarea
-                                name="comments"
-                                rows="5"
-                                maxlength="600"
-                                placeholder="Tell us what went well or what to improve"
-                            ></textarea>
-                            {getFieldError('comments') && <p class="field-error">{getFieldError('comments')}</p>}
-                        </label>
-
-                        <label class="consent-row">
-                            <input type="checkbox" name="contactConsent" value="true" />
-                            <span>Okay to contact me about this feedback</span>
-                        </label>
-
                         <div class="form-actions">
-                            <button type="submit" class="btn-primary" disabled={!isStorageReady}>
+                            <button type="submit" class="btn-primary" data-submit-button disabled={!isStorageReady}>
                                 Submit feedback
                             </button>
                             <button type="reset" class="btn-secondary">Clear</button>
                         </div>
                     </form>
+                </div>
+
+                <div class="mobile-submit-bar" data-mobile-submit-bar>
+                    <div class="mobile-submit-copy">
+                        <span class="mobile-submit-label">Progress</span>
+                        <strong data-mobile-progress>0 of {totalFeedbackCategories} ratings done</strong>
+                    </div>
+                    <button type="button" class="btn-primary" data-mobile-submit disabled={!isStorageReady}>
+                        Keep going
+                    </button>
                 </div>
             </div>
         </section>
@@ -194,6 +291,7 @@ if (submission) {
 <style>
     .feedback-page {
         padding-top: calc(var(--header-height) + 1.5rem);
+        padding-bottom: calc(5rem + env(safe-area-inset-bottom));
     }
 
     .feedback-hero {
@@ -262,6 +360,25 @@ if (submission) {
         line-height: 1.7;
     }
 
+    .hero-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        margin-top: 1.3rem;
+    }
+
+    .hero-stat {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.7rem 0.95rem;
+        border-radius: 999px;
+        border: 1px solid rgba(75, 47, 10, 0.12);
+        background: rgba(255, 255, 255, 0.7);
+        color: var(--brand-ink-soft);
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
     .hero-notes {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -304,17 +421,103 @@ if (submission) {
         background: rgba(250, 162, 39, 0.18);
     }
 
-    .hero-panel ol {
-        margin: 1rem 0 0 1.1rem;
-        display: grid;
-        gap: 0.8rem;
+    .panel-metric {
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+        margin-top: 1rem;
+    }
+
+    .panel-metric strong {
+        font-family: var(--font-heading);
+        font-size: clamp(2.3rem, 5vw, 3.2rem);
+        line-height: 1;
+    }
+
+    .panel-metric span {
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+
+    .progress-meter {
+        width: 100%;
+        height: 0.75rem;
+        margin-top: 1rem;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(75, 47, 10, 0.08);
+    }
+
+    .progress-meter span {
+        display: block;
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--brand-orange) 0%, var(--brand-orange-light) 100%);
+        transition: width 0.28s ease;
     }
 
     .panel-note {
+        margin-top: 1rem;
+        color: var(--text-gray);
+        line-height: 1.6;
+    }
+
+    .progress-list {
+        list-style: none;
+        display: grid;
+        gap: 0.75rem;
+        margin-top: 1.2rem;
+    }
+
+    .progress-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.8rem 0.9rem;
+        border-radius: 18px;
+        border: 1px solid rgba(75, 47, 10, 0.1);
+        background: rgba(255, 255, 255, 0.72);
+        transition: border-color 0.22s ease, background 0.22s ease, transform 0.22s ease;
+    }
+
+    .progress-list li.is-complete {
+        transform: translateY(-1px);
+        border-color: rgba(157, 93, 0, 0.2);
+        background: rgba(255, 248, 230, 0.94);
+    }
+
+    .progress-list li strong {
+        color: var(--text-muted);
+        font-size: 0.84rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .progress-list li.is-complete strong {
+        color: var(--brand-orange-deep);
+    }
+
+    .panel-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 3rem;
         margin-top: 1.25rem;
-        padding-top: 1rem;
-        border-top: 1px solid rgba(75, 47, 10, 0.12);
-        font-weight: 600;
+        padding: 0.75rem 1rem;
+        border-radius: 16px;
+        border: 1px solid rgba(75, 47, 10, 0.14);
+        background: rgba(255, 255, 255, 0.8);
+        font-weight: 800;
+        transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .panel-link:hover {
+        transform: translateY(-1px);
+        border-color: rgba(157, 93, 0, 0.3);
+        box-shadow: 0 12px 24px rgba(93, 60, 10, 0.1);
     }
 
     .feedback-section {
@@ -368,14 +571,28 @@ if (submission) {
         padding: 2rem;
         border-radius: 36px;
         background: rgba(255, 251, 243, 0.92);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .form-shell::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at top right, rgba(250, 162, 39, 0.12), transparent 24%),
+            radial-gradient(circle at bottom left, rgba(255, 212, 120, 0.12), transparent 22%);
+        pointer-events: none;
     }
 
     .form-header {
         display: flex;
         justify-content: space-between;
-        align-items: end;
+        align-items: start;
         gap: 2rem;
         margin-bottom: 1.75rem;
+        position: relative;
+        z-index: 1;
     }
 
     .form-header h2 {
@@ -384,26 +601,102 @@ if (submission) {
         line-height: 0.95;
     }
 
+    .form-header-meta {
+        max-width: 28rem;
+        display: grid;
+        gap: 0.85rem;
+    }
+
     .form-header p {
         max-width: 26rem;
         color: var(--text-gray);
         line-height: 1.65;
     }
 
+    .form-ready-indicator {
+        padding: 0.9rem 1rem;
+        border-radius: 18px;
+        border: 1px solid rgba(75, 47, 10, 0.12);
+        background: rgba(255, 255, 255, 0.75);
+        color: var(--brand-ink-soft);
+        font-weight: 700;
+        line-height: 1.55;
+    }
+
     .feedback-form {
         display: grid;
-        gap: 1.35rem;
+        gap: 1.5rem;
+        position: relative;
+        z-index: 1;
     }
 
     .rating-group {
-        padding: 0;
-        border: 0;
+        padding: 1.05rem;
+        border: 1px solid rgba(75, 47, 10, 0.1);
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.56);
+        transition: border-color 0.24s ease, box-shadow 0.24s ease, transform 0.24s ease, background 0.24s ease;
     }
 
-    .rating-group legend {
-        margin-bottom: 0.75rem;
+    .rating-group.is-complete {
+        transform: translateY(-1px);
+        border-color: rgba(157, 93, 0, 0.22);
+        box-shadow: 0 14px 28px rgba(93, 60, 10, 0.08);
+        background: rgba(255, 252, 245, 0.9);
+    }
+
+    .rating-group.has-error {
+        border-color: rgba(155, 62, 18, 0.24);
+        box-shadow: 0 14px 28px rgba(155, 62, 18, 0.08);
+    }
+
+    .rating-legend {
+        display: block;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .rating-step {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(38, 24, 11, 0.08);
+        color: var(--brand-orange-deep);
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    .rating-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 0.7rem;
         font-weight: 800;
         color: var(--brand-ink);
+    }
+
+    .rating-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 6rem;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        background: rgba(75, 47, 10, 0.08);
+        color: var(--text-muted);
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .rating-group.is-complete .rating-status {
+        background: rgba(250, 162, 39, 0.16);
+        color: var(--brand-orange-deep);
     }
 
     .rating-grid {
@@ -421,15 +714,16 @@ if (submission) {
     .rating-card {
         display: grid;
         justify-items: center;
-        gap: 0.4rem;
-        min-height: 5.9rem;
-        padding: 0.95rem 0.75rem;
-        border-radius: 20px;
+        gap: 0.35rem;
+        min-height: 6.4rem;
+        padding: 1rem 0.75rem 0.9rem;
+        border-radius: 22px;
         border: 1px solid rgba(250, 162, 39, 0.32);
-        background: rgba(255, 255, 255, 0.72);
+        background: rgba(255, 255, 255, 0.82);
         color: var(--brand-ink);
         transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
         cursor: pointer;
+        touch-action: manipulation;
     }
 
     .rating-card:hover {
@@ -446,6 +740,10 @@ if (submission) {
         transform: translateY(-3px);
     }
 
+    .rating-card:active {
+        transform: scale(0.985);
+    }
+
     .rating-choice input:focus-visible + .rating-card {
         box-shadow: var(--focus-ring);
     }
@@ -458,6 +756,40 @@ if (submission) {
     .rating-label {
         font-size: 0.92rem;
         font-weight: 700;
+    }
+
+    .rating-caption {
+        color: var(--text-muted);
+        font-size: 0.76rem;
+        font-weight: 700;
+    }
+
+    .details-shell {
+        display: grid;
+        gap: 1rem;
+        padding: 1.25rem;
+        border-radius: 28px;
+        border: 1px solid rgba(75, 47, 10, 0.12);
+        background: linear-gradient(180deg, rgba(255, 250, 242, 0.96) 0%, rgba(255, 246, 227, 0.94) 100%);
+    }
+
+    .details-header {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 1.25rem;
+    }
+
+    .details-header h3 {
+        margin-top: 0.75rem;
+        font-size: clamp(1.9rem, 4vw, 2.8rem);
+        line-height: 0.95;
+    }
+
+    .details-header p {
+        max-width: 24rem;
+        color: var(--text-gray);
+        line-height: 1.65;
     }
 
     .input-grid {
@@ -475,9 +807,24 @@ if (submission) {
         font-weight: 800;
     }
 
+    .field-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
     .field small {
         color: var(--text-muted);
         font-weight: 700;
+    }
+
+    .field-counter {
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
     }
 
     .field input,
@@ -489,6 +836,7 @@ if (submission) {
         background: rgba(255, 255, 255, 0.8);
         color: var(--brand-ink);
         font: inherit;
+        transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
     }
 
     .field textarea {
@@ -496,11 +844,77 @@ if (submission) {
         min-height: 8.8rem;
     }
 
+    .field input:focus,
+    .field textarea:focus {
+        border-color: rgba(157, 93, 0, 0.28);
+        background: rgba(255, 255, 255, 0.96);
+    }
+
+    .quick-comment-panel {
+        display: grid;
+        gap: 0.8rem;
+        padding: 1rem;
+        border-radius: 22px;
+        border: 1px dashed rgba(157, 93, 0, 0.28);
+        background: rgba(255, 252, 245, 0.84);
+    }
+
+    .quick-comment-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .quick-comment-header strong {
+        font-weight: 800;
+        color: var(--brand-ink);
+    }
+
+    .quick-comment-header span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .quick-comment-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+    }
+
+    .quick-comment-chip {
+        padding: 0.75rem 0.95rem;
+        border-radius: 999px;
+        border: 1px solid rgba(75, 47, 10, 0.12);
+        background: rgba(255, 255, 255, 0.82);
+        color: var(--brand-ink);
+        font: inherit;
+        font-size: 0.92rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        touch-action: manipulation;
+    }
+
+    .quick-comment-chip:hover,
+    .quick-comment-chip.is-used {
+        transform: translateY(-1px);
+        border-color: rgba(157, 93, 0, 0.28);
+        background: rgba(255, 245, 222, 0.96);
+        box-shadow: 0 10px 22px rgba(93, 60, 10, 0.08);
+    }
+
     .consent-row {
         display: inline-flex;
         align-items: center;
         gap: 0.65rem;
-        margin-top: -0.1rem;
+        width: fit-content;
+        padding: 0.85rem 1rem;
+        border-radius: 18px;
+        border: 1px solid rgba(75, 47, 10, 0.12);
+        background: rgba(255, 255, 255, 0.72);
         font-weight: 600;
         color: var(--text-gray);
     }
@@ -509,6 +923,12 @@ if (submission) {
         width: 1rem;
         height: 1rem;
         accent-color: var(--brand-orange-deep);
+    }
+
+    .form-note {
+        color: var(--text-muted);
+        font-size: 0.92rem;
+        line-height: 1.6;
     }
 
     .form-actions {
@@ -530,15 +950,64 @@ if (submission) {
         transform: none;
     }
 
+    .mobile-submit-bar {
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 1.25rem;
+        padding: 0.95rem 1rem;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 231, 195, 0.12);
+        background: rgba(38, 24, 11, 0.92);
+        color: #fff4de;
+        box-shadow: 0 22px 40px rgba(38, 24, 11, 0.22);
+        backdrop-filter: blur(14px);
+        position: sticky;
+        bottom: max(0.65rem, env(safe-area-inset-bottom));
+        z-index: 30;
+    }
+
+    .mobile-submit-copy {
+        display: grid;
+        gap: 0.25rem;
+    }
+
+    .mobile-submit-label {
+        color: rgba(255, 244, 222, 0.72);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .mobile-submit-copy strong {
+        font-size: 0.98rem;
+        line-height: 1.45;
+    }
+
+    .mobile-submit-bar :global(.btn-primary) {
+        min-height: 3.1rem;
+        box-shadow: none;
+        flex-shrink: 0;
+    }
+
     @media (max-width: 1000px) {
         .hero-grid,
         .form-header,
-        .input-grid {
+        .input-grid,
+        .details-header {
             grid-template-columns: 1fr;
         }
 
         .form-header {
             align-items: start;
+        }
+
+        .form-header-meta,
+        .form-header p,
+        .details-header p {
+            max-width: none;
         }
     }
 
@@ -559,13 +1028,35 @@ if (submission) {
         }
 
         .rating-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .details-shell {
+            padding: 1rem;
+        }
+
+        .mobile-submit-bar {
+            display: flex;
+        }
+    }
+
+    @media (max-width: 620px) {
+        .rating-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .rating-choice:last-child {
+            grid-column: span 2;
+        }
+
+        .input-grid {
+            grid-template-columns: 1fr;
         }
     }
 
     @media (max-width: 520px) {
-        .rating-choice:last-child {
-            grid-column: span 2;
+        .hero-stats {
+            display: grid;
         }
 
         .form-actions {
@@ -577,5 +1068,376 @@ if (submission) {
             width: 100%;
             justify-content: center;
         }
+
+        .mobile-submit-bar {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .mobile-submit-bar :global(.btn-primary) {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .rating-title-row {
+            align-items: start;
+            flex-direction: column;
+        }
     }
 </style>
+
+<script>
+    // @ts-nocheck
+    const form = document.querySelector('[data-feedback-form]');
+
+    if (!form) {
+        throw new Error('Feedback form not found.');
+    }
+
+    const storageKey = 'burgerium-feedback-draft';
+    const submittingKey = 'burgerium-feedback-submitting';
+    const isNative = false;
+    const ImpactStyle = {
+        Light: 'light',
+        Heavy: 'heavy',
+    };
+    const NotificationType = {
+        Warning: 'warning',
+        Success: 'success',
+    };
+    const ratingGroups = Array.from(form.querySelectorAll('[data-rating-group]'));
+    const liveRegion = document.querySelector('[data-feedback-live]');
+    const progressCount = document.querySelector('[data-progress-count]');
+    const progressBar = document.querySelector('[data-progress-bar]');
+    const progressCopy = document.querySelector('[data-progress-copy]');
+    const readyIndicator = document.querySelector('[data-form-ready-indicator]');
+    const mobileProgress = document.querySelector('[data-mobile-progress]');
+    const mobileSubmitButton = document.querySelector('[data-mobile-submit]');
+    const commentsField = form.querySelector('textarea[name="comments"]');
+    const commentsCount = form.querySelector('[data-comments-count]');
+    const submitButtons = Array.from(document.querySelectorAll('[data-submit-button], [data-mobile-submit]'));
+    const quickCommentButtons = Array.from(document.querySelectorAll('[data-comment-text]'));
+
+    try {
+        window.sessionStorage.removeItem(submittingKey);
+    } catch {}
+
+    const vibrateFallback = (duration) => {
+        if ('vibrate' in navigator) {
+            navigator.vibrate(duration);
+        }
+    };
+
+    const triggerSelection = async () => {
+        vibrateFallback(10);
+    };
+
+    const triggerImpact = async (style = ImpactStyle.Light) => {
+        vibrateFallback(style === ImpactStyle.Heavy ? 32 : 16);
+    };
+
+    const triggerNotification = async (type) => {
+        vibrateFallback(type === NotificationType.Warning ? [28, 45, 18] : 20);
+    };
+
+    const announce = (message) => {
+        if (liveRegion) {
+            liveRegion.textContent = message;
+        }
+    };
+
+    const updateCommentsCount = () => {
+        if (!commentsField || !commentsCount) return;
+        commentsCount.textContent = `${commentsField.value.length}/600`;
+    };
+
+    const saveDraft = () => {
+        const draft = {
+            ratings: Object.fromEntries(
+                ratingGroups
+                    .map((group) => {
+                        const checked = group.querySelector('input[type="radio"]:checked');
+                        const key = group.getAttribute('data-rating-group');
+                        return key && checked ? [key, checked.value] : null;
+                    })
+                    .filter(Boolean)
+            ),
+            comments: commentsField instanceof HTMLTextAreaElement ? commentsField.value : '',
+            contactConsent:
+                form.querySelector('input[name="contactConsent"]') instanceof HTMLInputElement
+                    ? form.querySelector('input[name="contactConsent"]').checked
+                    : false,
+        };
+
+        try {
+            window.sessionStorage.setItem(storageKey, JSON.stringify(draft));
+        } catch {}
+    };
+
+    const restoreDraft = () => {
+        let draft = null;
+
+        try {
+            draft = JSON.parse(window.sessionStorage.getItem(storageKey) ?? 'null');
+        } catch {
+            draft = null;
+        }
+
+        if (!draft || typeof draft !== 'object') {
+            updateCommentsCount();
+            return;
+        }
+
+        if (draft.ratings && typeof draft.ratings === 'object') {
+            Object.entries(draft.ratings).forEach(([key, value]) => {
+                const input = form.querySelector(`input[name="${key}"][value="${value}"]`);
+                if (input instanceof HTMLInputElement) {
+                    input.checked = true;
+                }
+            });
+        }
+
+        if (commentsField instanceof HTMLTextAreaElement && typeof draft.comments === 'string' && !commentsField.value) {
+            commentsField.value = draft.comments;
+        }
+
+        const consentInput = form.querySelector('input[name="contactConsent"]');
+        if (
+            consentInput instanceof HTMLInputElement &&
+            typeof draft.contactConsent === 'boolean' &&
+            !consentInput.checked
+        ) {
+            consentInput.checked = draft.contactConsent;
+        }
+
+        updateCommentsCount();
+    };
+
+    const updateProgress = () => {
+        const total = ratingGroups.length;
+        let completed = 0;
+
+        ratingGroups.forEach((group) => {
+            const key = group.getAttribute('data-rating-group');
+            if (!key) return;
+
+            const checked = group.querySelector('input[type="radio"]:checked');
+            const statusElement = document.querySelector(`[data-rating-status="${key}"]`);
+            const progressValue = document.querySelector(`[data-progress-value="${key}"]`);
+            const progressItem = document.querySelector(`[data-progress-item="${key}"]`);
+
+            if (checked instanceof HTMLInputElement) {
+                const labelElement = checked.nextElementSibling;
+                const label = labelElement instanceof HTMLElement ? labelElement.dataset.ratingLabel ?? 'Done' : 'Done';
+
+                completed += 1;
+                group.classList.add('is-complete');
+                group.classList.remove('has-error');
+
+                if (statusElement) {
+                    statusElement.textContent = label;
+                }
+
+                if (progressValue) {
+                    progressValue.textContent = label;
+                }
+
+                if (progressItem) {
+                    progressItem.classList.add('is-complete');
+                }
+            } else {
+                group.classList.remove('is-complete');
+
+                if (statusElement) {
+                    statusElement.textContent = 'Waiting';
+                }
+
+                if (progressValue) {
+                    progressValue.textContent = 'Waiting';
+                }
+
+                if (progressItem) {
+                    progressItem.classList.remove('is-complete');
+                }
+            }
+        });
+
+        const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+        if (progressCount) {
+            progressCount.textContent = `${completed}/${total}`;
+        }
+
+        if (progressBar instanceof HTMLElement) {
+            progressBar.style.width = `${percent}%`;
+        }
+
+        if (progressCopy) {
+            progressCopy.textContent =
+                completed === total
+                    ? 'Ratings done. Add your details and send the feedback.'
+                    : `${total - completed} ratings left. Tap one card in each section.`;
+        }
+
+        if (readyIndicator) {
+            readyIndicator.textContent = form.checkValidity()
+                ? 'Everything required is filled in. You can submit now.'
+                : completed < total
+                    ? 'Finish the ratings, then add your name and 10-digit phone number.'
+                    : 'Ratings are done. Add your name and 10-digit phone number to submit.';
+        }
+
+        if (mobileProgress) {
+            mobileProgress.textContent =
+                completed === total ? 'Ratings done. Finish the details.' : `${completed} of ${total} ratings done`;
+        }
+
+        if (mobileSubmitButton instanceof HTMLButtonElement) {
+            mobileSubmitButton.textContent = form.checkValidity()
+                ? 'Submit feedback'
+                : completed < total
+                    ? 'Keep going'
+                    : 'Finish details';
+        }
+    };
+
+    const findFirstIncompleteTarget = () => {
+        const incompleteGroup = ratingGroups.find((group) => !group.querySelector('input[type="radio"]:checked'));
+        if (incompleteGroup) return incompleteGroup;
+
+        const invalidField = Array.from(form.querySelectorAll('input, textarea')).find((field) => {
+            if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) return false;
+            if (field.type === 'radio' || field.type === 'checkbox') return false;
+            return !field.checkValidity();
+        });
+
+        return invalidField ?? null;
+    };
+
+    const focusTarget = (target) => {
+        if (!(target instanceof HTMLElement)) return;
+
+        target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+        });
+
+        if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+            window.setTimeout(() => {
+                target.focus({ preventScroll: true });
+            }, 160);
+        }
+    };
+
+    restoreDraft();
+    updateProgress();
+
+    ratingGroups.forEach((group) => {
+        group.addEventListener('change', async (event) => {
+            if (!(event.target instanceof HTMLInputElement) || event.target.type !== 'radio') return;
+
+            saveDraft();
+            updateProgress();
+            announce(`${event.target.name} rated ${event.target.value} out of 5.`);
+            await triggerSelection();
+        });
+    });
+
+    form.addEventListener('input', () => {
+        saveDraft();
+        updateCommentsCount();
+        updateProgress();
+    });
+
+    form.addEventListener('reset', () => {
+        window.setTimeout(() => {
+            try {
+                window.sessionStorage.removeItem(storageKey);
+                window.sessionStorage.removeItem(submittingKey);
+            } catch {}
+
+            updateCommentsCount();
+            updateProgress();
+            announce('Feedback draft cleared.');
+        }, 0);
+    });
+
+    form.addEventListener(
+        'invalid',
+        async (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+
+            const group = target.closest('[data-rating-group]');
+            if (group) {
+                group.classList.add('has-error');
+            }
+
+            announce('Please complete the missing required fields.');
+            await triggerNotification(NotificationType.Warning);
+        },
+        true
+    );
+
+    form.addEventListener('submit', async (event) => {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            const target = findFirstIncompleteTarget();
+            if (target) {
+                focusTarget(target);
+            }
+            await triggerNotification(NotificationType.Warning);
+            return;
+        }
+
+        try {
+            window.sessionStorage.setItem(submittingKey, '1');
+            window.sessionStorage.removeItem(storageKey);
+        } catch {}
+
+        submitButtons.forEach((button) => {
+            if (button instanceof HTMLButtonElement) {
+                button.disabled = true;
+                button.textContent = 'Submitting...';
+            }
+        });
+
+        announce('Submitting feedback.');
+        await triggerImpact(ImpactStyle.Medium);
+    });
+
+    quickCommentButtons.forEach((button) => {
+        button.addEventListener('click', async () => {
+            if (!(button instanceof HTMLButtonElement) || !(commentsField instanceof HTMLTextAreaElement)) return;
+
+            const comment = button.dataset.commentText?.trim();
+            if (!comment) return;
+
+            const existing = commentsField.value.trim();
+            commentsField.value = existing ? `${existing}${existing.endsWith('.') ? ' ' : '. '}${comment}` : comment;
+            button.classList.add('is-used');
+            window.setTimeout(() => button.classList.remove('is-used'), 900);
+            commentsField.focus();
+            commentsField.setSelectionRange(commentsField.value.length, commentsField.value.length);
+            saveDraft();
+            updateCommentsCount();
+            await triggerImpact(ImpactStyle.Light);
+        });
+    });
+
+    if (mobileSubmitButton instanceof HTMLButtonElement) {
+        mobileSubmitButton.addEventListener('click', async () => {
+            if (form.checkValidity()) {
+                form.requestSubmit();
+                return;
+            }
+
+            const target = findFirstIncompleteTarget();
+            if (target) {
+                focusTarget(target);
+            }
+
+            await triggerImpact(ImpactStyle.Heavy);
+        });
+    }
+</script>

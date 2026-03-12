@@ -1,11 +1,14 @@
 ---
 import '../styles/global.css';
+import { instagramUrl } from '../data/social';
 
 interface Props {
 	title: string;
 	description?: string;
 	image?: string;
 	robots?: string;
+	canonical?: string | URL;
+	structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
 }
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -17,13 +20,17 @@ const {
 	description = defaultDescription,
 	image = `${base}/og-burgerium.png`,
 	robots = 'index,follow',
+	canonical,
+	structuredData: extraStructuredData,
 } = Astro.props;
 
 const site = Astro.site ?? new URL('https://www.burgerium.in');
 const siteUrl = site.href.replace(/\/$/, '');
-const canonicalURL = new URL(Astro.url.pathname, site);
+const canonicalTarget = canonical instanceof URL ? canonical.href : canonical ?? Astro.url.pathname;
+const canonicalURL = new URL(canonicalTarget, site);
 const ogImageURL = new URL(image, site);
 const logoURL = new URL(`${base}/logo.png`, site);
+const isFeedbackRoute = Astro.url.pathname.startsWith('/feedback');
 
 const address = {
 	'@type': 'PostalAddress',
@@ -36,34 +43,59 @@ const address = {
 
 const menuUrl = `${siteUrl}/menu`;
 
-const structuredData = {
-	'@context': 'https://schema.org',
-	'@graph': [
-		{
-			'@type': 'WebSite',
-			'@id': `${siteUrl}/#website`,
-			url: siteUrl,
-			name: 'Burgerium',
-			description,
-			inLanguage: 'en-IN',
-			publisher: { '@id': `${siteUrl}/#restaurant` },
-		},
-		{
-			'@type': 'Restaurant',
-			'@id': `${siteUrl}/#restaurant`,
-			name: 'Burgerium',
-			url: siteUrl,
-			logo: logoURL.href,
-			image: [ogImageURL.href],
-			description,
-			servesCuisine: ['Burgers'],
-			address,
-			areaServed: 'Chennai, Tamil Nadu',
-			hasMenu: menuUrl,
-			mainEntityOfPage: canonicalURL.href,
-		},
-	],
-};
+const additionalStructuredData = Array.isArray(extraStructuredData)
+	? extraStructuredData
+	: extraStructuredData
+		? [extraStructuredData]
+		: [];
+
+const defaultStructuredData = isFeedbackRoute
+	? []
+	: [
+			{
+				'@type': 'WebSite',
+				'@id': `${siteUrl}/#website`,
+				url: siteUrl,
+				name: 'Burgerium',
+				description,
+				inLanguage: 'en-IN',
+				publisher: { '@id': `${siteUrl}/#restaurant` },
+			},
+			{
+				'@type': 'Restaurant',
+				'@id': `${siteUrl}/#restaurant`,
+				name: 'Burgerium',
+				url: siteUrl,
+				logo: logoURL.href,
+				image: [ogImageURL.href],
+				description,
+				servesCuisine: ['Burgers', 'Coffee', 'Desserts', 'Shakes'],
+				address,
+				areaServed: 'Chennai, Tamil Nadu',
+				hasMenu: menuUrl,
+				menu: menuUrl,
+				sameAs: [instagramUrl],
+				mainEntityOfPage: canonicalURL.href,
+			},
+			{
+				'@type': 'WebPage',
+				'@id': `${canonicalURL.href}#webpage`,
+				url: canonicalURL.href,
+				name: title,
+				description,
+				isPartOf: { '@id': `${siteUrl}/#website` },
+				about: { '@id': `${siteUrl}/#restaurant` },
+				inLanguage: 'en-IN',
+			},
+		];
+
+const structuredDataGraph = [...defaultStructuredData, ...additionalStructuredData];
+const structuredData = structuredDataGraph.length
+	? {
+			'@context': 'https://schema.org',
+			'@graph': structuredDataGraph,
+		}
+	: null;
 ---
 
 <!doctype html>
@@ -71,8 +103,9 @@ const structuredData = {
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 		<meta name="theme-color" content="#FAA227" />
+		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="robots" content={robots} />
 		<link rel="icon" type="image/png" href={`${base}/favicon.png`} />
 		<link rel="canonical" href={canonicalURL.href} />
@@ -80,7 +113,8 @@ const structuredData = {
 		<title>{title}</title>
 
 		<!-- Google Tag Manager -->
-		<script>
+        <script>
+            // @ts-nocheck
 			(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 			new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 			j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -104,7 +138,9 @@ const structuredData = {
 		<meta name="twitter:image" content={ogImageURL.href} />
 		<meta name="twitter:image:alt" content="Burgerium logo on brand orange" />
 
-		<script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+		{structuredData && (
+			<script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+		)}
 
         <!-- Preconnect for performance -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,7 +162,7 @@ const structuredData = {
             </style>
         </noscript>
 	</head>
-	<body>
+	<body class:list={{ 'route-feedback': isFeedbackRoute }}>
 		<!-- Google Tag Manager (noscript) -->
 		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PS3KLMLZ"
 		height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -134,22 +170,25 @@ const structuredData = {
         <!-- Skip to main content for accessibility -->
         <a href="#main-content" class="skip-link">Skip to main content</a>
 
-        <!-- Custom Preloader -->
-        <div id="preloader" aria-hidden="true">
-            <div class="loader-content">
-                <img src={`${base}/logo.png`} alt="" class="loader-logo">
-                <div class="loader-bar" role="progressbar" aria-label="Loading"><div class="bar-fill"></div></div>
+        {!isFeedbackRoute && (
+            <div id="preloader" aria-hidden="true">
+                <div class="loader-content">
+                    <img src={`${base}/logo.png`} alt="" class="loader-logo">
+                    <div class="loader-bar" role="progressbar" aria-label="Loading"><div class="bar-fill"></div></div>
+                </div>
             </div>
-        </div>
+        )}
 
         <main id="main-content">
             <slot />
         </main>
 
-        <!-- Lenis Smooth Scroll -->
-        <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+        {!isFeedbackRoute && (
+            <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+        )}
 
-        <script>
+        <script is:inline define:vars={{ isFeedbackRoute }}>
+            // @ts-nocheck
             const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             const canHover = window.matchMedia('(hover: hover)').matches;
 
@@ -190,27 +229,29 @@ const structuredData = {
                 }
             };
 
-            if (prefersReducedMotion || hasSeenPreloader) {
-                hidePreloader();
-            } else if (document.readyState === 'complete') {
-                markPreloaderSeen();
-                hidePreloader(120);
-            } else {
-                window.addEventListener('load', () => {
+            if (!isFeedbackRoute) {
+                if (prefersReducedMotion || hasSeenPreloader) {
+                    hidePreloader();
+                } else if (document.readyState === 'complete') {
                     markPreloaderSeen();
                     hidePreloader(120);
-                }, { once: true });
-                setTimeout(() => {
-                    markPreloaderSeen();
-                    hidePreloader();
-                }, 1600);
+                } else {
+                    window.addEventListener('load', () => {
+                        markPreloaderSeen();
+                        hidePreloader(120);
+                    }, { once: true });
+                    setTimeout(() => {
+                        markPreloaderSeen();
+                        hidePreloader();
+                    }, 1600);
+                }
             }
 
             // SMOOTH SCROLL (LENIS)
-            // @ts-ignore
-            if (!prefersReducedMotion && typeof Lenis !== 'undefined') {
-                // @ts-ignore
-                const lenis = new Lenis({
+            const LenisClass = globalThis['Lenis'];
+
+            if (!isFeedbackRoute && !prefersReducedMotion && typeof LenisClass !== 'undefined') {
+                const lenis = new LenisClass({
                     duration: 1.2,
                     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
                     direction: 'vertical',
@@ -229,19 +270,23 @@ const structuredData = {
             }
 
             // MAGNETIC BUTTONS
-            const btns = document.querySelectorAll('.btn-primary');
+            const btns = isFeedbackRoute ? [] : Array.from(document.querySelectorAll('.btn-primary'));
             if (canHover && !prefersReducedMotion) {
                 btns.forEach((btn) => {
-                    btn.addEventListener('mousemove', (e) => {
-                        const position = (btn as HTMLElement).getBoundingClientRect();
-                        const x = (e as MouseEvent).clientX - position.left - position.width / 2;
-                        const y = (e as MouseEvent).clientY - position.top - position.height / 2;
+                    if (!(btn instanceof HTMLElement)) return;
 
-                        (btn as HTMLElement).style.transform = `translate3d(${x * 0.08}px, ${y * 0.12}px, 0) scale(1.02)`;
+                    btn.addEventListener('mousemove', (event) => {
+                        if (!(event instanceof MouseEvent)) return;
+
+                        const position = btn.getBoundingClientRect();
+                        const x = event.clientX - position.left - position.width / 2;
+                        const y = event.clientY - position.top - position.height / 2;
+
+                        btn.style.transform = `translate3d(${x * 0.08}px, ${y * 0.12}px, 0) scale(1.02)`;
                     });
 
                     btn.addEventListener('mouseleave', () => {
-                        (btn as HTMLElement).style.transform = 'translate3d(0px, 0px, 0) scale(1)';
+                        btn.style.transform = 'translate3d(0px, 0px, 0) scale(1)';
                     });
                 });
             }

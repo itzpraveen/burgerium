@@ -1,21 +1,547 @@
 ---
-import { menuItemCount, menuSectionCount, menuSections } from "../data/menu";
+import {
+  menuSections,
+  type MenuBlock,
+  type MenuItem,
+  type MenuSection,
+} from "../data/menu";
+
+interface MenuGroupDefinition {
+  slug: string;
+  kicker: string;
+  title: string;
+  summary: string;
+  sectionSlugs: string[];
+}
+
+interface MenuGroup extends MenuGroupDefinition {
+  sections: MenuSection[];
+  itemCount: number;
+  sectionCount: number;
+  startingPrice: number;
+  previewItems: string[];
+}
+
+interface SignatureDefinition {
+  sectionSlug: string;
+  itemName: string;
+  badge: string;
+  note: string;
+}
+
+interface QuickFilterDefinition {
+  id: string;
+  label: string;
+}
+
+interface CardMeta {
+  searchValue: string;
+  shortDescription: string;
+  tags: string[];
+  tagIds: string[];
+}
+
+interface PreparedSignature extends CardMeta {
+  badge: string;
+  note: string;
+  group: MenuGroup;
+  section: MenuSection;
+  block: MenuBlock;
+  item: MenuItem;
+}
+
+const pdfMenuPath = "/Burgerium-Menu.pdf";
+const defaultStatus = "Browse favourites or use a quick filter.";
 
 const formatPrice = (price: number) => `Rs ${price}`;
-const getSectionCount = (section) =>
-  section.blocks.reduce((total, block) => total + block.items.length, 0);
+const normalize = (value?: string) => value?.toLowerCase() ?? "";
+const buildSearchValue = (values: Array<string | undefined>) =>
+  values.filter(Boolean).join(" ").toLowerCase();
+const shortenCopy = (value?: string, maxLength = 108) => {
+  if (!value) {
+    return "";
+  }
+
+  return value.length <= maxLength
+    ? value
+    : `${value.slice(0, maxLength - 3).trimEnd()}...`;
+};
+
+const filterIdForTag = (value: string) =>
+  value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+const hasAnyKeyword = (text: string, keywords: string[]) =>
+  keywords.some((keyword) => text.includes(keyword));
+
+const getItems = (section: MenuSection) =>
+  section.blocks.flatMap((block) => block.items);
+
+const getStartingPrice = (section: MenuSection) =>
+  Math.min(...getItems(section).map((item) => item.price));
+
+const getPreviewItems = (section: MenuSection) =>
+  getItems(section)
+    .slice(0, 3)
+    .map((item) => item.name)
+    .join(" • ");
+
+const findSections = (slugs: string[]) =>
+  slugs
+    .map((slug) => menuSections.find((section) => section.slug === slug))
+    .filter((section): section is MenuSection => Boolean(section));
+
+const menuGroupDefinitions: MenuGroupDefinition[] = [
+  {
+    slug: "burgers",
+    kicker: "Most ordered",
+    title: "Burgers",
+    summary: "Chicken, beef, signature stacks, veg burgers, and kids picks in one place.",
+    sectionSlugs: [
+      "classic-chicken-burgers",
+      "beef-burgers",
+      "signature-burgers",
+      "veg-burgers",
+      "sliders-kids",
+    ],
+  },
+  {
+    slug: "wraps-bowls",
+    kicker: "Handhelds",
+    title: "Wraps, subs & bowls",
+    summary: "For guests who want the same Burgerium flavours in wraps, subs, and bowl format.",
+    sectionSlugs: [
+      "subwiches",
+      "rolls-wraps",
+      "burger-bowls",
+      "veg-subwiches-bowls-salads",
+    ],
+  },
+  {
+    slug: "sides-salads",
+    kicker: "Add something",
+    title: "Fries, strips & salads",
+    summary: "Loaded fries, tenders, grilled plates, and salads to round out the table.",
+    sectionSlugs: [
+      "fries-starters",
+      "grilled-non-veg-salads",
+      "strips-tenders",
+    ],
+  },
+  {
+    slug: "cold-drinks-desserts",
+    kicker: "Sweet and cold",
+    title: "Shakes, coolers & desserts",
+    summary: "Milkshakes, mojitos, desserts, faloodas, and iced coffee for the second half of the meal.",
+    sectionSlugs: [
+      "milkshakes",
+      "mojitos",
+      "iced-treats-desserts",
+      "iced-coffee",
+    ],
+  },
+  {
+    slug: "coffee-tea",
+    kicker: "Cafe side",
+    title: "Coffee & tea",
+    summary: "Hot coffees, espresso drinks, tea infusions, and slower cafe sips.",
+    sectionSlugs: ["hot-coffee-tea", "hot-coffee"],
+  },
+];
+
+const quickFilters: QuickFilterDefinition[] = [
+  { id: "all", label: "All" },
+  { id: "veg", label: "Veg" },
+  { id: "non-veg", label: "Non-Veg" },
+  { id: "spicy", label: "Spicy" },
+  { id: "bestseller", label: "Bestsellers" },
+  { id: "under-rs-300", label: "Under Rs 300" },
+  { id: "coffee", label: "Coffee" },
+  { id: "dessert", label: "Dessert" },
+];
+
+const signatureDefinitions: SignatureDefinition[] = [
+  {
+    sectionSlug: "signature-burgers",
+    itemName: "Brooklyn Chick",
+    badge: "Signature stack",
+    note: "A stacked chicken burger with fries, fresh veggies, and cheesy cream.",
+  },
+  {
+    sectionSlug: "beef-burgers",
+    itemName: "Smash Buff",
+    badge: "Fast favourite",
+    note: "A straightforward beef burger with a rich, satisfying finish.",
+  },
+  {
+    sectionSlug: "classic-chicken-burgers",
+    itemName: "Sweet Fire Zing",
+    badge: "Crispy classic",
+    note: "Crispy chicken with sweet heat and plenty of crunch.",
+  },
+  {
+    sectionSlug: "veg-burgers",
+    itemName: "Red Flame Paneer",
+    badge: "Veg standout",
+    note: "A bold paneer burger with spicy, cheesy flavour.",
+  },
+  {
+    sectionSlug: "burger-bowls",
+    itemName: "Crunchy Buff Bowl",
+    badge: "No-bun route",
+    note: "All the Burgerium flavour in a bowl without the bun.",
+  },
+  {
+    sectionSlug: "milkshakes",
+    itemName: "Biscoff Blitz",
+    badge: "Sweet finish",
+    note: "A creamy Biscoff shake for a sweet finish.",
+  },
+];
+
+const heroPromises = [
+  "Veg and non-veg are clearly marked.",
+  "Prices stay visible before you open each section.",
+  "Download the PDF if you want the full menu in one view.",
+];
+
+const menuGroups: MenuGroup[] = menuGroupDefinitions
+  .map((group) => {
+    const sections = findSections(group.sectionSlugs);
+    const items = sections.flatMap((section) => getItems(section));
+
+    return {
+      ...group,
+      sections,
+      itemCount: items.length,
+      sectionCount: sections.length,
+      startingPrice: Math.min(...items.map((item) => item.price)),
+      previewItems: items.slice(0, 3).map((item) => item.name),
+    };
+  })
+  .filter((group) => group.sections.length > 0);
+
+const signatureNameIds = new Set(
+  signatureDefinitions.map((signature) => normalize(signature.itemName)),
+);
+
+const getGroupForSection = (sectionSlug: string) =>
+  menuGroups.find((group) =>
+    group.sections.some((section) => section.slug === sectionSlug),
+  );
+
+const inferTags = (
+  group: MenuGroup,
+  section: MenuSection,
+  block: MenuBlock,
+  item: MenuItem,
+) => {
+  const text = buildSearchValue([
+    group.title,
+    group.summary,
+    section.title,
+    section.label,
+    block.title,
+    block.note,
+    item.name,
+    item.description,
+  ]);
+  const itemText = buildSearchValue([
+    block.title,
+    block.note,
+    item.name,
+    item.description,
+  ]);
+
+  const tags = new Set<string>();
+  const sectionLabel = normalize(section.label);
+  const sectionTitle = normalize(section.title);
+
+  if (
+    sectionLabel.includes("vegetarian") ||
+    sectionTitle.includes("veg") ||
+    text.includes("paneer") ||
+    text.includes("shroom")
+  ) {
+    tags.add("Veg");
+  } else if (
+    sectionLabel.includes("non-veg") ||
+    sectionLabel.includes("chef") ||
+    text.includes("chicken") ||
+    text.includes("beef") ||
+    text.includes("buff")
+  ) {
+    tags.add("Non-Veg");
+  }
+
+  if (
+    hasAnyKeyword(text, [
+      "spicy",
+      "peri peri",
+      "peri-peri",
+      "chilli",
+      "chili",
+      "nashville",
+      "dragon",
+      "flame",
+      "fiery",
+      "schezwan",
+      "zing",
+      "sizzling",
+    ])
+  ) {
+    tags.add("Spicy");
+  }
+
+  if (item.price <= 299) {
+    tags.add("Under Rs 300");
+  }
+
+  if (signatureNameIds.has(normalize(item.name))) {
+    tags.add("Bestseller");
+  }
+
+  if (
+    hasAnyKeyword(itemText, [
+      "latte",
+      "espresso",
+      "americano",
+      "cappuccino",
+      "affogato",
+      "mocha",
+      "mochachino",
+      "coffee",
+      "hot chocolate",
+      "machiatto",
+    ])
+  ) {
+    tags.add("Coffee");
+  }
+
+  const dessertText = buildSearchValue([
+    block.title,
+    block.note,
+    item.name,
+    item.description,
+  ]);
+
+  if (
+    group.slug === "cold-drinks-desserts" &&
+    hasAnyKeyword(dessertText, [
+      "dessert",
+      "sundae",
+      "falooda",
+      "brownie",
+      "ice cream",
+    ])
+  ) {
+    tags.add("Dessert");
+  }
+
+  return Array.from(tags);
+};
+
+const buildCardMeta = (
+  group: MenuGroup,
+  section: MenuSection,
+  block: MenuBlock,
+  item: MenuItem,
+): CardMeta => {
+  const tags = inferTags(group, section, block, item);
+
+  return {
+    searchValue: buildSearchValue([
+      group.title,
+      group.summary,
+      section.title,
+      section.label,
+      block.title,
+      block.note,
+      item.name,
+      item.description,
+      ...tags,
+    ]),
+    shortDescription: shortenCopy(item.description),
+    tags,
+    tagIds: tags.map(filterIdForTag),
+  };
+};
+
+const createSignatureItem = (
+  definition: SignatureDefinition,
+): PreparedSignature | null => {
+  const group = getGroupForSection(definition.sectionSlug);
+
+  if (!group) {
+    return null;
+  }
+
+  const section = group.sections.find(
+    (currentSection) => currentSection.slug === definition.sectionSlug,
+  );
+
+  if (!section) {
+    return null;
+  }
+
+  const block = section.blocks.find((currentBlock) =>
+    currentBlock.items.some((item) => item.name === definition.itemName),
+  );
+
+  const item = block?.items.find(
+    (currentItem) => currentItem.name === definition.itemName,
+  );
+
+  if (!block || !item) {
+    return null;
+  }
+
+  return {
+    ...buildCardMeta(group, section, block, item),
+    ...definition,
+    group,
+    section,
+    block,
+    item,
+  };
+};
+
+const signatureItems = signatureDefinitions
+  .map(createSignatureItem)
+  .filter((signature): signature is PreparedSignature => Boolean(signature));
+
+const heroSpotlights = signatureItems.slice(0, 4);
 ---
 
-<section class="digital-menu-hero">
-    <div class="container hero-shell">
+<section class="menu-hero">
+  <div class="container hero-layout">
     <div class="hero-copy scroll-reveal">
-      <span class="hero-kicker">Burgerium Menu</span>
-      <h1>Browse the full Burgerium menu.</h1>
-      <p>
-        Search by item, jump between sections, and decide what you want before you arrive.
+      <span class="eyebrow">Burgerium menu</span>
+      <h1>What are you craving today?</h1>
+      <p class="hero-lead">
+        Start with a category, explore a few favourites, or open the full PDF if you want the whole menu at
+        once.
       </p>
 
-      <div class="search-panel hero-search-panel">
+      <div class="craving-row" aria-label="Menu categories">
+        {menuGroups.map((group) => (
+          <a href={`#${group.slug}`} class="craving-chip">
+            <span>{group.kicker}</span>
+            <strong>{group.title}</strong>
+          </a>
+        ))}
+      </div>
+
+      <div class="hero-actions">
+        <a class="btn-primary" href="#signatures">See signatures</a>
+        <a class="btn-secondary menu-pdf-link" href={pdfMenuPath} target="_blank" rel="noopener noreferrer">
+          Download PDF
+          <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <a class="pdf-feature scroll-reveal" href={pdfMenuPath} target="_blank" rel="noopener noreferrer">
+        <div class="pdf-feature-copy">
+          <span class="eyebrow pdf-eyebrow">Want the full menu?</span>
+          <strong>Open the full PDF menu</strong>
+          <p>See every page of the Burgerium menu in one PDF.</p>
+        </div>
+        <span class="pdf-feature-link">
+          View PDF
+          <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        </span>
+      </a>
+
+      <div class="promise-row">
+        {heroPromises.map((promise) => (
+          <span class="promise-pill">{promise}</span>
+        ))}
+      </div>
+    </div>
+
+    <aside class="hero-spotlight scroll-reveal" aria-labelledby="hero-spotlight-heading">
+      <div class="panel-head">
+        <span class="eyebrow">Fast picks</span>
+        <h2 id="hero-spotlight-heading">Popular picks to start with.</h2>
+      </div>
+
+      <div class="spotlight-grid">
+        {heroSpotlights.map((signature) => (
+          <article class="spotlight-card">
+            <div class="spotlight-top">
+              <span class="spotlight-badge">{signature.badge}</span>
+              <span class="spotlight-price">{formatPrice(signature.item.price)}</span>
+            </div>
+            <h3>{signature.item.name}</h3>
+            <p>{signature.note}</p>
+            <div class="spotlight-bottom">
+              <span>{signature.section.title}</span>
+              <a href={`#${signature.group.slug}`}>Open</a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section id="signatures" class="signature-rack" aria-labelledby="signatures-heading">
+  <div class="container">
+    <div class="section-top scroll-reveal">
+      <div>
+        <span class="eyebrow">Burgerium signatures</span>
+        <h2 id="signatures-heading">Guest favourites.</h2>
+      </div>
+      <p>A few guest favourites from across the menu.</p>
+    </div>
+
+    <div class="signature-grid">
+      {signatureItems.map((signature, index) => (
+        <article
+          class="signature-card scroll-reveal"
+          style={`--delay:${index * 0.04}s`}
+          data-signature-card
+          data-tags={signature.tagIds.join(" ")}
+          data-search={signature.searchValue}
+        >
+          <div class="signature-top">
+            <div>
+              <span class="eyebrow signature-eyebrow">{signature.badge}</span>
+              <h3>{signature.item.name}</h3>
+            </div>
+            <span class="signature-price">{formatPrice(signature.item.price)}</span>
+          </div>
+
+          <p class="signature-note">{signature.note}</p>
+          {signature.shortDescription && <p class="signature-copy">{signature.shortDescription}</p>}
+
+          <div class="tag-row">
+            {signature.tags.slice(0, 3).map((tag) => (
+              <span class="item-tag">{tag}</span>
+            ))}
+          </div>
+
+          <div class="signature-bottom">
+            <span>{signature.section.title}</span>
+            <a href={`#${signature.group.slug}`}>Open in menu</a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="menu-explorer" aria-labelledby="menu-explorer-heading">
+  <div class="container">
+    <div class="section-top explorer-top scroll-reveal">
+      <div>
+        <span class="eyebrow">Full menu</span>
+        <h2 id="menu-explorer-heading">Browse the full menu.</h2>
+      </div>
+      <p>Search by item, use a quick filter, or jump straight to a category.</p>
+    </div>
+
+    <div class="toolbar-shell scroll-reveal">
+      <div class="search-panel">
         <label class="search-label" for="menu-search">Search the menu</label>
         <div class="search-field">
           <i class="fas fa-search" aria-hidden="true"></i>
@@ -23,120 +549,143 @@ const getSectionCount = (section) =>
             id="menu-search"
             data-menu-search
             type="search"
-            placeholder="Search burgers, wraps, shakes, coffee..."
+            placeholder="Search burgers, wraps, coffee, dessert..."
             autocomplete="off"
           />
           <button type="button" class="clear-search" data-clear-search hidden>
             Clear
           </button>
         </div>
-        <p class="search-status" data-menu-status aria-live="polite">
-          {menuItemCount} items across {menuSectionCount} sections.
-        </p>
       </div>
 
-      <div class="hero-actions">
-        <a class="btn-primary" href="/#locations">See Chennai House</a>
-        <a class="hero-link" href="/#about">Our Story</a>
+      <div class="filter-bar" role="toolbar" aria-label="Quick menu filters">
+        {quickFilters.map((filter, index) => (
+          <button
+            type="button"
+            class={`filter-chip ${index === 0 ? "is-active" : ""}`}
+            data-menu-filter={filter.id}
+            aria-pressed={index === 0 ? "true" : "false"}
+          >
+            {filter.label}
+          </button>
+        ))}
       </div>
+
+      <p class="toolbar-status" data-menu-status aria-live="polite">{defaultStatus}</p>
     </div>
 
-    <div class="hero-notes scroll-reveal">
-      <article class="hero-note">
-        <strong>{menuItemCount}</strong>
-        <span>items on the menu</span>
-      </article>
-      <article class="hero-note">
-        <strong>{menuSectionCount}</strong>
-        <span>sections to browse</span>
-      </article>
-      <article class="hero-note">
-        <strong>Fresh Prep</strong>
-        <span>Food is prepared once you order</span>
-      </article>
-      <article class="hero-note hero-note-wide">
-        <strong>Prices shown before GST.</strong>
-        <span>The kitchen works to order, so timings can vary during rush hours.</span>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section id="menu" class="digital-menu-directory" aria-labelledby="digital-menu-heading">
-  <div class="container">
-    <div class="directory-top scroll-reveal">
-      <div>
-        <span class="directory-kicker">Full Menu</span>
-        <h2 id="digital-menu-heading">Pick a section and start browsing.</h2>
-      </div>
-      <p class="directory-note">
-        Use the sticky rail below to move from burgers and fries to coffee, shakes, and desserts.
-      </p>
-    </div>
-
-    <div class="section-rail scroll-reveal" aria-label="Menu sections">
-      {menuSections.map((section) => (
-        <a class="section-chip" data-menu-chip href={`#${section.slug}`}>
-          {section.title}
+    <nav class="category-rail scroll-reveal" aria-label="Menu group navigation">
+      {menuGroups.map((group) => (
+        <a href={`#${group.slug}`} class="category-link" data-group-link data-group-target={group.slug}>
+          <span>{group.kicker}</span>
+          <strong>{group.title}</strong>
+          <small>From {formatPrice(group.startingPrice)}</small>
         </a>
       ))}
-    </div>
+    </nav>
 
-    <div class="catalog">
-      {menuSections.map((section, sectionIndex) => (
+    <div class="group-stack">
+      {menuGroups.map((group, groupIndex) => (
         <section
-          id={section.slug}
-          class="catalog-section scroll-reveal"
-          data-menu-section
-          style={`--delay:${sectionIndex * 0.03}s`}
+          id={group.slug}
+          class="menu-group scroll-reveal"
+          data-menu-group
+          style={`--delay:${groupIndex * 0.05}s`}
         >
-          <div class="section-heading">
+          <div class="menu-group-head">
             <div>
-              <span class="section-label">{section.label}</span>
-              <h3>{section.title}</h3>
+              <span class="eyebrow group-eyebrow">{group.kicker}</span>
+              <h3>{group.title}</h3>
+              <p>{group.summary}</p>
+              <div class="preview-row">
+                {group.previewItems.map((itemName) => (
+                  <span class="preview-pill">{itemName}</span>
+                ))}
+              </div>
             </div>
-            <p class="section-total">{getSectionCount(section)} items</p>
+
+            <div class="group-summary">
+              <span>From {formatPrice(group.startingPrice)}</span>
+              <span>{group.sectionCount} sections</span>
+              <span>{group.itemCount} items</span>
+            </div>
           </div>
 
-          <div class={`section-blocks ${section.blocks.length === 1 ? "single-block" : ""}`}>
-            {section.blocks.map((block) => (
-              <article class="menu-block" data-menu-block>
-                {(block.title || block.note) && (
-                  <header class="block-head">
-                    {block.title && <h4>{block.title}</h4>}
-                    {block.note && <p>{block.note}</p>}
-                  </header>
-                )}
+          <div class="section-list">
+            {group.sections.map((section, sectionIndex) => {
+              const isDefaultOpen = groupIndex === 0 && sectionIndex === 0;
+              const sectionNote =
+                section.blocks.find((block) => block.note)?.note ??
+                section.blocks.find((block) => block.title)?.title ??
+                "";
 
-                <div class="item-list">
-                  {block.items.map((item) => {
-                    const searchValue = [
-                      section.title,
-                      section.label,
-                      block.title,
-                      block.note,
-                      item.name,
-                      item.description,
-                    ]
-                      .filter(Boolean)
-                      .join(" ")
-                      .toLowerCase();
+              return (
+                <details
+                  class="section-panel"
+                  data-menu-section
+                  data-default-open={isDefaultOpen ? "true" : "false"}
+                  open={isDefaultOpen}
+                >
+                  <summary class="section-summary">
+                    <div class="section-copy">
+                      <div class="section-topline">
+                        <span class="section-label">{section.label}</span>
+                        <span class="section-price">From {formatPrice(getStartingPrice(section))}</span>
+                      </div>
+                      <h4>{section.title}</h4>
+                      <p>{sectionNote || getPreviewItems(section)}</p>
+                    </div>
 
-                    return (
-                      <article class="menu-item" data-menu-item data-search={searchValue}>
-                        <div class="item-copy">
-                          <div class="item-topline">
-                            <h5>{item.name}</h5>
-                            <span class="item-price">{formatPrice(item.price)}</span>
-                          </div>
-                          {item.description && <p>{item.description}</p>}
+                    <span class="section-toggle">
+                      <span class="show-label">Open</span>
+                      <span class="hide-label">Close</span>
+                      <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </span>
+                  </summary>
+
+                  <div class="section-body">
+                    {section.blocks.map((block: MenuBlock) => (
+                      <article class="item-cluster" data-menu-block>
+                        {(block.title || block.note) && (
+                          <header class="cluster-head">
+                            {block.title && <h5>{block.title}</h5>}
+                            {block.note && <p>{block.note}</p>}
+                          </header>
+                        )}
+
+                        <div class="item-grid">
+                          {block.items.map((item: MenuItem) => {
+                            const meta = buildCardMeta(group, section, block, item);
+
+                            return (
+                              <article
+                                class="menu-item-card"
+                                data-menu-item
+                                data-tags={meta.tagIds.join(" ")}
+                                data-search={meta.searchValue}
+                              >
+                                <div class="menu-item-head">
+                                  <div>
+                                    <h6>{item.name}</h6>
+                                    <div class="tag-row">
+                                      {meta.tags.slice(0, 4).map((tag) => (
+                                        <span class="item-tag">{tag}</span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <span class="item-price">{formatPrice(item.price)}</span>
+                                </div>
+                                {meta.shortDescription && <p>{meta.shortDescription}</p>}
+                              </article>
+                            );
+                          })}
                         </div>
                       </article>
-                    );
-                  })}
-                </div>
-              </article>
-            ))}
+                    ))}
+                  </div>
+                </details>
+              );
+            })}
           </div>
         </section>
       ))}
@@ -144,49 +693,115 @@ const getSectionCount = (section) =>
   </div>
 </section>
 
-<script define:vars={{ menuItemCount, menuSectionCount }}>
+<script define:vars={{ defaultStatus }}>
   const searchInput = document.querySelector("[data-menu-search]");
   const clearSearchButton = document.querySelector("[data-clear-search]");
   const statusLabel = document.querySelector("[data-menu-status]");
-  const menuSections = Array.from(document.querySelectorAll("[data-menu-section]"));
+  const filterButtons = Array.from(document.querySelectorAll("[data-menu-filter]"));
+  const groupPanels = Array.from(document.querySelectorAll("[data-menu-group]"));
+  const groupLinks = Array.from(document.querySelectorAll("[data-group-link]"));
+  const signatureCards = Array.from(document.querySelectorAll("[data-signature-card]"));
 
-  const totalItems = menuItemCount;
-  const totalSections = menuSectionCount;
+  let activeFilter = "all";
 
-  const updateMenuSearch = () => {
+  const setActiveFilter = (nextFilter) => {
+    activeFilter = nextFilter;
+
+    filterButtons.forEach((button) => {
+      const isActive = button.dataset.menuFilter === nextFilter;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+  };
+
+  const itemMatchesFilter = (item, filterId) => {
+    if (filterId === "all") {
+      return true;
+    }
+
+    const tags = item.dataset.tags?.split(" ").filter(Boolean) ?? [];
+    return tags.includes(filterId);
+  };
+
+  const updateMenuView = () => {
     const query = searchInput instanceof HTMLInputElement
       ? searchInput.value.trim().toLowerCase()
       : "";
 
     let visibleItems = 0;
     let visibleSections = 0;
+    let visibleGroups = 0;
+    let visibleSignatures = 0;
 
-    menuSections.forEach((section) => {
-      const blocks = Array.from(section.querySelectorAll("[data-menu-block]"));
-      let sectionHasMatch = false;
+    groupPanels.forEach((groupPanel) => {
+      const sections = Array.from(groupPanel.querySelectorAll("[data-menu-section]"));
+      let groupHasMatch = false;
 
-      blocks.forEach((block) => {
-        const items = Array.from(block.querySelectorAll("[data-menu-item]"));
-        let blockHasMatch = false;
+      sections.forEach((section) => {
+        const blocks = Array.from(section.querySelectorAll("[data-menu-block]"));
+        let sectionHasMatch = false;
 
-        items.forEach((item) => {
-          const matches = !query || item.dataset.search?.includes(query);
-          item.hidden = !matches;
+        blocks.forEach((block) => {
+          const items = Array.from(block.querySelectorAll("[data-menu-item]"));
+          let blockHasMatch = false;
 
-          if (matches) {
-            visibleItems += 1;
-            blockHasMatch = true;
-            sectionHasMatch = true;
-          }
+          items.forEach((item) => {
+            const matchesQuery = !query || item.dataset.search?.includes(query);
+            const matchesFilter = itemMatchesFilter(item, activeFilter);
+            const matches = matchesQuery && matchesFilter;
+
+            item.hidden = !matches;
+
+            if (matches) {
+              visibleItems += 1;
+              blockHasMatch = true;
+              sectionHasMatch = true;
+            }
+          });
+
+          block.hidden = !blockHasMatch;
         });
 
-        block.hidden = !blockHasMatch;
+        section.hidden = !sectionHasMatch;
+
+        if (section instanceof HTMLDetailsElement) {
+          if (query || activeFilter !== "all") {
+            section.open = sectionHasMatch;
+          } else {
+            section.open = section.dataset.defaultOpen === "true";
+          }
+        }
+
+        if (sectionHasMatch) {
+          visibleSections += 1;
+          groupHasMatch = true;
+        }
       });
 
-      section.hidden = !sectionHasMatch;
+      groupPanel.hidden = !groupHasMatch;
 
-      if (sectionHasMatch) {
-        visibleSections += 1;
+      if (groupHasMatch) {
+        visibleGroups += 1;
+      }
+    });
+
+    groupLinks.forEach((link) => {
+      const target = link.dataset.groupTarget;
+      const targetPanel = target
+        ? document.getElementById(target)
+        : null;
+      link.hidden = Boolean(targetPanel?.hidden);
+    });
+
+    signatureCards.forEach((card) => {
+      const matchesQuery = !query || card.dataset.search?.includes(query);
+      const matchesFilter = itemMatchesFilter(card, activeFilter);
+      const matches = matchesQuery && matchesFilter;
+
+      card.hidden = !matches;
+
+      if (matches) {
+        visibleSignatures += 1;
       }
     });
 
@@ -195,198 +810,450 @@ const getSectionCount = (section) =>
     }
 
     if (statusLabel instanceof HTMLElement) {
-      if (query) {
-        const label = searchInput instanceof HTMLInputElement ? searchInput.value.trim() : "";
-        statusLabel.textContent = `${visibleItems} items match "${label}" across ${visibleSections} sections.`;
+      if (!query && activeFilter === "all") {
+        statusLabel.textContent = defaultStatus;
+      } else if (visibleItems === 0) {
+        statusLabel.textContent = "No menu items match this view. Try another filter or search term.";
       } else {
-        statusLabel.textContent = `${totalItems} items across ${totalSections} sections.`;
+        const filterLabel = activeFilter === "all"
+          ? "all items"
+          : activeFilter.replace(/-/g, " ");
+        const signatureCopy = visibleSignatures > 0
+          ? ` ${visibleSignatures} signature pick${visibleSignatures === 1 ? "" : "s"} still fit too.`
+          : "";
+
+        const groupLabel = visibleGroups === 1 ? "category" : "categories";
+        statusLabel.textContent =
+          `Showing ${visibleItems} item${visibleItems === 1 ? "" : "s"} across ${visibleSections} section${visibleSections === 1 ? "" : "s"} in ${visibleGroups} ${groupLabel} for ${filterLabel}.${signatureCopy}`;
       }
     }
   };
 
   if (searchInput instanceof HTMLInputElement) {
-    searchInput.addEventListener("input", updateMenuSearch);
+    searchInput.addEventListener("input", updateMenuView);
   }
 
   if (clearSearchButton instanceof HTMLButtonElement && searchInput instanceof HTMLInputElement) {
     clearSearchButton.addEventListener("click", () => {
       searchInput.value = "";
-      updateMenuSearch();
+      updateMenuView();
       searchInput.focus();
     });
   }
 
-  updateMenuSearch();
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextFilter = button.dataset.menuFilter ?? "all";
+      setActiveFilter(nextFilter);
+      updateMenuView();
+    });
+  });
+
+  setActiveFilter("all");
+  updateMenuView();
 </script>
 
 <style>
-  .digital-menu-hero {
-    padding: calc(var(--header-height) + 3.6rem) 0 2.8rem;
+  .menu-hero,
+  .menu-explorer {
     background:
-      radial-gradient(circle at top right, rgba(250, 162, 39, 0.16), transparent 30%),
-      radial-gradient(circle at left center, rgba(250, 162, 39, 0.08), transparent 28%),
-      linear-gradient(180deg, #fff8eb 0%, #ffe4a8 100%);
+      radial-gradient(circle at top right, rgba(250, 162, 39, 0.16), transparent 28%),
+      linear-gradient(180deg, #fff7e7 0%, #fff1d0 100%);
+  }
+
+  .menu-hero {
+    padding: calc(var(--header-height) + 3.4rem) 0 2.3rem;
     border-bottom: 1px solid rgba(75, 47, 10, 0.08);
   }
 
-  .hero-shell {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
-    gap: 1.75rem;
-    align-items: end;
+  .signature-rack {
+    padding: 1.8rem 0 2.1rem;
+    background:
+      linear-gradient(180deg, rgba(255, 242, 210, 0.9), rgba(255, 248, 230, 1)),
+      linear-gradient(120deg, rgba(250, 162, 39, 0.08), transparent 45%);
   }
 
-  .hero-copy {
-    padding: 1.7rem;
-    border: 1px solid var(--line-soft);
-    border-radius: var(--radius-lg);
-    background: rgba(255, 250, 241, 0.74);
+  .menu-explorer {
+    padding: 1rem 0 5rem;
+  }
+
+  .hero-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+    gap: 1.15rem;
+    align-items: start;
+  }
+
+  .hero-copy,
+  .hero-spotlight,
+  .signature-card,
+  .toolbar-shell,
+  .menu-group {
+    border: 1px solid rgba(75, 47, 10, 0.12);
     box-shadow: var(--shadow-soft);
   }
 
-  .hero-kicker,
-  .directory-kicker,
-  .section-label {
+  .hero-copy,
+  .hero-spotlight,
+  .toolbar-shell,
+  .menu-group {
+    border-radius: 32px;
+    min-width: 0;
+  }
+
+  .hero-copy {
+    padding: 1.8rem;
+    background:
+      linear-gradient(180deg, rgba(255, 251, 243, 0.92), rgba(255, 244, 216, 0.86)),
+      linear-gradient(145deg, rgba(250, 162, 39, 0.18), transparent 48%);
+  }
+
+  .eyebrow,
+  .item-tag,
+  .promise-pill,
+  .preview-pill,
+  .filter-chip,
+  .section-label,
+  .spotlight-badge {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 34px;
-    padding: 0.34rem 0.85rem;
+    padding: 0.34rem 0.82rem;
     border-radius: 999px;
-    background: rgba(250, 162, 39, 0.14);
-    color: var(--brand-orange);
     font-size: 0.74rem;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
+  .eyebrow,
+  .spotlight-badge {
+    background: rgba(250, 162, 39, 0.14);
+    color: var(--brand-orange-deep);
+  }
+
+  .hero-copy h1,
+  .section-top h2,
+  .menu-group h3,
+  .section-summary h4 {
+    color: var(--text-white);
+  }
+
   .hero-copy h1 {
-    margin: 1rem 0 0.9rem;
-    max-width: 12ch;
-    font-size: clamp(2.9rem, 6vw, 5.1rem);
-    line-height: 0.92;
+    margin: 1rem 0 0.95rem;
+    max-width: 10ch;
+    font-size: clamp(3rem, 7vw, 5.6rem);
+    line-height: 0.9;
   }
 
-  .hero-copy p {
-    max-width: 58ch;
+  .hero-lead,
+  .section-top p,
+  .menu-group-head p,
+  .section-summary p,
+  .cluster-head p,
+  .menu-item-card p,
+  .spotlight-card p,
+  .signature-copy,
+  .signature-note {
     color: var(--text-gray);
-    font-size: 1.04rem;
-    line-height: 1.72;
+    line-height: 1.7;
   }
 
-  .hero-search-panel {
+  .craving-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
     margin-top: 1.4rem;
+    min-width: 0;
+  }
+
+  .craving-chip,
+  .category-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    padding: 0.95rem 1.05rem;
+    border: 1px solid rgba(75, 47, 10, 0.12);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.44);
+    transition:
+      transform 0.22s ease,
+      border-color 0.22s ease,
+      box-shadow 0.22s ease;
+    min-width: 0;
+  }
+
+  .craving-chip:hover,
+  .category-link:hover {
+    transform: translateY(-3px);
+    border-color: rgba(250, 162, 39, 0.55);
+    box-shadow: 0 12px 28px rgba(75, 47, 10, 0.08);
+  }
+
+  .craving-chip span,
+  .category-link span {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brand-orange-deep);
+  }
+
+  .craving-chip strong,
+  .category-link strong {
+    font-size: 1rem;
+    color: var(--text-white);
   }
 
   .hero-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.9rem;
-    margin-top: 1.25rem;
+    margin: 1.45rem 0 1.2rem;
   }
 
-  .hero-link {
+  .pdf-feature {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.05rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(250, 162, 39, 0.28);
+    border-radius: 24px;
+    background:
+      linear-gradient(135deg, rgba(250, 162, 39, 0.22), rgba(255, 226, 162, 0.78)),
+      linear-gradient(180deg, rgba(255, 252, 246, 0.9), rgba(255, 243, 214, 0.84));
+    box-shadow: 0 18px 36px rgba(250, 162, 39, 0.12);
+    min-width: 0;
+  }
+
+  .pdf-feature strong {
+    display: block;
+    margin: 0.45rem 0 0.2rem;
+    font-family: var(--font-heading);
+    font-size: 1.7rem;
+    line-height: 0.95;
+    color: var(--text-white);
+  }
+
+  .pdf-feature p {
+    color: var(--text-gray);
+    line-height: 1.65;
+  }
+
+  .pdf-feature-copy {
+    min-width: 0;
+  }
+
+  .pdf-eyebrow {
+    background: rgba(255, 255, 255, 0.64);
+  }
+
+  .pdf-feature-link {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-height: 58px;
-    padding: 1rem 1.5rem;
-    border: 1px solid var(--line-strong);
-    color: var(--text-white);
-    font-family: var(--font-heading);
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    border-radius: 18px;
-    background: rgba(255, 251, 244, 0.6);
-    transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+    gap: 0.55rem;
+    min-height: 48px;
+    padding: 0 1rem;
+    border-radius: 999px;
+    background: #2d1800;
+    color: #fff4dc;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 10px 22px rgba(45, 24, 0, 0.18);
   }
 
-  .hero-link:hover {
-    transform: translateY(-2px);
-    border-color: var(--brand-orange);
-    background: rgba(250, 162, 39, 0.08);
+  .menu-pdf-link {
+    gap: 0.55rem;
   }
 
-  .hero-notes {
+  .promise-row,
+  .preview-row,
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .promise-pill,
+  .preview-pill,
+  .item-tag {
+    background: rgba(255, 255, 255, 0.58);
+    color: var(--text-gray);
+    letter-spacing: 0.07em;
+  }
+
+  .hero-spotlight {
+    padding: 1.35rem;
+    background:
+      linear-gradient(180deg, rgba(76, 46, 9, 0.96), rgba(48, 29, 8, 0.97)),
+      linear-gradient(180deg, rgba(250, 162, 39, 0.12), transparent 45%);
+    color: #fff4dd;
+  }
+
+  .panel-head h2 {
+    margin-top: 1rem;
+    max-width: 13ch;
+    font-size: clamp(2rem, 4.3vw, 3.25rem);
+    line-height: 0.95;
+    color: #fff6e8;
+  }
+
+  .spotlight-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.9rem;
+    margin-top: 1.3rem;
   }
 
-  .hero-note {
-    min-height: 132px;
+  .spotlight-card {
+    min-height: 182px;
     padding: 1rem;
-    border: 1px solid var(--line-soft);
     border-radius: 24px;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.36)),
-      linear-gradient(150deg, rgba(250, 162, 39, 0.16), transparent 55%);
-    box-shadow: 0 12px 24px rgba(75, 47, 10, 0.05);
+      linear-gradient(180deg, rgba(255, 249, 236, 0.95), rgba(255, 238, 204, 0.9)),
+      linear-gradient(145deg, rgba(250, 162, 39, 0.14), transparent 42%);
+    border: 1px solid rgba(255, 223, 168, 0.18);
+    box-shadow: 0 14px 26px rgba(20, 9, 0, 0.18);
   }
 
-  .hero-note strong {
-    display: block;
-    margin-bottom: 0.35rem;
-    font-family: var(--font-heading);
-    font-size: clamp(2rem, 3vw, 2.8rem);
-    line-height: 0.95;
+  .spotlight-top,
+  .signature-top,
+  .section-top,
+  .menu-group-head,
+  .section-topline,
+  .menu-item-head,
+  .section-summary,
+  .spotlight-bottom,
+  .signature-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .spotlight-price,
+  .signature-price,
+  .section-price,
+  .item-price,
+  .group-summary span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0.28rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(250, 162, 39, 0.14);
+    color: var(--brand-orange-deep);
+    font-weight: 700;
+  }
+
+  .spotlight-card h3,
+  .signature-card h3,
+  .menu-group h3,
+  .section-summary h4,
+  .menu-item-card h6 {
     color: var(--text-white);
   }
 
-  .hero-note span {
-    display: block;
-    color: var(--text-gray);
-    line-height: 1.5;
+  .spotlight-card h3,
+  .signature-card h3,
+  .menu-group h3 {
+    margin: 0.75rem 0 0.65rem;
+    font-size: 1.55rem;
+    line-height: 0.98;
   }
 
-  .hero-note-wide {
-    grid-column: span 2;
-    min-height: 0;
+  .spotlight-card h3 {
+    color: #2a1602;
   }
 
-  .digital-menu-directory {
-    padding: 1rem 0 6rem;
-    background:
-      linear-gradient(180deg, #fff7e0 0%, #fff0cd 100%);
+  .spotlight-card p {
+    color: rgba(45, 24, 0, 0.72);
   }
 
-  .directory-top {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.7fr);
-    gap: 1.2rem;
+  .spotlight-bottom,
+  .signature-bottom {
+    margin-top: 1rem;
     align-items: center;
-    margin-bottom: 1.5rem;
+    color: rgba(45, 24, 0, 0.78);
+    font-size: 0.95rem;
   }
 
-  .directory-top h2 {
+  .spotlight-bottom a,
+  .signature-bottom a {
+    color: var(--brand-orange);
+    font-weight: 700;
+  }
+
+  .section-top {
+    align-items: end;
+    margin-bottom: 1.35rem;
+  }
+
+  .section-top h2 {
     margin-top: 1rem;
     max-width: 14ch;
-    font-size: clamp(2.2rem, 4.5vw, 3.7rem);
-    line-height: 0.95;
+    font-size: clamp(2.2rem, 4.8vw, 4rem);
+    line-height: 0.94;
   }
 
-  .directory-note {
-    max-width: 31ch;
-    margin-left: auto;
-    color: var(--text-gray);
-    line-height: 1.7;
+  .signature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .signature-card {
+    min-height: 300px;
+    padding: 1.2rem;
+    border-radius: 28px;
+    background:
+      linear-gradient(180deg, rgba(255, 251, 244, 0.94), rgba(255, 242, 214, 0.88)),
+      linear-gradient(150deg, rgba(250, 162, 39, 0.16), transparent 48%);
+    transition:
+      transform 0.26s ease,
+      border-color 0.26s ease;
+    transition-delay: var(--delay, 0s);
+  }
+
+  .signature-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(250, 162, 39, 0.55);
+  }
+
+  .signature-eyebrow {
+    margin-bottom: 0.7rem;
+  }
+
+  .signature-note {
+    margin-top: 0.2rem;
+    font-weight: 600;
+  }
+
+  .signature-copy {
+    margin-top: 0.8rem;
+  }
+
+  .toolbar-shell {
+    position: sticky;
+    top: calc(var(--header-height) + 0.7rem);
+    z-index: 8;
+    padding: 1.05rem;
+    margin-bottom: 1rem;
+    background: rgba(255, 250, 240, 0.93);
+    backdrop-filter: blur(14px);
   }
 
   .search-panel {
-    padding: 1.1rem;
-    border: 1px solid var(--line-soft);
-    background: rgba(255, 249, 237, 0.88);
-    border-radius: 26px;
-    box-shadow: 0 12px 24px rgba(75, 47, 10, 0.05);
+    display: grid;
+    gap: 0.7rem;
   }
 
   .search-label {
-    display: block;
-    margin-bottom: 0.7rem;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-gray);
   }
@@ -394,12 +1261,12 @@ const getSectionCount = (section) =>
   .search-field {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 0.75rem;
+    gap: 0.7rem;
     align-items: center;
     min-height: 60px;
     padding: 0 1rem;
-    border: 1px solid var(--line-soft);
-    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(75, 47, 10, 0.12);
+    background: rgba(255, 255, 255, 0.72);
     border-radius: 18px;
   }
 
@@ -409,11 +1276,11 @@ const getSectionCount = (section) =>
 
   .search-field input {
     width: 100%;
+    min-height: 58px;
     border: 0;
     background: transparent;
     color: var(--text-white);
     font: inherit;
-    min-height: 58px;
   }
 
   .search-field input::placeholder {
@@ -426,348 +1293,459 @@ const getSectionCount = (section) =>
 
   .clear-search {
     border: 0;
+    border-radius: 999px;
+    padding: 0.5rem 0.9rem;
     background: rgba(250, 162, 39, 0.16);
     color: var(--brand-orange-deep);
-    padding: 0.5rem 0.8rem;
     font-weight: 700;
     cursor: pointer;
-    border-radius: 999px;
   }
 
-  .search-status {
-    margin-top: 0.65rem;
-    color: var(--text-gray);
-    line-height: 1.5;
-  }
-
-  .section-rail {
-    position: sticky;
-    top: calc(var(--header-height) + 0.8rem);
-    z-index: 40;
+  .filter-bar,
+  .category-rail {
     display: flex;
     gap: 0.7rem;
     overflow-x: auto;
-    margin-bottom: 1.5rem;
-    padding: 0.7rem;
-    border: 1px solid var(--line-soft);
-    background: rgba(255, 248, 232, 0.86);
-    backdrop-filter: blur(16px);
-    scroll-snap-type: x proximity;
-    border-radius: 24px;
-    box-shadow: 0 12px 20px rgba(75, 47, 10, 0.04);
+    padding-bottom: 0.15rem;
+    scrollbar-width: none;
   }
 
-  .section-chip {
+  .filter-bar::-webkit-scrollbar,
+  .category-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-bar {
+    margin-top: 0.95rem;
+  }
+
+  .filter-chip {
     flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    min-height: 42px;
-    padding: 0.5rem 0.95rem;
-    border: 1px solid var(--line-soft);
-    color: var(--text-white);
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
-    scroll-snap-align: start;
+    border: 1px solid rgba(75, 47, 10, 0.12);
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--text-gray);
+    cursor: pointer;
+    letter-spacing: 0.09em;
   }
 
-  .section-chip:hover {
-    transform: translateY(-2px);
+  .filter-chip.is-active {
+    background: var(--brand-orange);
     border-color: var(--brand-orange);
-    background: rgba(250, 162, 39, 0.08);
+    color: #2d1800;
   }
 
-  .catalog {
+  .toolbar-status {
+    margin-top: 0.9rem;
+    color: var(--text-gray);
+  }
+
+  .category-rail {
+    margin: 1.1rem 0 1.3rem;
+  }
+
+  .category-link {
+    flex: 0 0 clamp(210px, 22vw, 270px);
+    min-height: 116px;
+    justify-content: space-between;
+  }
+
+  .category-link small {
+    color: var(--text-gray);
+    font-size: 0.92rem;
+  }
+
+  .group-stack {
     display: grid;
-    gap: 1.25rem;
+    gap: 1rem;
   }
 
-  .catalog-section {
+  .menu-group {
     padding: 1.3rem;
-    border: 1px solid var(--line-soft);
-    border-radius: 28px;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.34)),
-      linear-gradient(160deg, rgba(250, 162, 39, 0.12), transparent 45%);
-    transition: border-color 0.3s ease, transform 0.3s ease;
+      linear-gradient(180deg, rgba(255, 251, 243, 0.96), rgba(255, 244, 221, 0.88)),
+      linear-gradient(150deg, rgba(250, 162, 39, 0.14), transparent 48%);
     transition-delay: var(--delay, 0s);
   }
 
-  .catalog-section:hover {
-    border-color: rgba(250, 162, 39, 0.35);
+  .group-eyebrow {
+    margin-bottom: 0.8rem;
   }
 
-  .section-heading {
+  .group-summary {
     display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: end;
-    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    max-width: 320px;
   }
 
-  .section-heading h3 {
-    margin-top: 0.9rem;
-    font-size: clamp(2rem, 4vw, 3rem);
-    line-height: 0.95;
+  .preview-row {
+    margin-top: 1rem;
   }
 
-  .section-total {
-    color: var(--text-gray);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.82rem;
+  .section-list {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 1.2rem;
+  }
+
+  .section-panel {
+    border: 1px solid rgba(75, 47, 10, 0.1);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.62);
+    overflow: hidden;
+  }
+
+  .section-panel[hidden] {
+    display: none;
+  }
+
+  .section-summary {
+    align-items: center;
+    padding: 1rem 1.05rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .section-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .section-copy {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .section-topline {
+    align-items: center;
+  }
+
+  .section-summary h4 {
+    font-size: 1.45rem;
+    line-height: 0.98;
+  }
+
+  .section-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 38px;
+    padding: 0 0.85rem;
+    border-radius: 999px;
+    background: rgba(250, 162, 39, 0.1);
+    color: var(--brand-orange-deep);
+    font-weight: 700;
     white-space: nowrap;
   }
 
-  .section-blocks {
+  .hide-label {
+    display: none;
+  }
+
+  .section-panel[open] .show-label {
+    display: none;
+  }
+
+  .section-panel[open] .hide-label {
+    display: inline;
+  }
+
+  .section-panel[open] .section-toggle i {
+    transform: rotate(90deg);
+  }
+
+  .section-toggle i {
+    transition: transform 0.22s ease;
+  }
+
+  .section-body {
+    padding: 0 1.05rem 1.05rem;
+    border-top: 1px solid rgba(75, 47, 10, 0.08);
+  }
+
+  .item-cluster {
+    padding-top: 1rem;
+  }
+
+  .item-cluster + .item-cluster {
+    margin-top: 0.2rem;
+  }
+
+  .cluster-head {
+    margin-bottom: 0.9rem;
+  }
+
+  .cluster-head h5 {
+    font-size: 1.15rem;
+    color: var(--text-white);
+  }
+
+  .item-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
   }
 
-  .section-blocks.single-block {
-    grid-template-columns: 1fr;
+  .menu-item-card {
+    padding: 0.95rem;
+    border-radius: 20px;
+    border: 1px solid rgba(75, 47, 10, 0.08);
+    background: rgba(255, 255, 255, 0.72);
   }
 
-  .menu-block {
-    padding: 1rem;
-    border: 1px solid var(--line-soft);
-    background: rgba(255, 250, 240, 0.86);
-    border-radius: 22px;
+  .menu-item-card[hidden],
+  .signature-card[hidden],
+  .category-link[hidden] {
+    display: none;
   }
 
-  .block-head {
-    margin-bottom: 1rem;
-    padding-bottom: 0.9rem;
-    border-bottom: 1px solid var(--line-soft);
-  }
-
-  .block-head h4 {
-    font-size: 1.2rem;
-    margin-bottom: 0.45rem;
-  }
-
-  .block-head p {
-    color: var(--text-gray);
-    line-height: 1.65;
-    font-size: 0.94rem;
-  }
-
-  .item-list {
-    display: grid;
-    gap: 0.85rem;
-  }
-
-  .menu-item {
-    padding-bottom: 0.85rem;
-    border-bottom: 1px solid rgba(71, 45, 6, 0.08);
-  }
-
-  .menu-item:last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
-  }
-
-  .item-topline {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
+  .menu-item-head {
     align-items: start;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.65rem;
   }
 
-  .item-topline h5 {
-    font-family: var(--font-body);
-    font-size: 1.03rem;
-    font-weight: 700;
-    letter-spacing: 0;
-    text-transform: none;
-    line-height: 1.4;
+  .menu-item-card h6 {
+    font-size: 1.15rem;
+    line-height: 1.05;
   }
 
-  .item-price {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    min-height: 34px;
-    padding: 0.2rem 0.75rem;
-    border-radius: 999px;
-    background: rgba(250, 162, 39, 0.14);
-    color: var(--brand-orange-deep);
-    font-weight: 700;
-    font-size: 0.82rem;
+  .menu-item-card .tag-row {
+    margin-top: 0.45rem;
   }
 
-  .item-copy p {
-    color: var(--text-gray);
-    line-height: 1.65;
-    font-size: 0.94rem;
+  .item-tag {
+    min-height: 28px;
+    padding: 0.24rem 0.65rem;
+    font-size: 0.67rem;
+    letter-spacing: 0.08em;
   }
 
-  @media (max-width: 980px) {
-    .hero-shell,
-    .directory-top {
-      grid-template-columns: 1fr;
+  @media (max-width: 1100px) {
+    .hero-layout,
+    .section-top,
+    .menu-group-head {
+      grid-template-columns: minmax(0, 1fr);
+      display: grid;
     }
 
-    .hero-copy h1,
-    .directory-top h2 {
-      max-width: none;
+    .spotlight-grid,
+    .signature-grid,
+    .item-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .section-rail {
-      top: calc(var(--header-height) + 0.5rem);
-    }
-
-    .directory-note {
-      margin-left: 0;
+    .group-summary {
+      justify-content: flex-start;
       max-width: none;
     }
   }
 
   @media (max-width: 720px) {
-    .digital-menu-hero {
-      padding: calc(var(--header-height) + 2.5rem) 0 2rem;
+    .menu-hero {
+      padding-top: calc(var(--header-height) + 2.9rem);
     }
 
-    .hero-shell {
-      gap: 1rem;
+    .menu-hero .container,
+    .signature-rack .container,
+    .menu-explorer .container {
+      padding-inline: 0.7rem;
     }
 
-    .hero-copy {
-      padding: 1.2rem;
-      border-radius: 26px;
+    .hero-layout {
+      gap: 0.85rem;
     }
 
-    .hero-copy h1 {
-      font-size: clamp(2.5rem, 12vw, 3.4rem);
-      line-height: 0.94;
-      margin: 0.85rem 0;
-    }
-
-    .hero-copy p {
-      font-size: 0.98rem;
-      line-height: 1.7;
-    }
-
-    .hero-notes {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.7rem;
-    }
-
-    .hero-note-wide {
-      grid-column: span 2;
-    }
-
-    .hero-actions {
-      flex-direction: column;
-    }
-
-    .hero-actions :global(.btn-primary),
-    .hero-link {
-      width: 100%;
-      justify-content: center;
-    }
-
-    .directory-top {
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .search-panel {
-      padding: 0.9rem;
-      border-radius: 22px;
-    }
-
-    .search-field {
-      min-height: 56px;
-      padding: 0 0.8rem;
-      gap: 0.55rem;
-    }
-
-    .search-field input {
-      min-height: 54px;
-      font-size: 0.98rem;
-    }
-
-    .section-rail {
-      margin-bottom: 1rem;
-      padding: 0.55rem;
-      border-radius: 18px;
-      scrollbar-width: none;
-    }
-
-    .section-rail::-webkit-scrollbar {
-      display: none;
-    }
-
-    .section-chip {
-      min-height: 38px;
-      padding: 0.45rem 0.8rem;
-      font-size: 0.78rem;
-    }
-
-    .section-heading,
-    .item-topline {
-      flex-direction: column;
-      align-items: start;
-    }
-
-    .catalog-section,
-    .menu-block,
-    .search-panel {
-      padding: 1rem;
-    }
-
-    .catalog-section {
+    .hero-copy,
+    .hero-spotlight,
+    .toolbar-shell,
+    .menu-group {
+      padding: 1rem 0.95rem;
       border-radius: 24px;
     }
 
-    .menu-block {
-      border-radius: 18px;
+    .hero-copy,
+    .hero-spotlight {
+      box-shadow: none;
     }
 
-    .section-heading h3 {
-      font-size: clamp(1.7rem, 8vw, 2.2rem);
+    .hero-copy {
+      padding: 1.1rem 0.95rem 1rem;
+      border-color: rgba(75, 47, 10, 0.08);
+      background:
+        linear-gradient(180deg, rgba(255, 252, 246, 0.9), rgba(255, 245, 220, 0.78)),
+        linear-gradient(145deg, rgba(250, 162, 39, 0.14), transparent 52%);
     }
 
-    .section-total {
-      white-space: normal;
+    .hero-copy h1 {
+      font-size: clamp(2.5rem, 12vw, 4rem);
+      max-width: 10.8ch;
     }
 
-    .item-topline {
-      gap: 0.5rem;
+    .hero-lead {
+      max-width: none;
+      font-size: 1.02rem;
+      line-height: 1.65;
     }
 
-    .item-price {
-      min-height: 30px;
-      padding: 0.2rem 0.62rem;
-      font-size: 0.76rem;
-    }
-  }
-
-  @media (max-width: 520px) {
-    .hero-note {
-      min-height: 112px;
-      padding: 0.85rem;
+    .craving-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
     }
 
-    .hero-note strong {
-      font-size: 1.7rem;
+    .craving-chip {
+      min-height: 90px;
+      justify-content: center;
+      padding: 0.85rem 0.9rem;
+      border-radius: 20px;
     }
 
-    .hero-notes {
+    .craving-chip strong {
+      font-size: 0.96rem;
+      line-height: 1.15;
+    }
+
+    .hero-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+
+    .hero-actions a {
+      justify-content: center;
+      min-width: 0;
+      text-align: center;
+    }
+
+    .panel-head h2,
+    .section-top h2 {
+      max-width: none;
+      font-size: clamp(2rem, 10vw, 3rem);
+    }
+
+    .hero-spotlight {
+      padding: 1rem 0;
+      border: 0;
+      background: transparent;
+      color: var(--text-white);
+    }
+
+    .panel-head {
+      padding: 0 0.2rem;
+    }
+
+    .panel-head h2 {
+      color: var(--text-white);
+    }
+
+    .signature-grid,
+    .item-grid {
       grid-template-columns: 1fr;
     }
 
-    .hero-note-wide {
-      grid-column: auto;
+    .spotlight-grid {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(255px, 82vw);
+      overflow-x: auto;
+      gap: 0.8rem;
+      padding-bottom: 0.25rem;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
     }
 
-    .search-status {
-      font-size: 0.9rem;
+    .spotlight-grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .spotlight-card {
+      min-height: auto;
+      scroll-snap-align: start;
+    }
+
+    .pdf-feature {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 0.9rem 1rem;
+      border-radius: 20px;
+    }
+
+    .pdf-feature strong {
+      font-size: 1.45rem;
+    }
+
+    .promise-row {
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .promise-pill {
+      justify-content: flex-start;
+      width: 100%;
+    }
+
+    .section-summary,
+    .menu-item-head,
+    .signature-top,
+    .signature-bottom,
+    .spotlight-top,
+    .spotlight-bottom,
+    .section-topline {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .section-toggle {
+      margin-top: 0.5rem;
+    }
+
+    .section-summary h4,
+    .signature-card h3,
+    .spotlight-card h3 {
+      font-size: 1.3rem;
+    }
+
+    .category-link {
+      flex-basis: min(80vw, 270px);
+    }
+
+    .toolbar-shell {
+      top: calc(var(--header-height) + 0.35rem);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .menu-hero .container,
+    .signature-rack .container,
+    .menu-explorer .container {
+      padding-inline: 0.55rem;
+    }
+
+    .hero-copy,
+    .toolbar-shell,
+    .menu-group {
+      padding: 0.95rem 0.85rem;
+      border-radius: 22px;
+    }
+
+    .hero-copy h1 {
+      font-size: clamp(2.35rem, 12.5vw, 3.55rem);
+      max-width: 10.5ch;
+    }
+
+    .craving-row,
+    .hero-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .craving-chip {
+      min-height: 0;
+      padding: 0.8rem 0.9rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      width: 100%;
     }
   }
 </style>

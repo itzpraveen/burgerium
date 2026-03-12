@@ -1,0 +1,500 @@
+---
+import Footer from '../components/Footer.astro';
+import Navigation from '../components/Navigation.astro';
+import Layout from '../layouts/Layout.astro';
+import {
+    createPublicFeedbackArchive,
+    type PublicFeedbackTestimonial,
+} from '../lib/feedback';
+import { listFeedbackSubmissions } from '../lib/feedback-store';
+
+export const prerender = false;
+
+const PAGE_SIZE = 9;
+const submissions = await listFeedbackSubmissions();
+const reviews = createPublicFeedbackArchive(submissions);
+const totalReviews = reviews.length;
+const totalPages = Math.max(1, Math.ceil(totalReviews / PAGE_SIZE));
+const requestedPage = Number.parseInt(Astro.url.searchParams.get('page') ?? '1', 10);
+const currentPage = Number.isFinite(requestedPage) && requestedPage > 0
+    ? Math.min(requestedPage, totalPages)
+    : 1;
+const startIndex = (currentPage - 1) * PAGE_SIZE;
+const visibleReviews = reviews.slice(startIndex, startIndex + PAGE_SIZE);
+const dateFormatter = new Intl.DateTimeFormat('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+});
+
+const buildPageHref = (page: number) => (page <= 1 ? '/guest-feedback' : `/guest-feedback?page=${page}`);
+const hasPreviousPage = currentPage > 1;
+const hasNextPage = currentPage < totalPages;
+const visiblePageNumbers = getVisiblePageNumbers(currentPage, totalPages);
+const getStarString = (score: number) => '★★★★★'.slice(0, score).padEnd(5, '☆');
+const formatReviewDate = (createdAt: string) => dateFormatter.format(new Date(createdAt));
+const canonicalPath = currentPage <= 1 ? '/guest-feedback' : `/guest-feedback?page=${currentPage}`;
+const reviewStructuredData = {
+    '@type': 'CollectionPage',
+    '@id': `https://www.burgerium.in${canonicalPath}#collection`,
+    url: `https://www.burgerium.in${canonicalPath}`,
+    name: 'Burgerium Guest Reviews',
+    description: 'Recent guest reviews from Burgerium in Chennai.',
+    isPartOf: { '@id': 'https://www.burgerium.in/#website' },
+    about: { '@id': 'https://www.burgerium.in/#restaurant' },
+    mainEntity: {
+        '@type': 'ItemList',
+        numberOfItems: visibleReviews.length,
+        itemListElement: visibleReviews.map((review, index) => ({
+            '@type': 'Review',
+            position: startIndex + index + 1,
+            author: {
+                '@type': 'Person',
+                name: review.name,
+            },
+            reviewBody: review.quote,
+            datePublished: review.createdAt,
+            reviewRating: {
+                '@type': 'Rating',
+                ratingValue: review.score,
+                bestRating: 5,
+                worstRating: 1,
+            },
+            itemReviewed: {
+                '@type': 'Restaurant',
+                name: 'Burgerium',
+            },
+        })),
+    },
+};
+
+function getVisiblePageNumbers(page: number, count: number) {
+    if (count <= 7) {
+        return Array.from({ length: count }, (_, index) => index + 1);
+    }
+
+    const selectedPages = new Set([1, count, page - 1, page, page + 1]);
+    const sortedPages = Array.from(selectedPages)
+        .filter((value) => value >= 1 && value <= count)
+        .sort((left, right) => left - right);
+
+    const items: Array<number | null> = [];
+
+    sortedPages.forEach((value, index) => {
+        if (index > 0 && value - sortedPages[index - 1] > 1) {
+            items.push(null);
+        }
+
+        items.push(value);
+    });
+
+    return items;
+}
+---
+
+<Layout
+    title="Guest Reviews | Burgerium Chennai"
+    description="Read recent guest reviews from Burgerium. Names are shortened for privacy and phone numbers are never shown."
+    canonical={canonicalPath}
+    structuredData={reviewStructuredData}
+>
+    <Navigation />
+    <section class="guest-feedback-hero">
+        <div class="container">
+            <div class="hero-copy">
+                <p class="badge">Guest reviews</p>
+                <h1 class="section-title">Read what <span class="text-orange">guests are saying</span></h1>
+                <p class="hero-intro">
+                    Recent guest reviews from the Burgerium table.
+                </p>
+                <div class="hero-actions">
+                    <a href="/feedback" class="btn-primary">
+                        Leave feedback
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="guest-feedback-listing">
+        <div class="container">
+            {visibleReviews.length > 0 ? (
+                <>
+                    <div class="listing-head">
+                        <h2 class="listing-title">Latest guest reviews</h2>
+                        {totalPages > 1 && (
+                            <p class="listing-copy">Page {currentPage} of {totalPages}</p>
+                        )}
+                    </div>
+
+                    <div class="archive-grid">
+                        {visibleReviews.map((review: PublicFeedbackTestimonial) => (
+                            <article class="archive-card">
+                                <div class="archive-top">
+                                    <div class="reviewer-lockup">
+                                        <div class="avatar">{review.initial}</div>
+                                        <div>
+                                            <strong>{review.name}</strong>
+                                            <p>{review.tag}</p>
+                                        </div>
+                                    </div>
+                                    <div class="score-lockup">
+                                        <span class="score-pill">{review.score}/5</span>
+                                        <span class="stars" aria-label={`${review.score} out of 5 stars`}>
+                                            {getStarString(review.score)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <p class="archive-quote">"{review.quote}"</p>
+
+                                <div class="archive-foot">
+                                    <span>Guest review</span>
+                                    <time datetime={review.createdAt}>{formatReviewDate(review.createdAt)} IST</time>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+
+                    {totalPages > 1 && (
+                        <nav class="pagination" aria-label="Guest feedback pages">
+                            <a
+                                href={hasPreviousPage ? buildPageHref(currentPage - 1) : undefined}
+                                class:list={{ 'page-button': true, disabled: !hasPreviousPage }}
+                                aria-disabled={!hasPreviousPage}
+                            >
+                                <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                                Newer
+                            </a>
+
+                            <div class="page-number-row">
+                                {visiblePageNumbers.map((value) =>
+                                    value === null ? (
+                                        <span class="page-ellipsis" aria-hidden="true">…</span>
+                                    ) : (
+                                        <a
+                                            href={buildPageHref(value)}
+                                            class:list={{ 'page-number': true, active: value === currentPage }}
+                                            aria-current={value === currentPage ? 'page' : undefined}
+                                        >
+                                            {value}
+                                        </a>
+                                    )
+                                )}
+                            </div>
+
+                            <a
+                                href={hasNextPage ? buildPageHref(currentPage + 1) : undefined}
+                                class:list={{ 'page-button': true, disabled: !hasNextPage }}
+                                aria-disabled={!hasNextPage}
+                            >
+                                Older
+                                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                            </a>
+                        </nav>
+                    )}
+                </>
+            ) : (
+                <div class="archive-empty">
+                    <strong>Guest reviews will appear here soon.</strong>
+                    <p>
+                        Check back soon for more guest reviews.
+                    </p>
+                    <a href="/feedback" class="btn-primary">
+                        Leave feedback
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+            )}
+        </div>
+    </section>
+    <Footer />
+</Layout>
+
+<style>
+    .guest-feedback-hero {
+        padding: calc(var(--header-height) + 4.25rem) 0 3.5rem;
+        background:
+            radial-gradient(circle at top left, rgba(250, 162, 39, 0.16), transparent 28%),
+            linear-gradient(180deg, #fff6df 0%, #f5ead1 100%);
+    }
+
+    .hero-copy {
+        max-width: 64rem;
+        padding: 2rem;
+        border-radius: 28px;
+        border: 1px solid rgba(79, 50, 12, 0.1);
+        box-shadow: 0 20px 34px rgba(89, 56, 11, 0.08);
+        background: linear-gradient(180deg, rgba(255, 251, 243, 0.96), rgba(255, 243, 216, 0.96));
+        margin: 0 auto;
+    }
+
+    .hero-intro {
+        max-width: 52rem;
+        margin: 0;
+        color: rgba(43, 29, 13, 0.82);
+        font-size: 1.02rem;
+        line-height: 1.8;
+    }
+
+    .hero-actions {
+        margin-top: 1.75rem;
+    }
+
+    .guest-feedback-listing {
+        padding: 0 0 5.5rem;
+        background: linear-gradient(180deg, #f5ead1 0%, #efe0c4 100%);
+    }
+
+    .listing-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .listing-title {
+        margin: 0;
+        color: var(--text-white);
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+    }
+
+    .listing-copy {
+        margin: 0;
+        color: rgba(43, 29, 13, 0.72);
+        font-weight: 700;
+    }
+
+    .archive-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
+
+    .archive-card {
+        padding: 1.5rem;
+        border-radius: 24px;
+        background: rgba(255, 251, 243, 0.95);
+        border: 1px solid rgba(79, 50, 12, 0.08);
+        box-shadow: 0 18px 32px rgba(89, 56, 11, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .archive-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .reviewer-lockup {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+    }
+
+    .reviewer-lockup strong {
+        display: block;
+        color: var(--text-white);
+    }
+
+    .reviewer-lockup p {
+        margin: 0.24rem 0 0;
+        color: rgba(43, 29, 13, 0.58);
+        font-size: 0.88rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 700;
+    }
+
+    .avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        color: #1f1509;
+        background: var(--brand-orange);
+        flex-shrink: 0;
+    }
+
+    .score-lockup {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.35rem;
+    }
+
+    .score-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 32px;
+        padding: 0.2rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(250, 162, 39, 0.16);
+        color: var(--brand-orange-deep);
+        font-weight: 800;
+        font-size: 0.82rem;
+    }
+
+    .stars {
+        color: var(--brand-orange);
+        letter-spacing: 0.08em;
+        font-size: 0.95rem;
+    }
+
+    .archive-quote {
+        margin: 0;
+        color: rgba(43, 29, 13, 0.88);
+        line-height: 1.85;
+        font-size: 1rem;
+        flex: 1;
+    }
+
+    .archive-foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        color: rgba(43, 29, 13, 0.58);
+        font-size: 0.88rem;
+        font-weight: 700;
+        border-top: 1px solid rgba(79, 50, 12, 0.08);
+        padding-top: 1rem;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding: 1rem 0 0;
+    }
+
+    .page-button,
+    .page-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 48px;
+        padding: 0.65rem 1rem;
+        border-radius: 16px;
+        border: 1px solid rgba(79, 50, 12, 0.12);
+        background: rgba(255, 251, 243, 0.9);
+        color: var(--text-white);
+        font-weight: 800;
+        transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .page-button:hover,
+    .page-number:hover {
+        transform: translateY(-1px);
+        border-color: rgba(250, 162, 39, 0.42);
+        background: rgba(255, 247, 232, 0.98);
+    }
+
+    .page-button.disabled {
+        pointer-events: none;
+        opacity: 0.48;
+    }
+
+    .page-number-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .page-number {
+        min-width: 48px;
+        padding-inline: 0.8rem;
+    }
+
+    .page-number.active {
+        background: var(--brand-orange);
+        color: #000;
+        border-color: rgba(79, 50, 12, 0.14);
+        box-shadow: 0 12px 24px rgba(157, 93, 0, 0.14);
+    }
+
+    .page-ellipsis {
+        color: rgba(43, 29, 13, 0.6);
+        font-weight: 800;
+        letter-spacing: 0.18em;
+    }
+
+    .archive-empty {
+        padding: 2rem;
+        border-radius: 28px;
+        background: rgba(255, 251, 243, 0.95);
+        border: 1px solid rgba(79, 50, 12, 0.08);
+        box-shadow: 0 18px 32px rgba(89, 56, 11, 0.08);
+        text-align: center;
+    }
+
+    .archive-empty strong {
+        display: block;
+        color: var(--text-white);
+        font-size: 1.2rem;
+    }
+
+    .archive-empty p {
+        max-width: 38rem;
+        margin: 0.85rem auto 1.5rem;
+        color: rgba(43, 29, 13, 0.76);
+        line-height: 1.8;
+    }
+
+    @media (max-width: 1024px) {
+        .archive-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .guest-feedback-hero {
+            padding-top: calc(var(--header-height) + 3rem);
+        }
+
+        .hero-copy,
+        .hero-note,
+        .archive-card,
+        .archive-empty {
+            padding: 1.35rem;
+        }
+
+        .hero-metrics {
+            grid-template-columns: 1fr;
+        }
+
+        .listing-head,
+        .archive-top,
+        .archive-foot,
+        .pagination {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .score-lockup {
+            align-items: flex-start;
+        }
+
+        .page-button,
+        .page-number {
+            justify-content: center;
+        }
+
+        .page-number-row {
+            order: -1;
+        }
+    }
+</style>

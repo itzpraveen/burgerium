@@ -24,6 +24,11 @@ import Layout from '../../layouts/Layout.astro';
                         experience.
                     </p>
 
+                    <div class="thanks-pill-row" aria-label="What happens next">
+                        <span class="thanks-pill">Sent to the Burgerium team</span>
+                        <span class="thanks-pill">Used to improve future visits</span>
+                    </div>
+
                     <div class="thanks-actions">
                         <a href="/feedback" class="btn-primary">Submit another response</a>
                         <a href="/menu" class="btn-secondary">View menu</a>
@@ -39,6 +44,7 @@ import Layout from '../../layouts/Layout.astro';
 <style>
     .thanks-page {
         padding-top: calc(var(--header-height) + 1.5rem);
+        padding-bottom: calc(2rem + env(safe-area-inset-bottom));
     }
 
     .thanks-section {
@@ -84,6 +90,27 @@ import Layout from '../../layouts/Layout.astro';
         line-height: 1.7;
     }
 
+    .thanks-pill-row {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.7rem;
+        margin-top: 1.35rem;
+    }
+
+    .thanks-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.75rem;
+        padding: 0.65rem 0.95rem;
+        border-radius: 999px;
+        border: 1px solid rgba(75, 47, 10, 0.12);
+        background: rgba(255, 255, 255, 0.76);
+        color: var(--brand-ink-soft);
+        font-size: 0.92rem;
+        font-weight: 700;
+    }
+
     .thanks-actions {
         display: flex;
         justify-content: center;
@@ -106,3 +133,33 @@ import Layout from '../../layouts/Layout.astro';
         }
     }
 </style>
+
+<script>
+    // @ts-nocheck
+    const run = async () => {
+        const storageKey = 'burgerium-feedback-draft';
+        const submittingKey = 'burgerium-feedback-submitting';
+        const shouldCelebrate = (() => {
+            try {
+                return window.sessionStorage.getItem(submittingKey) === '1';
+            } catch {
+                return false;
+            }
+        })();
+
+        try {
+            window.sessionStorage.removeItem(storageKey);
+            window.sessionStorage.removeItem(submittingKey);
+        } catch {}
+
+        if (shouldCelebrate) {
+            try {
+                if ('vibrate' in navigator) {
+                    navigator.vibrate([22, 42, 18]);
+                }
+            } catch {}
+        }
+    };
+
+    void run();
+</script>

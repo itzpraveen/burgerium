@@ -8,19 +8,17 @@ const currentYear = new Date().getFullYear();
 const quickLinks = [
     { href: isHomePage ? '#about' : '/#about', label: 'Our Roots' },
     { href: isHomePage ? '#menu' : '/menu', label: 'Menu Highlights' },
+    { href: '/guest-feedback', label: 'Guest Feedback' },
     { href: isHomePage ? '#locations' : '/#locations', label: 'Locations' },
 ];
 
-const socialLinks = [
-    { href: instagramUrl, icon: 'fa-instagram', label: 'Follow us on Instagram' },
-];
 ---
 
 <footer role="contentinfo">
     <!-- Top Bar Call to Action -->
     <div class="footer-cta">
         <div class="container cta-content">
-            <h3>Planning your first Burgerium visit?</h3>
+            <h3>Planning a Burgerium visit?</h3>
             <a href={isHomePage ? '#locations' : '/#locations'} class="btn-primary">
                 See Chennai House
                 <i class="fas fa-arrow-right" aria-hidden="true"></i>
@@ -37,37 +35,24 @@ const socialLinks = [
                     <img src={`${base}/logo.png`} alt="Burgerium" class="f-logo" loading="lazy" />
                     <p class="legal-line">A Unit of Urban Eats and Kitchen LLP</p>
                     <p class="brand-note">
-                        Bakery roots, burger-house energy, and a menu that is built to be used before you even walk in.
+                        Bakery roots, bold burgers, and a Chennai house worth the trip.
                     </p>
                     <a
                         href={instagramUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="instagram-card"
+                        class="instagram-link"
                         aria-label={`Open Burgerium Instagram ${instagramHandle}`}
                     >
-                        <span class="instagram-icon" aria-hidden="true">
+                        <span class="instagram-link-icon" aria-hidden="true">
                             <i class="fab fa-instagram"></i>
                         </span>
-                        <span class="instagram-copy">
+                        <span class="instagram-link-copy">
                             <strong>Instagram</strong>
                             <small>{instagramHandle}</small>
                         </span>
-                        <i class="fas fa-arrow-up-right-from-square instagram-external" aria-hidden="true"></i>
+                        <i class="fas fa-arrow-up-right-from-square instagram-link-external" aria-hidden="true"></i>
                     </a>
-                    <div class="socials" role="list" aria-label="Social media links">
-                        {socialLinks.map((social) => (
-                            <a
-                                href={social.href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label={social.label}
-                                role="listitem"
-                            >
-                                <i class={`fab ${social.icon}`} aria-hidden="true"></i>
-                            </a>
-                        ))}
-                    </div>
                 </div>
 
                 <!-- Locations -->
@@ -96,7 +81,6 @@ const socialLinks = [
 
             <div class="sub-footer">
                 <p>&copy; {currentYear} Burgerium. <strong>A Unit of Urban Eats and Kitchen LLP</strong>.</p>
-                <p class="sub-footer-note">Opening updates land on Instagram first. The full menu and prices are already online.</p>
             </div>
         </div>
     </div>
@@ -129,11 +113,10 @@ const socialLinks = [
 
     /* Main Footer */
     .main-footer {
-        background:
-            radial-gradient(circle at top right, rgba(250, 162, 39, 0.12), transparent 22%),
-            linear-gradient(180deg, #2b1d0d 0%, #160f08 100%);
-        color: #fff5e5;
+        background: linear-gradient(180deg, #faa227 0%, #ef9618 100%);
+        color: var(--brand-ink);
         padding-top: 4rem;
+        border-top: 1px solid rgba(38, 24, 11, 0.14);
     }
 
     .footer-grid {
@@ -141,12 +124,12 @@ const socialLinks = [
         grid-template-columns: 1.5fr 1fr 1fr;
         gap: 3rem;
         padding-bottom: 3rem;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(38, 24, 11, 0.14);
     }
 
     .f-logo {
         width: 180px;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.25rem;
     }
 
     .brand-col p {
@@ -160,56 +143,49 @@ const socialLinks = [
         text-transform: uppercase;
         font-size: 0.75rem;
         letter-spacing: 0.5px;
-        color: rgba(255, 245, 229, 0.72);
+        color: rgba(38, 24, 11, 0.66);
         margin-bottom: 1.5rem;
     }
 
     .brand-note {
         max-width: 24rem;
-        color: rgba(255, 245, 229, 0.82);
+        color: rgba(38, 24, 11, 0.78);
         margin-bottom: 1.5rem;
     }
 
-    .instagram-card {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
+    .instagram-link {
+        display: inline-flex;
         align-items: center;
         gap: 0.9rem;
-        max-width: 320px;
-        padding: 0.9rem 1rem;
-        margin-bottom: 1rem;
-        border: 1px solid rgba(255,255,255,0.14);
-        background: rgba(255,248,233,0.08);
-        color: #fff5e5;
-        border-radius: 22px;
-        transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+        margin-top: 0.25rem;
+        color: var(--brand-ink);
+        transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
-    .instagram-card:hover {
-        transform: translateY(-2px);
-        background: rgba(255,248,233,0.14);
-        border-color: rgba(250,162,39,0.34);
+    .instagram-link:hover {
+        opacity: 0.84;
+        transform: translateY(-1px);
     }
 
-    .instagram-icon {
-        width: 44px;
-        height: 44px;
+    .instagram-link-icon {
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        background: var(--brand-orange);
-        color: #000;
+        background: rgba(38, 24, 11, 0.92);
+        color: #fff5e5;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         font-size: 1.15rem;
     }
 
-    .instagram-copy {
+    .instagram-link-copy {
         display: flex;
         flex-direction: column;
         min-width: 0;
     }
 
-    .instagram-copy strong {
+    .instagram-link-copy strong {
         font-family: var(--font-heading);
         font-size: 1.05rem;
         letter-spacing: 0.05em;
@@ -217,46 +193,17 @@ const socialLinks = [
         line-height: 1;
     }
 
-    .instagram-copy small {
+    .instagram-link-copy small {
         margin-top: 0.3rem;
         font-size: 0.82rem;
         font-weight: 700;
         letter-spacing: 0.05em;
-        color: rgba(255, 245, 229, 0.7);
+        color: rgba(38, 24, 11, 0.62);
     }
 
-    .instagram-external {
+    .instagram-link-external {
         font-size: 0.9rem;
-        opacity: 0.72;
-    }
-
-    .socials {
-        display: flex;
-        gap: 0.75rem;
-    }
-
-    .socials a {
-        width: 40px;
-        height: 40px;
-        background: rgba(255, 248, 233, 0.08);
-        color: #fff2d5;
-        border: 1px solid rgba(255,255,255,0.12);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: transform 0.3s ease, background 0.3s ease;
-        font-size: 1rem;
-    }
-
-    .socials a:hover {
-        transform: translateY(-3px);
-        background: rgba(250, 162, 39, 0.18);
-        color: var(--brand-orange);
-    }
-
-    .socials a:focus-visible {
-        box-shadow: 0 0 0 3px rgba(250, 162, 39, 0.3);
+        opacity: 0.62;
     }
 
     .f-col h5 {
@@ -265,7 +212,7 @@ const socialLinks = [
         margin-bottom: 1.5rem;
         font-size: 1rem;
         letter-spacing: 1px;
-        color: var(--brand-orange);
+        color: rgba(38, 24, 11, 0.9);
     }
 
     .f-list {
@@ -281,11 +228,12 @@ const socialLinks = [
         transition: opacity 0.3s ease;
         display: inline-block;
         padding: 0.25rem 0;
+        color: rgba(38, 24, 11, 0.82);
     }
 
     .f-list li a:hover {
         opacity: 1;
-        color: var(--brand-orange);
+        color: var(--brand-ink);
     }
 
     .f-list li a:focus-visible {
@@ -301,7 +249,7 @@ const socialLinks = [
 
     .f-list li small {
         font-size: 0.8rem;
-        color: rgba(255, 245, 229, 0.68);
+        color: rgba(38, 24, 11, 0.62);
         display: block;
         margin-top: 0.25rem;
     }
@@ -317,7 +265,7 @@ const socialLinks = [
         left: 0;
         width: 100%;
         height: 2px;
-        background: var(--brand-orange);
+        background: rgba(38, 24, 11, 0.7);
     }
 
     .sub-footer {
@@ -325,19 +273,11 @@ const socialLinks = [
         text-align: center;
         font-size: 0.8rem;
         font-weight: 500;
-        color: rgba(255, 245, 229, 0.74);
+        color: rgba(38, 24, 11, 0.72);
     }
 
     .sub-footer strong {
         font-weight: 700;
-    }
-
-    .sub-footer-note {
-        margin-top: 0.5rem;
-        color: rgba(255, 245, 229, 0.58);
-        font-size: 0.74rem;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
     }
 
     @media (max-width: 768px) {
@@ -368,11 +308,7 @@ const socialLinks = [
             align-items: center;
         }
 
-        .instagram-card {
-            width: 100%;
-        }
-
-        .socials {
+        .instagram-link {
             justify-content: center;
         }
 
